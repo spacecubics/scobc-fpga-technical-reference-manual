@@ -1,0 +1,8 @@
+#+TITLE: Space Cubics OBC (SC-OBC-A1) Technical Reference Manual
+#+PROPERTY: header-args:emacs-lisp :results silent
+
+このレポジトリは、Space Cubics OBCに搭載する FPGAの仕様を説明する「SC OBC FPGA Technical Reference Manual」に関するものです。
+
+SC OBC FPGAの開発や、ソフトウェアの開発に必要な、FPGA機能に関する仕様やレジスタの仕様が記載されています。
+
+[[file:./technical_reference_manual.org][Space Cubics OBC FPGA Technical Reference Manual (日本語版)]]
