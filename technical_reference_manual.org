@@ -1,0 +1,1192 @@
+#+TITLE: Space Cubics OBC FPGA Technical Reference Manual
+#+SUBTITLE: 対象型番: SC-OBC-A1
+#+AUTHOR: Space Cubics
+#+DATE: March 8, 2022
+#+EMAIL:
+#+OPTIONS: ^:{}
+#+OPTIONS: H:6
+
+* Overview
+Space Cubics OBC FPGA(SC OBC FPGA)は Space Cubics OBCモジュール(SC-OBC-A1)のFPGAに搭載されるシステムです。
+
+Space Cubics OBCは 3U以上の CubeSatをターゲットとする On Board Computer(以下、OBC)です。
+メインプロセッサ用デバイスとして Xilinx製 Artix-7 FPGAを採用し、FPGAにインプリする ARM Cortex-M3を核としシステムを構成します。
+FPGAを採用する事で、インターフェースの種類や数を 柔軟にカスタマイズする事が可能です。
+
+SC OBC FPGAには、ユーザーのIPコアを実装するためのモジュールが準備されており、AXIバス規格に適合した IPコアを設計する事で、簡単にシステムに組み込む事ができます。
+
+#+CAPTION: SC OBC FPGA Block Diagram
+[[file:./images/FPGABlockDiagram.png]]
+
+SC OBC FPGAのシステムは大きく 6つの機能に分割されます。
+
+*System Controller*
+
+System Controllerは、FPGAのクロック, リセットを生成するためのモジュールです。
+このモジュールで生成されるクロック, リセットは、FPGA全体に供給されます。
+
+*CPU Subsystem*
+
+Space Cubics OBCの FPGA機能を司る CPUを構成するモジュールです。
+CPUには ARM製の Cortex-M3を採用しています。
+ARM Cortex-M3 Design Start FPGA-Xilinx editionをベースとし、ITCM(Instruction Tightly Coupled Memory)や、バスIPなどで構成されます。
+
+*HRMEM (High-reliability Memory)*
+
+HRMEMは、CPUが使用するメインメモリです。
+CPUとの接続は AMBA AHBで構成される CPU Local Busで行われます。
+
+CPU Local Busは ARM Cortex-M3の Instruction code AHB, Data code AHBをまとめたバスで構成されています。
+CPU Local Busでメモリと直接接続する構成とする事で、Instructionアクセスのレイテンシーを最小限に抑えるように設計されています。
+
+*Main AXI Bus System*
+
+Main AXI Bus Systemは、CubeSat向けの OBCシステムとして必須となる機能の中で、アクセススピードが比較的重視されるIPコアをまとめたシステムです。
+
+このバスには、コンピュータシステムとして必要なメモリコントロールIPや CubeSatのメインの通信バスとなる CANのコントローラIPなどが接続されています。
+
+*Low Performance IP Bus System*
+
+Low Performance IP Bus Systemは、CubeSat向け OBCシステムとして必須となる機能の中、アクセス頻度の低いIPコアをまとめたシステムです。
+
+このシステムは AHBを採用する事で、IPコアの回路規模を小さくする事ができます。
+このバスには、システムレジスタやI2Cコントローラなどが接続されます。
+
+*Mission Bus System*
+
+Mission Bus SystemはユーザーがCubeSatのミッションを行うためのIPコアを接続するシステムです。
+このシステムはバスに AXIを採用しています。
+ユーザーが設計するIPコアは全てこのバスに接続します。
+
+** Outline
+
+| Feature                         | Description                                                                                 |
+|---------------------------------+---------------------------------------------------------------------------------------------|
+| FPGA Device                     | Xilinx Artix-7 (XC7A200T-1FBG676I)                                                          |
+|                                 | - Logic Cell 215,360                                                                        |
+|                                 | - CLB スライス数(4 LUT, 8 F/F) 33,650                                                       |
+|                                 | - CLB 最大分散RAM 2,888 Kb                                                                  |
+|                                 | - DSP48E1スライス 740                                                                       |
+|                                 | - BlockRAM 36 Kb x 365 (18 Kb x 730)                                                        |
+|                                 | - CMT 10                                                                                    |
+|                                 | - XADC 1 (for FPGA die temperature measurement)                                             |
+|                                 | - I/O Bank 10                                                                               |
+| CPU Core                        | ARM Cortex-M3 Design Start FPGA Xilinx Edition r0p1                                         |
+|                                 | - CPU Revision r2p1                                                                         |
+|                                 | - ARMv7-M architecture profile                                                              |
+|                                 | - Maximum operation frequency up to 96 MHz (T.B.D.)                                         |
+| On Chip SRAM (ITCM for Boot)    | 128 KByte (Revision A)                                                                      |
+| HRMEM [High-reliability Memory] | 4 MByte (Revision Aでは実装されていません)                                                  |
+|                                 | - ECC Memory Protection                                                                     |
+|                                 | - Memory Scrubbing                                                                          |
+| Internal System Bus             | CPU Local Bus: AMBA AHB3 32 bitMain Bus: AMBA AXI4 32bit                                    |
+|                                 | Mission Bus (for User): AMBA AXI4 32 bit                                                    |
+|                                 | Low Performance IP Bus: AMBA AHB3 32 bit                                                    |
+| DMA                             | Not Support                                                                                 |
+| Interrupt Support               | 16 User interrupt signal                                                                    |
+| Watchdog Timer                  | Revision Aでは実装されていません                                                            |
+| FPGA Configuration Memory       | 32 MByte/Redundancy (S25FL256L)                                                             |
+| Data Memory                     | 32 MByte/Redundancy (S25FL256L)                                                             |
+| FeRAM                           | 512 kByte x 2 (CY15B104QSN)                                                                 |
+| Control Area Network (CAN)      | Conforms to the ISO 11898-1, CAN2.0A, and CAN2.0B standards Supports bit rates up to 1 Mb/s |
+| Space Communication Bus (SCBus) | Revision Aでは実装されていません                                                            |
+|                                 | Compliant with the USB-based communication interface proposed by Space Cubics (T.B.D.)      |
+|                                 | - Supports bit rates 12 Mbps (USB Full-Speed)                                               |
+| I2C Interface                   | SC OBC On Board I2C x 1 channel                                                             |
+|                                 | External I2C x 1 channel                                                                    |
+| FPGA User IO                    | User IO Group 1 x 16 pin (IO電圧可変)                                                       |
+|                                 | User IO Group 2 x 16 pin (IO電圧可変)                                                       |
+|                                 | User IO Group 4 x 6 pin, Cortex-M3 JTAG兼用 (3.3V固定)                                      |
+| Debug Port                      | ARM SWJ-DP Interface                                                                        |
+
+* Memory Map
+以下に、SC OBC FPGAのメモリマップを示します。
+
+#+CAPTION: SC OBC FPGA Memory Map
+[[file:./images/memory_map.png]]
+
+#+CAPTION: SC OBC FPGA メモリマップ
+| Field                                    | Address Space             | Comment           |
+|------------------------------------------+---------------------------+-------------------|
+| Instruction Tightly Coupled Memory (CM3) | 0x0000_0000 - 0x0000_1FFF | CFGITCMEN[0] is 1 |
+| Reserved (HRMEM)                         | 0x0000_0000 - 0x003F_FFFF | CFGITCMEM[0] is 0 |
+| Main AXI Bus                             | 0x4000_0000 - 0x4FFF_FFFF | 　                |
+| - QSPI Controller (Configuration Memory) | 0x4000_0000 - 0x4000_FFFF | 　                |
+| - QSPI Controller (Data Memory)          | 0x4010_0000 - 0x4010_FFFF | 　                |
+| - QSPI Controller(FeRAM)                 | 0x4020_0000 - 0x4020_FFFF | 　                |
+| - CAN Controller                         | 0x4040_0000 - 0x4040_FFFF | 　                |
+| Low Performance IP Bus                   | 0x4F00_0000 - 0x4FFF_FFFF | 　                |
+| - System Register                        | 0x4F00_0000 - 0x4F00_FFFF | 　                |
+| - UART Lite (Console Interface)          | 0x4F01_0000 - 0x4F01_FFFF | 　                |
+| - Internal I2C Master                    | 0x4F02_0000 - 0x4F02_FFFF | 　                |
+| - External I2C Master                    | 0x4F03_0000 - 0x4F03_FFFF | 　                |
+| Mission(UDL) Bus                         | 0x5000_0000 - 0x5FFF_FFFF | 　                |
+| Internal Private peripheral bus (CM3)    | 0xE000_0000 - 0xE003_FFFF | 　                |
+| - ITM                                    | 0xE000_0000 - 0xE000_0FFF | 　                |
+| - DWT                                    | 0xE000_1000 - 0xE000_1FFF | 　                |
+| - FPB                                    | 0xE000_2000 - 0xE000_2FFF | 　                |
+| - SCS                                    | 0xE000_E000 - 0xE000_EFFF | 　                |
+| External Private peripheral bus (CM3)    | 0xE004_0000 - 0xE00F_FFFF | 　                |
+| - TPIU                                   | 0xE004_0000 - 0xE004_0FFF | 　                |
+| - ETM                                    | 0xE004_1000 - 0xE004_1FFF | 　                |
+| - External PPB                           | 0xE004_2000 - 0xE00F_EFFF | 　                |
+| - ROM Table                              | 0xE00F_F000 - 0xE00F_FFFF | 　                |
+
+* Interrupt
+SC OBC FPGAは、Cortex-M3に組み込まれる割り込みコントローラの外部割り込みを使用し、IPコアの割り込みをCPUに伝えます。
+Cortex-M3の 割り込みコントローラの仕様については、ARM Cortex-M3 Technical Reference Manualを参照してください。
+
+以下に、SC OBC FPGAの IPコアが出力する割り込みの割り当てを示します。
+
+#+CAPTION: SC OBC FPGA割り込みリスト
+| Exception No. | IRQ Bit | Interrupt                              | Type  |
+|---------------+---------+----------------------------------------+-------|
+|            16 | [0]     | AHB UART Lite(Console)                 | Pulse |
+|            17 | [1]     | Reserved                               | Level |
+|            18 | [2]     | QSPI Controller (Configuration Memory) | Level |
+|            19 | [3]     | QSPI Controller (Flash Data Memory)    | Level |
+|            20 | [4]     | QSPI Controller (FeRAM)                | Level |
+|            21 | [5]     | CAN Controller                         | Level |
+|            22 | [6]     | Internal I2C Master                    | Level |
+|            23 | [7]     | External I2C Master                    | Level |
+|       24 - 31 | [15:8]  | Reserved (OBC System Interrupt Area)   | -     |
+|       32 - 47 | [31:16] | Reserved (UDL IP Interrupt Area)       | -     |
+
+* System Register
+System Registerは、SC OBC FPGAのシステム制御を司るレジスタで構成されるモジュールです。
+
+** レジスタ詳細
+System Registerは、Base Address 0x4F00_0000に配置されています。
+
+#+CAPTION: System Registerメモリマップ
+|    Address | Symbol           | Register                            |    Initial |
+|------------+------------------+-------------------------------------+------------|
+| 0x4F000000 | SYSREG_CODEMSEL  | Code Memory Select Register         | 0x00000001 |
+| 0x4F000004 | SYSREG_SYSCLKCTL | System Clock Control Register       | 0x00000001 |
+| 0x4F0000F0 | SYSREG_SPAD1     | Scratchpad 1 Register               | 0x00000000 |
+| 0x4F0000F4 | SYSREG_SPAD2     | Scratchpad 2 Register               | 0x00000000 |
+| 0x4F0000F8 | SYSREG_SPAD3     | Scratchpad 3 Register               | 0x00000000 |
+| 0x4F0000FC | SYSREG_SPAD4     | Scratchpad 4 Register               | 0x00000000 |
+| 0x4F00F000 | SYSREG_VER       | System Register IP Version Register |          - |
+
+*** Code Memory Select Register (Offset 0x0000)
+Code Memory Select Registerは CPUの Instruction codeが格納されているメモリを選択するためのレジスタです。
+本レジスタの制御により、メモリ空間の アドレス 0x00000000にマッピングされるメモリを選択します。
+
+電源投入時、ITCMENビットは "1"となっており、メモリ空間のアドレス 0x00000000には ITCMがマッピングされています。
+CPUによって、ITCMENビットが "0"に書き換えられると、メモリ空間のアドレス 0x00000000に HRMEMがマッピングされます。
+
+ITCMENビットの設定値が変更された時、システム全体にリセットが発行されます。
+ITCMENビットの変更は、ITCMに書き込まれた Boot用のソフトウェアから HRMEMに書き込まれたメインのソフトウェアに遷移する時に 1度だけ制御する事を想定しています。
+
+#+CAPTION: Code Memory Select Regsiter ビットフィールド
+|   bit | Symbol    | Field           | Description                                                                                                                                                                                                          | R/W |
+|-------+-----------+-----------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:16 | ITCMENPKC | Protect Keycode | ITCMENビットの書き込みプロテクトフィールドです。ITCMENビットに書き込みを行う場合は、このフィールドに0x5A5Aを書き込んでください。このフィールドに0x5A5A以外が設定された場合、ITCMENビットへの書き込みは無視されます。 | WO  |
+|  15:1 | -         | Reserved        | Reserved                                                                                                                                                                                                             | -   |
+|     0 | ITCMEN    | ITCM Enable     | メモリ空間のアドレス 0x00000000にマッピングされるメモリを選択します。0: HRMEM 1: ITCMEN                                                                                                                              | R/W |
+
+*** System Clock Control Register (Offset 0x0004)
+System Clock Control Registerは、システム内部で使われるクロックの周波数を設定するためのレジスタです。
+
+このレジスタの制御により、SC OBC FPGA内部の PLLを停止させ、低消費電力動作させることが可能です。
+
+#+CAPTION: System Clock Control Register ビットフィールド
+|  bit | Symbol  | Field           | Description                                                                                                                                | R/W |
+|------+---------+-----------------+--------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:2 | -       | Reserved        | Reserved                                                                                                                                   | -   |
+|  1:0 | CLKMODE | CLKMODE Control | システムのクロックモードを制御します。設定値とクロック周波数の関係は "CLKMODE設定と PLL状態 及び クロック周波数の関係"を参照してください。 | R/W |
+
+CLKMODE信号の設定値と、PLLの状態 及び システムクロック周波数の関係は以下となります。
+
+#+CAPTION: CLKMODE設定と PLL状態 及び クロック周波数の関係
+| CLKMODE[1:0]    | PLL Status       | REF_CLK                  | SYS_CLK                  | MAXI_CLK                 | USER_CLK1 / USER_CLK2                             |
+|-----------------+------------------+--------------------------+--------------------------+--------------------------+---------------------------------------------------|
+| 0b00            | PowerDown        | 24 MHz (Reference Clock) | 24 MHz (Reference Clock) | 24 MHz (Reference Clock) | RTLパラメータにより設定 (Stop or Reference Clock) |
+| 0b01            | Normal Operation | 24 MHz (Reference Clock) | 48 MHz (PLL Output)      | 48 MHz (PLL Output)      | RTLパラメータにより設定 (PLL Output)              |
+| 0b10            | Normal Operation | 24 MHz (Reference Clock) | 96 MHz (PLL Output)      | 96 MHz (PLL Output)      | RTLパラメータにより設定 (PLL Output)              |
+| 0b11 (設定禁止) | -                | -                        | -                        | -                        | -                                                 |
+
+*** Scratchpad 1-4 Register (Offset 0x00F0-0x00FC)
+Scratchpad 1-4 Registerは、ソフトウェアがワークスペースとして使用する為のレジスタです。
+このレジスタの書き込みは、SC OBC FPGAの機能に一切影響を与えません。
+
+#+CAPTION: Scratchpad 1 Register ビットフィールド (Offset: 0x00F0)
+|  bit | Symbol | Field        | Description                       | R/W |
+|------+--------+--------------+-----------------------------------+-----|
+| 31:0 | SPAD1  | Scratchpad 1 | 32bitのScratchpadフィールドです。 | R/W |
+
+#+CAPTION: Scratchpad 2 Register ビットフィールド (Offset: 0x00F4)
+|  bit | Symbol | Field        | Description                       | R/W |
+|------+--------+--------------+-----------------------------------+-----|
+| 31:0 | SPAD2  | Scratchpad 2 | 32bitのScratchpadフィールドです。 | R/W |
+
+#+CAPTION: Scratchpad 3 Register ビットフィールド (Offset: 0x00F8)
+|  bit | Symbol | Field        | Description                       | R/W |
+|------+--------+--------------+-----------------------------------+-----|
+| 31:0 | SPAD3  | Scratchpad 3 | 32bitのScratchpadフィールドです。 | R/W |
+
+#+CAPTION: Scratchpad 4 Register ビットフィールド (Offset: 0x00FC)
+|  bit | Symbol | Field        | Description                       | R/W |
+|------+--------+--------------+-----------------------------------+-----|
+| 31:0 | SPAD4  | Scratchpad 4 | 32bitのScratchpadフィールドです。 | R/W |
+
+*** System Register IP Version Register (Offset: 0xF000)
+System Registerの IPコアバージョンの管理レジスタです。
+
+#+CAPTION: System Register IP Version Register ビットフィールド
+|   bit | Symbol | Field                              | Description                              | R/W |
+|-------+--------+------------------------------------+------------------------------------------+-----|
+| 31:24 | MAJVER | System Register Core Major Version | System RegisterコアのMajor Versionです。 | RO  |
+| 23:16 | MINVER | System Register Core Minor Version | System RegisterコアのMinor Versionです。 | RO  |
+|  15:0 | PATVER | System Register Core Patch Version | System RegisterコアのPatch Versionです。 | RO  |
+
+* QSPI Controller
+QSPI Controllerは、SC OBCモジュールに搭載するメモリとSPIプロトコルによる通信を行うためのモジュールです。
+QSPI Controllerは、Single SPIモード, Dual SPIモード, Quad SPIモードに対応しており、メモリとの高速な通信を行う事ができます。
+
+SC OBCモジュールには、FPGA Configurationデータを格納するためのNOR Flashメモリと、運用データを格納するための NOR Flashメモリ 及び FeRAMが搭載されています。
+これらのメモリとの通信を行う場合には、QSPI Controllerを使用します。
+
+SC OBCモジュールに実装される メモリの型番は以下の通りです。
+各メモリの仕様については、ベンダーからリリースされている Datasheetを参照してください。
+
+| Memory                                     | Vendor               | Part Number |
+|--------------------------------------------+----------------------+-------------|
+| Configurationデータ格納用 NOR Flash Memory | infineon (旧Cypress) | S25FL256L   |
+| データ格納用 NOR Flash Memory              | infineon (旧Cypress) | S25FL256L   |
+| データ格納用 FeRAM                         | infineon (旧Cypress) | CY15B104QSN |
+
+** レジスタ詳細
+QSPI Controllerは、各メモリにアクセスするため 3個搭載されています。
+各コアは以下のアドレスに配置されています。
+
+#+CAPTION: QSPI Controller アドレスの割り当て
+| Target                                      | Base Address |
+|---------------------------------------------+--------------|
+| Configuration Memory Access QSPI Controller | 0x4000_0000  |
+| Data Memory Access QSPI Controller          | 0x4010_0000  |
+| FeRAM Access QSPI Controller                | 0x4020_0000  |
+
+QSPI Controllerには以下のレジスタが実装されています。
+
+#+CAPTION: QSPI Controller Register メモリマップ
+| Offset | Symbol      | Register                                  |    Initial |
+|--------+-------------+-------------------------------------------+------------|
+| 0x0000 | QSPI_ACR    | QSPI Access Control Register              | 0x00000000 |
+| 0x0004 | QSPI_TDR    | QSPI TX Data Register                     | 0x00000000 |
+| 0x0008 | QSPI_RDR    | QSPI RX Data Register                     | 0x00000000 |
+| 0x000C | QSPI_ASR    | QSPI Access Status Register               | 0x00000000 |
+| 0x0010 | QSPI_FIFOSR | QSPI FIFO Status Register                 | 0x00000000 |
+| 0x0014 | QSPI_FIFORR | QSPI FIFO Reset Register                  | 0x00000000 |
+| 0x0020 | QSPI_ISR    | QSPI Interrupt Status Register            | 0x00000000 |
+| 0x0024 | QSPI_IER    | QSPI Interrupt Enable Register            | 0x00000000 |
+| 0x0030 | QSPI_CCR    | QSPI Clock Control Register               | 0x00000000 |
+| 0x0034 | QSPI_DCMSR  | QSPI Data Capture Mode Setting Register   | 0x00000000 |
+| 0x0038 | QSPI_FTLSR  | QSPI FIFO Threshold Level Setting Register | 0x00000000 |
+| 0xF000 | QSPI_VER    | QSPI Controller IP Version Register       |          - |
+
+*** QSPI Access Control Register (Offset 0x0000)
+QSPI Access Control Registerは、SPIアクセスにおける SS信号、I/Oモードを制御するためのレジスタです。
+
+#+CAPTION: QSPI Access Control Register ビットフィールド
+|   bit | Symbol    | Field          | Description                                                                                                                                   | R/W |
+|-------+-----------+----------------+-----------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:18 | -         | Reserved       | Reserved                                                                                                                                      | -   |
+| 17:16 | SPIIOMODE | SPI I/O Mode   | SPIアクセスにおけるI/Oモードを設定します。 2b00: Standard(Single)-IO SPIモード 2b01: Dual-IO SPIモード 2b10: Quad-IO SPIモード 2b11: 設定禁止 | R/W |
+|  15:1 | -         | Reserved       | Reserved                                                                                                                                      | -   |
+|     0 | SPISSCTL  | SPI SS Control | デバイスへの SS(Chip Select)信号を制御するためのビットです。 0: SS信号をインアクティブ状態に設定します 1: SS信号をアクティブ状態に設定します  | R/W |
+
+*** QSPI TX Data Register (Offset 0x0004)
+QSPI TX Data Registerは、SPIデバイスにデータを送信するためのレジスタです。
+
+SPIデバイスへのデータ送信は TX FIFOを介し行います。
+
+SPIデバイスにデータを送信する場合、QSPI TX Data Registerの SPITXDATAフィールドに書き込みを行います。
+このレジスタにデータを書き込むと、書き込みデータは TX FIFOに格納されます。
+TX FIFOは送信データを最大16 Byte格納できます。
+TX FIFOに格納されたデータは、書き込まれた順番ですぐに SPIデバイスに送信されます。
+
+SPIデバイスが要求するダミーサイクルは、このレジスタに書き込みを行うことによって、SPIクロックを出力させ生成します。
+
+#+CAPTION: QSPI TX Data Register ビットフィールド
+|  bit | Symbol    | Field       | Description                                                                                                                          | R/W |
+|------+-----------+-------------+--------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:8 | -         | Reserved    | Reserved                                                                                                                             | -   |
+|  7:0 | SPITXDATA | SPI Tx Data | TX FIFOに格納する送信データを書き込みます。このレジスタに書き込んだデータはTX FIFOに格納され、書き込まれた順番ですぐに送信されます。 | WO  |
+
+*** QSPI RX Data Register (Offset 0x0008)
+QSPI RX Data Registerは、SPIデバイスからのデータ受信制御と、RX FIFOからの受信データの読み出しを行うためのレジスタです。
+
+SPIデバイスからのデータ受信は RX FIFOを介して行います。
+
+SPIデバイスからデータを受信する場合、QSPI RX Data Registerの SPIRXDATAフィールドに書き込みアクセスを行います。
+このレジスタに書き込む値は何も影響しません。
+SPIRXDATAビットの書き込みが行われると、SPIデバイスに対し SPIクロックが送信され、SPIデバイスはそのクロックに同期しデータを出力します。
+SPIデバイスの出力データは、RX FIFOに格納されます。
+RX FIFOは 最大 16 Byteのデータを格納する事ができます。
+
+RX FIFOに格納されたデータを読み出す場合、QSPI RX Data Registerの SPIRXDATAフィールドに読み出しアクセスを行います。
+データは SPIデバイスから出力された順に読み出されます。
+
+QSPI Data Capture Mode Setting Registerの DTCAPTビットが"1" にセットされている時、SPIRXDATAフィールドの書き込み時だけではなく、QSPI TX Data Registerの書き込み時も、RX FIFOにデータが格納されます。
+この時 RX FIFOに格納されているデータは SPITXDATAに書き込んだデータ (SPIに出力されているデータ)となります。
+
+#+CAPTION: QSPI RX Data Register ビットフィールド
+|  bit | Symbol    | Field       | Description                                                                                                                                                          | R/W |
+|------+-----------+-------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:8 | -         | Reserved    | Reserved                                                                                                                                                             | -   |
+|  7:0 | SPIRXDATA | SPI Rx Data | このレジスタへの書き込み時は、SPIクロックを送信しデバイスからのデータ受信を行います。このレジスタの読み出し時は、RX FIFOに格納されたデータが古い順に読み出されます。 | R/W |
+
+*** QSPI Access Status Register (Offset 0x000C)
+QSPI Access Status Registerは、QSPI Controllerの実行ステータスを確認するためのレジスタです。
+
+QSPI Controllerは、QSPI TX Data Regsiterへの書き込み、QSPI Rx Data Registerへの書き込み、QSPI Access Control Registerの SPI SS Controlレジスタの書き込み時に Busy状態となり、SPIが未使用状態になると Idle状態に戻ります。
+
+#+CAPTION: QSPI Access Status Register ビットフィールド
+|  bit | Symbol  | Field           | Description                                                           | R/W |
+|------+---------+-----------------+-----------------------------------------------------------------------+-----|
+| 31:1 | -       | Reserved        | Reserved                                                              | -   |
+|    0 | SPIBUSY | SPI Status Busy | QSPI Controllerの実行ステータスを表示します。 0: Idle状態 1: Busy状態 | RO  |
+
+*** QSPI FIFO Status Register (Offset 0x0010)
+QSPI FIFO Status Registerは、TX FIFO/RX FIFOの状態を示すレジスタです。
+
+#+CAPTION: QSPI FIFO Status Register ビットフィールド
+|   bit | Symbol    | Field            | Description                                           | R/W |
+|-------+-----------+------------------+-------------------------------------------------------+-----|
+| 31:21 | -         | Reserved         | Reserved                                              | -   |
+| 20:16 | TXFIFOCAP | TX FIFO Capacity | TX FIFOに格納されているデータ量を示すフィールドです。 | RO  |
+|  15:5 | -         | Reserved         | Reserved                                              | -   |
+|   4:0 | RXFIFOCAP | RX FIFO Capacity | RX FIFOに格納されているデータ量を示すフィールドです。 | RO  |
+
+*** QSPI FIFO Reset Register (Offset 0x0014)
+QSPI FIFO Reset Registerは、TX FIFO/RX FIFOのリセット制御(データ消去)を行うためのレジスタです。
+何らかの理由によりFIFOのクリアを行いたい場合にこのレジスタを使用します。
+
+#+CAPTION: QSPI FIFO Reset Register ビットフィールド
+|   bit | Symbol    | Field         | Description                                                          | R/W |
+|-------+-----------+---------------+----------------------------------------------------------------------+-----|
+| 31:17 | -         | Reserved      | Reserved                                                             | -   |
+|    16 | TXFIFORST | TX FIFO Reset | 本ビットに1をセットすると、TX FIFOがクリアされデータが消去されます。 | WO  |
+|  15:1 | -         | Reserved      | Reserved                                                             | -   |
+|     0 | RXFIFORST | RX FIFO Reset | 本ビットに1をセットすると、RX FIFOがクリアされデータが消去されます。 | WO  |
+
+*** QSPI Interrupt Status Register (Offset: 0x0020)
+QSPI Interrupt Status Registerは、QSPI Controllerの割り込みステータスレジスタです。
+全ての割り込みビットは ”1"をセットするとクリアする事ができます。
+
+#+CAPTION: QSPI Interrupt Status Register ビットフィールド
+|   bit | Symbol    | Field                   | Description                                                                                                                                                                                                            | R/W  |
+|-------+-----------+-------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------|
+| 31:27 | -         | Reserved                | Reserved                                                                                                                                                                                                               | -    |
+|    26 | TXFIFOUTH | TX FIFO Under Threshold | TX FIFOに格納されたデータが設定した閾値を下回った事を示すビットです。TX FIFOに格納されるデータ量が QSPI FIFO Threshold Level Setting Registerの TXFIFOUTHLフィールドよりも少なくなった場合に本ビットがセットされます。 | R/WC |
+|    25 | TXFIFOOVF | TX FIFO Overflow        | TX FIFOの Overflowが発生したことを示すビットです。TX FIFOが Fullの状態で QSPI TX Data Registerに書き込みを行うと本ビットがセットされます。                                                                             | R/WC |
+|    24 | TXFIFOUDF | TX FIFO Underflow       | TX FIFOの Underflowが発生したことを示すビットです。この割り込みは通常の状態で発生する事はありません。この割り込みが発生した場合は、本モジュールをリセットしてください。                                                | R/WC |
+| 23:19 | -         | Reserved                | Reserved                                                                                                                                                                                                               | -    |
+|    18 | RXFIFOOTH | RX FIFO Over Threshold  | RX FIFOに格納されたデータが設定した閾値を上回った事を示すビットです。RX FIFOに格納されるデータ量が QSPI FIFO Threshold Level Setting Registerの RXFIFOOTHLフィールドよりも多くなった場合に本ビットがセットされます。   | R/WC |
+|    17 | RXFIFOOVF | RX FIFO Overflow        | RX FIFOの Overflowが発生したことを示すビットです。RX FIFOが Fullの状態でデータ受信を行うと本ビットがセットされます。                                                                                                   | R/WC |
+|    16 | RXFIFOUDF | RX FIFO Underflow       | RX FIFOの Underflowが発生したことを示すビットです。RX FIFOが Emptyの状態で QSPI RX Data Registerの読み出しを行うと本ビットがセットされます。                                                                           | R/WC |
+|  15:1 | -         | Reserved                | Reserved                                                                                                                                                                                                               | -    |
+|     0 | SPICTRLDN | SPI Control Done        | SPI制御が完了した事を示すビットです。QSPI Controllerの実行ステータス(QSPI Access Status Register: SPI Status Busyビット)が BusyからIdleに変化した時、本ビットが 1にセットされます。                                    | R/WC |
+
+*** QSPI Interrupt Enable Register (Offset: 0x0024)
+QSPI Interrupt Enable Registerは、QSPI Controllerの割り込みイベントを割り込み信号に通知する設定を行うためのレジスタです。
+
+#+CAPTION: QSPI Interrupt Enable Register ビットフィールド
+|   bit | Symbol       | Field                          | Description                                                                   | R/W |
+|-------+--------------+--------------------------------+-------------------------------------------------------------------------------+-----|
+| 31:27 | -            | Reserved                       | Reserved                                                                      | -   |
+|    26 | TXFIFOUTHEMB | TX FIFO Under Threshold Enable | TXFIFOUTHイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
+|    25 | TXFIFOOVFEMB | TX FIFO Overflow Enable        | TXFIFOOVFイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
+|    24 | TXFIFOUDFEMB | TX FIFO Underflow Enable       | TXFIFOUDFイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
+| 23:19 | -            | Reserved                       | Reserved                                                                      | -   |
+|    18 | RXFIFOOTHEMB | RX FIFO Over Threshold Enable  | RXFIFOOTHイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
+|    17 | RXFIFOOVFEMB | RX FIFO Overflow Enable        | RXFIFOOVFイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
+|    16 | RXFIFOUDFEMB | RX FIFO Underflow Enable       | RXFIFOUDFイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
+|  15:1 | -            | Reserved                       | Reserved                                                                      | -   |
+|     0 | SPIBUSYDNEMB | SPI Status Busy Done Enable    | SPIBUSYDNイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
+
+*** QSPI Clock Control Register (Offset 0x0030)
+QSPI Clock Control Registerは、SPIクロックの周波数、極性、位相設定を制御するためのレジスタです。
+
+#+CAPTION: QSPI Clock Control Register ビットフィールド
+|   bit | Symbol | Field              | Description                                                                                                                                                  | R/W |
+|-------+--------+--------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:21 | -      | Reserved           | Reserved                                                                                                                                                     | -   |
+|    20 | SCKPOL | SPI Clock Polarity | SPIクロックのクロック極性(CPOL)を設定します。0: Idle時のクロックを Low Levelとする 1: Idle時のクロックを High Levelとする                                    | R/W |
+| 19:17 | -      | Reserved           | Reserved                                                                                                                                                     | -   |
+|    16 | SCKPHA | SPI Clock Phase    | SPIクロックのクロック位相(CPHA)を設定します。0: Data sampling: Rise Edge / Data Shift: Fall Edge 1: Data sampling: Fall Edge / Data Shift: Rise Edge         | R/W |
+| 15:12 | -      | Reserved           | Reserved                                                                                                                                                     | -   |
+|  11:0 | SCKDIV | SPI Clock Divide   | システムクロックに対するSPIクロックの分周数を設定します。本フィールドに0(最小値)をセットした場合、SPI Clockはシステムクロックを2分周した周波数で動作します。 | R/W |
+
+SPIクロックの周波数(fSCLK)は、システムクロック(fSYS)と SCKDIVの設定により以下のように計算されます。
+#+BEGIN_QUOTE
+$fSCLK[MHz] = \frac{fSYS[MHz]}{2(SCKDIV+1)}$
+#+END_QUOTE
+
+*** QSPI Data Capture Mode Setting Register (Offset 0x0034)
+QSPI Data Capture Mode Setting Registerは、RX FIFOにデータを取り込む条件を設定するためのレジスタです。
+このレジスタをセットすることで、QSPI RX Data Registerへの書き込みアクセスを行った時だけではなく、QSPI TX Data Registerへの書き込みを行った時もデータの取り込みを行う事ができます。
+これにより SPIデバイスへの「送信フェーズ」「ダミーフェーズ」を含めた全てのフェーズのデータを取り込むことができます。
+
+#+CAPTION: QSPI Data Capture Mode Setting Register ビットフィールド
+|  bit | Symbol | Field        | Description                                                                                                                                         | R/W |
+|------+--------+--------------+-----------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:1 | -      | Reserved     | Reserved                                                                                                                                            | -   |
+|    0 | DTCAPT | Data Capture | RX FIFOにデータを取り込む条件を設定します。0: QSPI RX Data Registerの書き込み時のみ 1: QSPI TX Data Registerと QSPI RX Data Registerの両方の書き込み時 | R/W |
+
+*** QSPI FIFO Threshold Level Setting Register (Offset 0x0038)
+QSPI FIFO Threshold Level Setting Registerは、TX FIFO/RX FIFOのデータ量に応じた割り込み出力を行うための設定レジスタです。
+
+#+CAPTION: QSPI FIFO Threshold Level Setting Register ビットフィールド
+|   bit | Symbol     | Field                         | Description                                                                                                                                                                         | R/W |
+|-------+------------+-------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:21 | -          | Reserved                      | Reserved                                                                                                                                                                            | -   |
+| 20:16 | TXFIFOUTHL | TX FIFO Under Threshold Level | TXFIFOUTH割り込みを発生させる TX FIFOのデータ格納量の閾値を設定するためのフィールドです。本フィールドに 0または最大値を設定した場合 TXFIFOUTHは無効となり、割り込みは発生しません。 | R/W |
+|  15:5 | -          | Reserved                      | Reserved                                                                                                                                                                            | -   |
+|   4:0 | RXFIFOOTHL | RX FIFO Over Threshold Level  | RXFIFOOTH割り込みを発生させる RX FIFOのデータ格納料の閾値を設定するためのフィールドです。本フィールドに 0または最大値を設定した場合 RXFIFOOTHは無効となり、割り込みは発生しません。 | R/W |
+
+*** QSPI Controller IP Version Register (Offset: 0xF000)
+QSPI Controller IPコアバージョンの管理レジスタです。
+
+#+CAPTION: QSPI Controller IP Version Register ビットフィールド
+|   bit | Symbol | Field                            | Description                              | R/W |
+|-------+--------+----------------------------------+------------------------------------------+-----|
+| 31:24 | MAJVER | QSPI Controller IP Major Version | QSPI ControllerコアのMajor Versionです。 | RO  |
+| 23:16 | MINVER | QSPI Controller IP Minor Version | QSPI ControllerコアのMinor Versionです。 | RO  |
+|  15:0 | PATVER | QSPI Controller IP Patch Version | QSPI ControllerコアのPatch Versionです。 | RO  |
+
+** QSPIアクセス手順
+この章では、Infineon製Flash Memory 「S25FL256L」を例に、QSPI Controllerによる Flashメモリの書き込み, 読み出しを行うための手順を説明します。
+
+*** データ書き込み操作手順例
+本章では、Quad Page ProgramコマンドによるFlash Memoryへのデータ書き込みの手順を説明します。
+CPOL=0、CPHA=0に設定した時のSPI Interface波形と手順を以下に示します。
+
+#+CAPTION: Quad Page Program アクセス波形
+#+ATTR_HTML: :width 600
+[[file:./images/quad_page_program_acc_seq.png]]
+
+A: QSPI Access Control Registerを設定します。
+SPI I/O Modeは Standard(Single)-IO SPIモード、SPI SS Controlは"1"とするため、0x00000001を書き込みます。
+書き込み後、SPI_CS信号がアクティブ状態(Low level)に変化します。
+
+B: QSPI TX Data Registerに 1 ByteのInstruction(Quad Page Program: 0x32)と 3 Byteの Addressを書き込みます。
+QSPI TX Data Registerに書き込まれたデータからSPIデバイスに順次送信されます。
+
+C: Bで書き込んだ全てのデータの送信完了後に、QSPI Access Control Registerに0x00020001を書き込み、SPI I/O ModeをQuad-IO SPIモードに変更します。
+
+D: Flash MemoryへのWriteデータをQSPI TX Data Registerに書き込み、データ送信を行います。TX FIFOは送信するデータを最大16Byteまで格納することができます。
+TX FIFOの容量を超えるサイズのデータを送信する場合は、TX FIFOが OverflowしないようQSPI TX Data Registerへの書き込み間隔を調整する必要があります。
+TX_FIFOのデータ格納量のステータスは、QSPI FIFO Status RegisterやTX_FIFO関連の割り込み要因により確認することができます。
+
+E: Dで書き込んだ全てのデータの送信完了後に、QSPI Access Control Registerに0x0000_0000を書き込みSPI_CS信号をインアクティブ状態(High level)に変化させ、SPIアクセスを終了します。
+
+CからD時の遷移を除いた全てのフェーズの切り替わりには、QSPI Controllerの実行ステータスを確認し、必ずIdle状態となってから次の操作を実行する必要があります。
+実行ステータスの確認方法は以下の2通りがあります。
+- QSPI Access Status Registerの監視
+- SPICTRLDN割り込みの検出
+QSPI Controllerの実行ステータスがBusyの状態で次の操作が実行された場合、SPIアクセスは不適切なフォーマットで転送される可能性があります。
+
+*** データ読み出し操作手順例
+本章では、Quad I/O ReadコマンドによるFlash Memoryからのデータ読み出しの手順を説明します。
+CPOL=0、CPHA=0に設定した時のSPI Interfaceの波形と手順を以下に示します。
+
+#+CAPTION: Quad I/O Read アクセス波形
+#+ATTR_HTML: :width 650
+[[file:./images/quad_io_read_acc_seq.png]]
+
+A: QSPI Access Control Registerを設定します。
+SPI I/O ModeはStandard(Single)-IO SPIモード、SPI SS Controlは1とするため、0x00000001を書き込みます。
+書き込み後、SPI_CS信号がアクティブ状態(Low level)に変化します。
+
+B: QSPI TX Data Registerに 1 ByteのInstruction(Quad I/O Read:0xEB)を書き込みます。
+
+C: Bで書き込んだデータの送信完了後に、QSPI Access Control Registerに0x00020001を書き込み、SPI I/O ModeをQuad-IO SPIモードに変更します。
+
+D: QSPI TX Data Registerに 3 ByteのAddress、1 ByteのMode、4 Byte分のダミーデータを 1 Byte単位で書き込みます。TX FIFOに格納します。
+QSPI TX Data Registerに書き込まれたデータからSPIデバイスに順次送信されます。
+
+E: QSPI RX Data Registerに書き込みを行いFlash MemoryからのReadデータをRX FIFOに格納します。
+受信データはQSPI RX Data Registerを読み出すことにより受信順に取得されます。
+RX FIFOは受信したデータを最大16Byteまで格納できます。
+RX FIFOの容量を超えるサイズのデータを受信する場合は、RX FIFOが OverflowしないようQSPI TX Data Registerの書き込みと読み出しの順序を考慮する必要があります。
+RX_FIFOのデータ格納量のステータスは、QSPI FIFO Status RegisterやRX_FIFO関連の割り込み要因により確認することができます。
+
+F: Eで受信した全てのデータ読み出しの完了後に、QSPI Access Control Registerに0x00000000を書き込みSPI_CS信号をインアクティブ状態(High level)に変化させ、SPIアクセスを終了します。
+
+Data Write Operation時と同様、CからD時を除いた全てのフェーズの切り替わり時には、QSPI Controllerの実行ステータスを確認し、必ずIdle状態となってから次の操作を実行する必要があります。
+
+* AHB UART Lite
+AHU UART Liteは、UART通信を行うためのモジュールです。
+このモジュールはソフトウェア開発時のコンソール出力を目的としているため、フロー制御を行う機能などは持っていません。
+
+** レジスタ詳細
+AHB UART Liteは、Base Address 0x4F010000に配置されています。
+
+#+CAPTION: AHB UART Lite Registerメモリマップ
+|     Offset | Symbol        | Register                          |    Initial |
+|------------+---------------+-----------------------------------+------------|
+| 0x4F010000 | UARTL_RXFIFOR | Rx FIFO Register                  | 0x00000000 |
+| 0x4F010004 | UARTL_TXFIFOR | Tx FIFO Register                  | 0x00000000 |
+| 0x4F010008 | UARTL_STATR   | Status Register                   | 0x00000004 |
+| 0x4F01000C | UARTL_CTRLR   | Control Register                  | 0x00000000 |
+| 0x4F010010 | UARTL_UBRSR   | UART Baudrate Setting Register    | 0x000001A0 |
+| 0x4F01F000 | UARTL_VER     | AHB UART Lite IP Version Register |          - |
+
+*** Rx FIFO Register (Offset 0x0000)
+Rx FIFO Registerは、UARTの受信データを読み出すためのレジスタです。
+
+Rx FIFOは受信したデータを 1 Byte単位で最大 16エントリまで格納できます。
+
+Rx FIFOが Emptyの時にこのレジスタの読み出しを行うと、Cortex-M3がBusFaultを起こしてしまいます。
+そのため Rx FIFOが Empty状態での読み出しアクセスが発生しないよう、Status Registerの Rx FIFO Valid Dataビットを確認しながら受信を行ってください。
+Rx FIFOの読み出しにより BusFaultが発生する仕様は今後変更される予定です。
+
+#+CAPTION: Rx FIFO Register ビットフィールド
+|  bit | Symbol | Field        | Description                                                                                         | R/W |
+|------+--------+--------------+-----------------------------------------------------------------------------------------------------+-----|
+| 31:8 | -      | Reserved     | Reserved                                                                                            | -   |
+|  7:0 | RXDATA | UART Rx Data | 受信したデータを Rx FIFOから読み出すためのレジスタです。UART受信した順に 1 Byteずつ読み出されます。 | RO  |
+
+*** Tx FIFO Register (Offset 0x0004)
+Tx FIFO Registerは、UARTの送信データを書き込むためのレジスタです。
+
+書き込みデータは Tx FIFOに格納され、書き込み後直ちに送信を開始します。
+Tx FIFOは送信するデータを 1 Byte単位で最大 16エントリまで格納できます。
+
+Tx FIFOが Fullの時にこのレジスタに書き込みを行うと、Cortex-M3が BusFaultを起こしてしまいます。
+そのため Tx FIFOが Full状態での書き込みアクセスが発生しないよう、Status Registerの Tx Fullビットを確認しながら送信を行ってください。
+Tx FIFOの書き込みにより BusFaultが発生する仕様は今後変更される予定です。
+
+#+CAPTION: Tx FIFO Register ビットフィールド
+|  bit | Symbol | Field        | Description                                                                                                             | R/W |
+|------+--------+--------------+-------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:8 | -      | Reserved     | Reserved                                                                                                                | -   |
+|  7:0 | TXDATA | UART Tx Data | 送信データを Tx FIFOに書き込むためのレジスタです。このTx FIFOに書き込みが行われると、ただちにUARTの送信が開始されます。 | WO  |
+
+*** Status Register (Offset 0x0008)
+Status Registerは、AHB UART Liteの Errorや FIFOのステータスを確認するためのレジスタです。
+
+Control Registerの INTENACTLが "1"にセットされている時、RXFIFOVALビットまたは TXFIFOEMPビットが "0"から "1"に変化するたびに CPUに対しエッジ割り込みが出力されます。
+
+#+CAPTION: Status Register ビットフィールド
+|  bit | Symbol     | Field               | Description                                                                                                                                                                                                                                            | R/W |
+|------+------------+---------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:8 | -          | Reserved            | Reserved                                                                                                                                                                                                                                               | -   |
+|    7 | PRTYERR    | Parity Error        | 受信したUARTフレームでParityエラーが発生したことを示すビットです。このビットは 読み出すとクリアされます。0: Parityエラー未発生 1: Parityエラー発生 このビットはUARTがParity無しで設定されている場合はアサートしません。                                | RC  |
+|    6 | FRAMEERR   | Frame Error         | 受信したUARTフレームで Frameエラーが発生したことを示すビットです。このビットは 読み出すとクリアされます。0: Frameエラー未発生 1: Frameエラー発生　Frameエラー発生時の受信データは無効となり、Rx FIFOに格納されません。                                 | RC  |
+|    5 | OVERRUNERR | Overrun Error       | Rx FIFO FULL時にUART受信したことによりRx FIFOでOverrunエラーが発生したことを示すビットです。このビットは 読み出すとクリアされます。0: Overrunエラー未発生 1: Overrunエラー発生  Overrunエラー発生時の受信データは無効となり、Rx FIFOに格納されません。 | RC  |
+|    4 | INTENAMON  | Int Enabled Monitor | 割り込み通知ステータスを示します。Control Registerの INTENACTLが "1"にセットされている時、このビットは "1"になります。0: 割り込み通知は無効 1: 割り込み通知は有効                                                                                      | RO  |
+|    3 | TXFIFOFULL | Tx FIFO Full        | Tx FIFOのFull状態を示します。0: Tx FIFOは Full状態でない 1: Tx FIFOは Full状態                                                                                                                                                                         | RO  |
+|    2 | TXFIFOEMP  | Tx FIFO Empty       | Tx FIFOのEmpty状態を示します。0: Tx FIFOは Empty状態でない 1: Tx FIFOは Empty状態                                                                                                                                                                      | RO  |
+|    1 | RXFIFOFULL | Rx FIFO Full        | Rx FIFOのFull状態を示します。0: Rx FIFOは Full状態でない 1: Rx FIFOはFull状態                                                                                                                                                                          | RO  |
+|    0 | RXFIFOVAL  | Rx FIFO Valid Data  | Rx FIFOの有効データ格納状態を示します。0: Rx FIFOにデータ無し 1: Rx FIFOにデータ有り                                                                                                                                                                   | RO  |
+
+*** Control Register (Offset 0x000C)
+Control Registerは、Tx FIFO/Rx FIFOのリセット制御と割り込み通知の設定を行うためのレジスタです。
+
+#+CAPTION: Control Register ビットフィールド
+|  bit | Symbol    | Field              | Description                                                                                             | R/W |
+|------+-----------+--------------------+---------------------------------------------------------------------------------------------------------+-----|
+| 31:5 | -         | Reserved           | Reserved                                                                                                | -   |
+|    4 | INTENACTL | Int Enable Control | AUB UART Liteの割り込み通知の有無を設定します。 0: 割り込み通知を無効にする 1: 割り込み通知を有効にする | WO  |
+|  3:2 | -         | Reserved           | Reserved                                                                                                | -   |
+|    1 | RXFIFORST | Reset Rx FIFO      | このビットは Rx FIFOをクリアするためのビットです。このビットに1を書き込むと Rx FIFOをリセットします。   | WO  |
+|    0 | TXFIFORST | Reset Tx FIFO      | このビットは Tx FIFOをクリアするためのビットです。このビットに1を書き込むと Tx FIFOをリセットします。   | WO  |
+
+*** UART Baudrate Setting Register (Offset 0x0010)
+UART Baudrate Setting Registerは、UART通信のボーレートを設定するためのレジスタです。
+
+この設定では、UARTの 1ビットの幅がシステムクロックの何サイクルで生成するかを設定します。
+そのため、System Register.System Clock Control Registerの CLKMODEの設定を変更し、システムクロックの周波数が変わると設定しなおす必要があります。
+
+レジスタの設定値はシステムクロックの周期と、設定するボーレートから以下のように計算することができます。
+
+#+BEGIN_QUOTE
+$UDIVSET = \frac{1}{{baudrate[bps]}\times{SYSCLK\ period[s]}}-1$
+#+END_QUOTE
+
+#+CAPTION: UART Baudrate Setting Register ビットフィールド
+|  bit | Symbol  | Field                | Description                                          | R/W |
+|------+---------+----------------------+------------------------------------------------------+-----|
+| 15:0 | UDIVSET | UART Divider Setting | UART通信のボーレートを設定するためのフィールドです。 | R/W |
+
+*** AHB UART Lite IP Version Register (Offset: 0xF000)
+AHB UART Lite IPのバージョン管理用レジスタです。
+
+#+CAPTION: AHB UART Lite IP Version Register ビットフィールド
+|   bit | Symbol     | Field                          | Description                           | R/W |
+|-------+------------+--------------------------------+---------------------------------------+-----|
+| 31:24 | MAJVER     | AHB UART Lite IP Major Version | AHB UART LiteコアのMajor Versionです。  | RO  |
+| 23:16 | MINVER     | AHB UART Lite IP Minor Version | AHB UART LiteコアのMinor Versionです。  | RO  |
+|  15:0 | PATVER     | AHB UART Lite IP Patch Version | AHB UART LiteコアのPatch Versionです。  | RO  |
+
+* I2C Master Controller
+I2C Master Controllerは、I2Cデバイスとの通信を行うためのモジュールです。
+
+SC OBCには、SC OBC Module上の I2Cデバイスにアクセスするための I2C Interface(Internal I2C)と、SC OBC Moduleの Board to Boardコネクタを介した外部の I2Cデバイスにアクセスするための I2C Interface(External I2C)が準備されています。
+これら 2つの I2C Interfaceを制御するため、SC OBC FPGAには 2個の I2C Master Controllerが搭載されています。
+
+** レジスタ詳細
+I2C Master Controller Registerは、それぞれ以下のアドレスに配置されています。
+
+#+CAPTION: I2C Master Controller メモリマップ
+| Target                  | Base Address |
+|-------------------------+--------------|
+| Internal I2C Controller | 0x4F02_0000  |
+| External I2C Controller | 0x4F03_0000  |
+
+I2C Master Controllerには以下のレジスタが実装されています。
+
+#+CAPTION: I2C Master Controller Register アドレスマップ
+| Offset | Symbol       | Register                                                |    Initial |
+|--------+--------------+---------------------------------------------------------+------------|
+| 0x0000 | I2CM_ENR     | I2C Master Enable Register                              | 0x00000000 |
+| 0x0004 | I2CM_TXFIFOR | I2C Master TX FIFO Register                             | 0x00000000 |
+| 0x0008 | I2CM_RXFIFOR | I2C Master RX FIFO Register                             | 0x00000000 |
+| 0x000C | I2CM_BSR     | I2C Master Bus Status Register                          | 0x00000000 |
+| 0x0010 | I2CM_ISR     | I2C Master Interrupt Status Register                    | 0x00000000 |
+| 0x0014 | I2CM_IER     | I2C Master Interrupt Enable Register                    | 0x00000000 |
+| 0x0018 | I2CM_FIFOSR  | I2C Master FIFO Status Register                         | 0x00000000 |
+| 0x001C | I2CM_FIFORR  | I2C Master FIFO Reset Register                          | 0x00000000 |
+| 0x0020 | I2CM_FTLSR   | I2C Master FIFO Threshold Level Setting Register        | 0x00000000 |
+| 0x0024 | I2CM_SCLTSR  | I2C Master SCL Timeout Setting Register                 | 0x00000000 |
+| 0x0030 | I2CM_THDSTAR | I2C Master START Hold Timing Setting Register           | 0x00000031 |
+| 0x0034 | I2CM_TSUSTOR | I2C Master STOP Setup Timing Setting Register           | 0x00000031 |
+| 0x0038 | I2CM_TSUSTAR | I2C Master Repeated START Setup Timing Setting Register | 0x00000031 |
+| 0x003C | I2CM_THIGHR  | I2C Master Clock High Timing Setting Register           | 0x00000039 |
+| 0x0040 | I2CM_THDDATR | I2C Master Data Hold Timing Setting Register            | 0x00000004 |
+| 0x0044 | I2CM_TSUDATR | I2C Master Data Setup Timing Setting Register           | 0x00000039 |
+| 0x0048 | I2CM_TBUFR   | I2C Master Bus Free Timing Setting Register             | 0x00000045 |
+| 0x004C | I2CM_TBSMPLR | I2C Master Bus Sampling Timing Setting Register         | 0x00000000 |
+| 0xF000 | I2CM_VER     | I2C Master Controller IP Version Register               |          - |
+
+*** I2C Master Enable Register (Offset 0x0000)
+I2C Master Enable Registerは、I2C Master ControllerのEnable設定を行うレジスタです。
+
+EnableがOFFの時は、I2C Master ControllerはI2C Busに接続される FPGAのBufferを HiZ状態とし、一切の送受信を行いません。
+EnableをONにすると、I2C BusがIdle状態の時に送受信が可能となります。
+
+#+CAPTION: I2C Master Enable Register ビットフィールド
+|  bit | Symbol  | Field      | Description                                                             | R/W |
+|------+---------+------------+-------------------------------------------------------------------------+-----|
+| 31:1 | -       | Reserved   | Reserved                                                                | -   |
+|    0 | I2CM_EN | I2C Enable | I2C Master ControllerのEnable設定を行います。0: Enable OFF 1: Enable ON | R/W |
+
+*** I2C Master TX FIFO Register (Offset 0x0004)
+I2C Master TX FIFO Registerは、I2Cデバイスへ送信するデータや、送受信データのフォーマットを設定するためのレジスタです。
+
+レジスタに書き込む値は、転送状況によって変わります。
+
+転送開始の 1 Byte目は、I2CM_TXDATAフィールドの ビット7:1に 通信する I2Cデバイスのデバイスアドレスを書き込み、ビット0に R/W情報として 次の転送サイクルが 送信モードの場合は"0", 受信モードの場合は"1"を書き込みます。
+ここで書き込まれた 8ビットのデータは MSB側から順にそのまま I2Cバスに出力されます。
+
+1 Byte目にビット0に書き込まれた R/W情報によって、送信モード(R/W: 0)となる場合、2 Byte目以降は I2CM_TXDATAに転送データを書き込みます。
+送信モードの場合、I2CM_TXDATAの書き込みと同時に I2CM_STOPか I2CM_RESTARTが "1"に書き込まれるまで転送が継続します。
+I2CM_TXDATAと共に I2CM_STOPが"1"に書き込まれた場合は、データ送信の完了後に STOP Conditionが送信され、I2CM_TXDATAと共に I2CM_RESTARTが"1"に書き込まれた場合は、データ送信の完了後に Repeated START Conditionが送信されます。
+この状態になると、次の送信は 1 Byte目の送信状態に戻ります。
+
+1 Byte目にビット0に書き込まれた R/W情報によって、受信モード(R/W: 1)となる場合、2 Byte目の I2CM_TXDATAには受信データの Byte数を書き込みます。
+この時、書き込む受信データの Byte数は、「実際に受信する Byte数 - 1」の値を設定します。
+また、最終Byteとなるデータの受信後に STOP Conditionまたは Repeated START Conditionを送信するため、I2CM_STOPか I2CM_RESTARTのどちらかのビットを"1"にセットします。
+
+本レジスタの設定については「I2C通信操作手順例」も参照してください。
+
+#+CAPTION: I2C Master TX FIFO Register ビットフィールド
+|   bit | Symbol       | Field                        | Description                                                                                                                                                                                  | R/W |
+|-------+--------------+------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:10 | -            | Reserved                     | Reserved                                                                                                                                                                                     | -   |
+|     9 | I2CM_RESTART | I2C Repeated START Condition | 最終 Byteの転送完了後に I2C BusにRepeated START Conditionを送信する場合にセットするビットです。最終Byteの送受信後にRepeated START Conditionを挿入する場合は、このビットを"1"にセットします。 | WO  |
+|     8 | I2CM_STOP    | I2C STOP Condition           | 最終 Byteの転送完了後に I2C BusにSTOP Conditionを送信する場合にセットするビットです。最終Byteの送受信後にSTOP Conditionを送信する場合は、このビットを"1"にセットします。                     | WO  |
+|   7:0 | I2CM_TXDATA  | I2C Tx Data                  | I2Cの送信データを設定します。このレジスタの書き込みデータは、送信モードでは送信データ, 受信モードでは 受信データ Byte数となります。                                                          | WO  |
+
+*** I2C Master RX FIFO Register (Offset 0x0008)
+I2C Master RX FIFO Registerは、I2Cデバイスから受信したデータを読み出すためのレジスタです。
+
+I2Cデバイスから受信データは RX FIFOに格納されます。
+RX FIFOは 16 Byte実装されており、このレジスタを読み出す事で RX FIFOに格納されたデータを 1 Byteずつデータを読み出す事ができます。
+
+#+CAPTION: I2C Master RX FIFO Register ビットフィールド
+|  bit | Symbol      | Field       | Description                                                   | R/W |
+|------+-------------+-------------+---------------------------------------------------------------+-----|
+| 31:8 | -           | Reserved    | Reserved                                                      | -   |
+|  7:0 | I2CM_RXDATA | I2C Rx Data | I2Cデバイスから受信したデータを読み出すためのフィールドです。 | RO  |
+
+*** I2C Master Bus Status Register (Offset 0x000C)
+I2C Master Bus Status Registerは、I2C Busのステータスを確認するためのレジスタです。
+I2C_SELFBUSY,I2C_OTHERBUSYビットがともに"0"を示す時、I2C BusがIdle状態であることを示します。
+
+#+CAPTION: I2C Master Bus Status Register ビットフィールド
+|  bit | Symbol         | Field                               | Description                                                                                                                                              | R/W |
+|------+----------------+-------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:2 | -              | Reserved                            | Reserved                                                                                                                                                 | -   |
+|    1 | I2CM_OTHERBUSY | I2C Bus Busy by Other Communication | 同一I2C Busのバス状態を示すビットです。他のマスターデバイスがI2C通信中の時、このビットは"1"を示します。このビットはI2C EnableがOFFの状態でも機能します。 | RO  |
+|    0 | I2CM_SELFBUSY  | I2C Bus Busy by Self Communication  | I2C Master ControllerのI2Cバス状態を示すビットです。自身のI2C Master ControllerがI2C通信中、このビットは"1"を示します。                                  | RO  |
+
+*** I2C Master Interrupt Status Register (Offset: 0x0010)
+I2C Master Interrupt Status Registerは、I2C Master Controllerの割り込みステータスレジスタです。
+それぞれのビットは"1"をセットすると、割り込みをクリアする事ができます。
+
+#+CAPTION: I2C Master Interrupt Status Register ビットフィールド
+|   bit | Symbol         | Field                       | Description                                                                                                                                                                                                                                                                          | R/W  |
+|-------+----------------+-----------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------|
+| 31:13 | -              | Reserved                    | Reserved                                                                                                                                                                                                                                                                             | -    |
+|    12 | I2CM_SCLTO     | I2C SCL Timeout             | 通信中のSCL Timeoutが発生した事を示すビットです。I2CデバイスによるSCLのクロックストレッチ機能等により、通信中にSCLがLoとなっている時間が I2C Master SCL Timeout Setting RegisterのI2CM_SCLTOPRODフィールドの設定値を超えたとき本ビットが"1"にセットされます。                    | R/WC |
+|    11 | I2CM_RXFIFOUDF | I2C RX FIFO Underflow       | RX FIFOの Underflowが発生したことを示すビットです。RX FIFOが Emptyの時に、I2C Master RX FIFO Registerの読み出しが行われたとき、本ビットが"1"にセットされます。                                                                                                                       | R/WC |
+|    10 | I2CM_TXFIFOOVF | I2C TX FIFO Overflow        | TX FIFOの Overflowが発生したことを示すビットです。TX FIFOが Fullの時に、I2C Master TX FIFO Registerへの書き込みを行ったとき、本ビットが"1"にセットされます。                                                                                                                         | R/WC |
+|     9 | I2CM_BITER     | I2C BIT Error               | BIT Errorが発生したことを示すビットです。Lowレベルのビットを送信した時に、異なるレベルが検出された場合に本ビットが"1"にセットされます。BIT Errorを検出すると、I2C Master Controllerは以降のデータ送信を停止し、STOP Conditionを送信してからI2C EnableをOffにしてIdle状態に戻ります。    | R/WC |
+|     8 | I2CM_ACKER     | I2C ACK Error               | ACK Errorが発生したことを示すビットです。送信中に ACKビットでLowレベルが検出出来なかった場合に本ビットが"1"にセットされます。ACK Errorを検出すると、I2C Master Controllerは以降のデータ送信を停止し、STOP Conditionを送信してからI2C EnableをOffにしてIdle状態に戻ります。              | R/WC |
+|   7:6 | -              | Reserved                    | Reserved                                                                                                                                                                                                                                                                             | -    |
+|     5 | I2CM_RXFIFOOTH | I2C RX FIFO Over Threshold  | RX FIFOに格納されるデータが閾値を上回ったことを示すビットです。データ量が I2C Master FIFO Threshold Level Setting Registerの I2CM_RXFIFOOTHLフィールドの設定値より多くなった場合に本ビットが"1"にセットされます。                                                                    | R/WC |
+|     4 | I2CM_TXFIFOUTH | I2C TX FIFO Under Threshold | TX FIFOに格納されるデータが閾値を下回ったことを示すビットです。データ量が I2C Master FIFO Threshold Level Setting Registerの I2CM_TXFIFOUTHLフィールドの設定値より少なくなった場合に本ビットが"1"にセットされます。                                                                  | R/WC |
+|   3:2 | -              | Reserved                    | Reserved                                                                                                                                                                                                                                                                             | -    |
+|     1 | I2CM_ARBLST    | I2C Arbitration Lost        | 送信中にArbitration Lostが発生した事を示すビットです。送信中に他の I2C Masterと送信が競合したことによる調停制御で送信を停止した場合、本ビットが"1"にセットされます。Arbitration Lostを検出すると、I2C Master Controllerは I2C EnableをOffにしてIdle状態に戻ります。                  | R/WC |
+|     0 | I2CM_COMP      | I2C Complite                | I2C Master ControllerによるI2C通信が正常に完了した事を示すビットです。I2C通信の正常完了で I2C BusにSTOP Conditionを送信した時、本ビットが"1”にセットされます。Arbitration LostやError検出によるSTOP Conditionの送信時には本ビットはセットされません。                               | R/WC |
+
+*** I2C Master Interrupt Enable Register (Offset: 0x0014)
+I2C Master Interrupt Enable Registerは、I2C Master Controllerの割り込みイベントを割り込み信号に通知する設定を行うためのレジスタです。
+
+Interrupt Enable Registerのビットが "1"にセットした時、その割り込み要因に対応する Interrupt Status Registerのビットが "1"にセットされた時、レベル割り込みが出力します。
+
+#+CAPTION: I2C Master Interrupt Enable Register ビットフィールド
+|   bit | Symbol            | Field                              | Description                                                                        | R/W |
+|-------+-------------------+------------------------------------+------------------------------------------------------------------------------------+-----|
+| 31:13 | -                 | Reserved                           | Reserved                                                                           | -   |
+|    12 | I2CM_SCLTOENB     | I2C SCL Timeout Enable             | I2CM_SCLTOイベントが発生した時に割り込み信号を発生させるかどうかを設定します。     | R/W |
+|    11 | I2CM_RXFIFOUDFENB | I2C RX FIFO Underflow Enable       | I2CM_RXFIFOUDFイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
+|    10 | I2CM_TXFIFOOVFENB | I2C TX FIFO Overflow Enable        | I2CM_TXFIFOOVFイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
+|     9 | I2CM_BITERENB     | I2C BIT Error Enable               | I2CM_BITERイベントが発生した時に割り込み信号を発生させるかどうかを設定します。     | R/W |
+|     8 | I2CM_ACKERENB     | I2C ACK Error Enable               | I2CM_ACKERイベントが発生した時に割り込み信号を発生させるかどうかを設定します。     | R/W |
+|   7:6 | -                 | Reserved                           | Reserved                                                                           | -   |
+|     5 | I2CM_RXFIFOOTHENB | I2C RX FIFO Over Threshold Enable  | I2CM_RXFIFOOTHイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
+|     4 | I2CM_TXFIFOUTHENB | I2C TX FIFO Under Threshold Enable | I2CM_TXFIFOUTHイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
+|   3:2 | -                 | Reserved                           | Reserved                                                                           | -   |
+|     1 | I2CM_ARBLSTENB    | I2C Arbitration Lost Enable        | I2CM_ARBLSTイベントが発生した時に割り込み信号を発生させるかどうかを設定します。    | R/W |
+|     0 | I2CM_COMPENB      | I2C Complite Enable                | I2CM_COMPイベントが発生した時に割り込み信号を発生させるかどうかを設定します。      | R/W |
+
+*** I2C Master FIFO Status Register (Offset 0x0018)
+I2C Master FIFO Status Registerは、TX FIFO/RX FIFOに格納されているデータ量を読み出すためのレジスタです。
+
+#+CAPTION: I2C Master FIFO Status Register ビットフィールド
+|   bit | Symbol         | Field                | Description                                           | R/W |
+|-------+----------------+----------------------+-------------------------------------------------------+-----|
+| 31:21 | -              | Reserved             | Reserved                                              | -   |
+| 20:16 | I2CM_RXFIFOCAP | I2C RX FIFO Capacity | RX FIFOに格納されているデータ量を示すフィールドです。 | RO  |
+|  15:5 | -              | Reserved             | Reserved                                              | -   |
+|   4:0 | I2CM_TXFIFOCAP | I2C TX FIFO Capacity | TX FIFOに格納されているデータ量を示すフィールドです。 | RO  |
+
+*** I2C Master FIFO Reset Register (Offset 0x001C)
+I2C Master FIFO Reset Registerは、TX FIFO/RX FIFOのリセットを行うためのレジスタです。
+何らかの理由によりFIFOのクリアを行いたい場合にこのレジスタを使用します。
+
+#+CAPTION: I2C Master FIFO Reset Register ビットフィールド
+|   bit | Symbol         | Field             | Description                                                                                                     | R/W |
+|-------+----------------+-------------------+-----------------------------------------------------------------------------------------------------------------+-----|
+| 31:17 | -              | Reserved          | Reserved                                                                                                        | -   |
+|    16 | I2CM_RXFIFORST | I2C RX FIFO Reset | RX FIFOをリセットするためのビットです。本ビットに"1"をセットすると、TX FIFOがリセットされデータが消去されます。 | WO  |
+|  15:1 | -              | Reserved          | Reserved                                                                                                        | -   |
+|     0 | I2CM_TXFIFORST | I2C TX FIFO Reset | TX FIFOをリセットするためのビットです。本ビットに"1"をセットすると、RX FIFOがリセットされデータが消去されます。 | WO  |
+
+*** I2C Master FIFO Threshold Level Setting Register (Offset 0x0020)
+I2C Master FIFO Threshold Level Registerは、TX FIFO/RX FIFOのデータ量に応じた割り込み出力を行うための設定レジスタです。
+
+#+CAPTION: I2C Master FIFO Threshold Level Setting Register ビットフィールド
+|   bit | Symbol          | Field                             | Description                                                                                                                                                                | R/W |
+|-------+-----------------+-----------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:21 | -               | Reserved                          | Reserved                                                                                                                                                                   | -   |
+| 20:16 | I2CM_RXFIFOOTHL | I2C RX FIFO Over Threshold Level  | I2CM_RXFIFOOTH割り込みを発生させるRX FIFOのデータ格納量の閾値を設定するためのフィールドです。本フィールドに 0または最大値を設定した場合 I2CM_RXFIFOOTHは無効となり、割り込みは発生しません。 | R/W |
+|  15:5 | -               | Reserved                          | Reserved                                                                                                                                                                   | -   |
+|   4:0 | I2CM_TXFIFOUTHL | I2C TX FIFO Under Threshold Level | I2CM_TXFIFOUTH割り込みを発生させるTX FIFOのデータ格納量の閾値を設定するためのフィールドです。本フィールドに 0または最大値を設定した場合 I2CM_TXFIFOUTHは無効となり、割り込みは発生しません。     | R/W |
+
+*** I2C Master SCL Timeout Setting Register (Offset 0x0024)
+I2C Master SCL Timeout Setting Registerは、SCL Timeout割り込み発生させるための SCL Timeout時間を設定するレジスタです。
+
+#+CAPTION: I2C Master SCL Timeout Setting Register ビットフィールド
+|   bit | Symbol         | Field                  | Description                                                                                                                                                                                                        | R/W |
+|-------+----------------+------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:16 | -              | Reserved               | Reserved                                                                                                                                                                                                           | -   |
+|  15:0 | I2CM_SCLTOPROD | I2C SCL Timeout Period | I2CM_SCLTO割り込みを発生させる SCL Low期間を設定するためのフィールドです。このフィールドには、1 us単位の Timeout時間を設定します。本フィールドを0に設定した場合は I2CM_SCLTOは無効となり、割り込みは発生しません。 | R/W |
+
+*** I2C Master START Hold Timing Setting Register (Offset 0x0030)
+I2C Master START Hold Timing Setting Registerは、I2C規格における START/Repeated START Conditionの Hold時間を設定するためのレジスタです。
+このレジスタは、I2C Master Enable RegisterのI2CM_ENビットが"0"の時のみ書き込みが可能です。
+
+#+CAPTION: I2C Master START Hold Timing Setting Register ビットフィールド
+|   bit | Symbol      | Field               | Description                                                                                                                     | R/W |
+|-------+-------------+---------------------+---------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:16 | -           | Reserved            | Reserved                                                                                                                        | -   |
+|  15:0 | I2CM_THDSTA | I2C START Hold Time | START ConditionのHold時間を設定するフィールドです。このフィールドはシステムクロックのサイクル数によってタイミングを設定します。 | R/W |
+
+レジスタ設定によるSTART Hold Time(tHDSTA)は、次の式で計算できます。
+
+#+BEGIN_QUOTE
+$tHDSTA [s] = System\ Clock\ period\ [s] \times \left(I2CM\_THDSTA +1\right)$
+#+END_QUOTE
+
+このレジスタの設定を行う場合は「I2Cタイミングパラメータの設定」も参照してください。
+
+*** I2C Master STOP Setup Timing Setting Register (Offset 0x0034)
+I2C Master STOP Setup Timing Setting Registerは、I2C規格における STOP ConditionのSetup時間を設定するためのレジスタです。
+このレジスタは、I2C Master Enable RegisterのI2CM_ENビットが"0"の時のみ書き込みが可能です。
+
+#+CAPTION: I2C Master STOP Setup Timing Setting Register ビットフィールド
+|   bit | Symbol      | Field               | Description                                                                                                                     | R/W |
+|-------+-------------+---------------------+---------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:16 | -           | Reserved            | Reserved                                                                                                                        | -   |
+|  15:0 | I2CM_TSUSTO | I2C STOP Setup Time | STOP ConditionのSetup時間を設定するフィールドです。このフィールドはシステムクロックのサイクル数によってタイミングを設定します。 | R/W |
+
+レジスタ設定によるSTOP Setup Time(tSUSTO)は、次の式で計算できます。
+
+#+BEGIN_QUOTE
+$tSUSTO [s] = System\ Clock\ period\ [s] \times \left(I2CM\_TSUSTO +1\right)$
+#+END_QUOTE
+
+マルチマスター構成となる場合、または、クロックストレッチ機能を持った I2Cデバイスと接続して通信する場合、このレジスタは"0x3"以上に設定してください。
+
+このレジスタの設定を行う場合は「I2Cタイミングパラメータの設定」も参照してください。
+
+*** I2C Master Repeated START Setup Timing Setting Register (Offset 0x0038)
+I2C Master Repeated START Setup Timing Setting Registerは、I2C規格における Repeated START ConditionのSetup時間を設定するためのレジスタです。
+このレジスタは、I2C Master Enable RegisterのI2CM_ENビットが"0"の時のみ書き込みが可能です。
+
+#+CAPTION: I2C Master Repeated START Setup Timing Setting Register ビットフィールド
+|   bit | Symbol      | Field                         | Description                                                                                                                               | R/W |
+|-------+-------------+-------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:16 | -           | Reserved                      | Reserved                                                                                                                                  | -   |
+|  15:0 | I2CM_TSUSTA | I2C Repeated START Setup Time | Repeated START ConditionのSetup時間を設定するフィールドです。このフィールドはシステムクロックのサイクル数によってタイミングを設定します。 | R/W |
+
+レジスタ設定によるRepeated START Setup Time(tSUSTA)は、次の式で計算できます。
+
+#+BEGIN_QUOTE
+$tSUSTA [s] = System\ Clock\ period\ [s] \times \left(I2CM\_TSUSTA +1\right)$
+#+END_QUOTE
+
+マルチマスター構成となる場合、または、クロックストレッチ機能を持った I2Cデバイスと接続して通信する場合、このレジスタは 0x3以上に設定してください。
+
+このレジスタの設定を行う場合は「I2Cタイミングパラメータの設定」も参照してください。
+
+*** I2C Master Clock High Timing Setting Register (Offset 0x003C)
+I2C Master Clock High Timing Setting Registerは、I2C規格における SCLのHigh時間を設定するレジスタです。
+このレジスタは、I2C Master Enable RegisterのI2CM_ENビットが"0"の時のみ書き込みが可能です。
+
+#+CAPTION: I2C Master Clock High Timing Setting Register ビットフィールド
+|   bit | Symbol     | Field               | Description                                                                                                         | R/W |
+|-------+------------+---------------------+---------------------------------------------------------------------------------------------------------------------+-----|
+| 31:16 | -          | Reserved            | Reserved                                                                                                            | -   |
+|  15:0 | I2CM_THIGH | I2C SCL High period | SCLのHigh時間を設定するフィールドです。このフィールドはシステムクロックのサイクル数によってタイミングを設定します。 | R/W |
+
+レジスタ設定によるSCLのHigh時間(tHIGH)は、次の式で計算できます。
+
+#+BEGIN_QUOTE
+$tHIGH\ [s] = System\ Clock\ period\ [s] \times \left(I2CM\_THIGH +1\right)$
+#+END_QUOTE
+
+このレジスタは必ず"0x4"以上に設定する必要があります。
+
+このレジスタの設定を行う場合は「I2Cタイミングパラメータの設定」も参照してください。
+
+*** I2C Master Data Hold Timing Setting Register (Offset 0x0040)
+I2C Master Data Hold Timing Setting Registerは、I2C規格における データのHold時間を設定するためのレジスタです。
+このレジスタは、I2C Master Enable RegisterのI2CM_ENビットが"0"の時のみ書き込みが可能です。
+
+#+CAPTION: I2C Master Data Hold Timing Setting Register ビットフィールド
+|   bit | Symbol      | Field              | Description                                                                                                | R/W |
+|-------+-------------+--------------------+----------------------------------------------------------------------------------------------------------+-----  |
+| 31:16 | -           | Reserved           | Reserved                                                                                                   | -   |
+|  15:0 | I2CM_THDDAT | I2C Data Hold Time | データのHold時間を設定するフィールドです。このフィールドはシステムクロックのサイクル数によって設定します。 | R/W |
+
+レジスタ設定によるData Hold Time(tHDDAT)は、次の式で計算できます。
+
+#+BEGIN_QUOTE
+$tHDDAT\ [s] = System\ Clock\ period\ [s] \times \left(I2CM\_THDDAT +1\right)$
+#+END_QUOTE
+
+マルチマスター構成となる場合、または、クロックストレッチ機能を持った I2Cデバイスと接続して通信する場合、このレジスタは"0x3"以上に設定してください。
+
+このレジスタの設定を行う場合は「I2Cタイミングパラメータの設定」も参照してください。
+
+*** I2C Master Data Setup Timing Setting Register (Offset 0x0044)
+I2C Master Data Setup Timing Setting Registerは、I2C規格における データのSetup時間を設定するためのレジスタです。
+このレジスタは、I2C Master Enable RegisterのI2CM_ENビットが"0"の時のみ書き込みが可能です。
+
+#+CAPTION: I2C Master Data Setup Timing Setting Register ビットフィールド
+|   bit | Symbol      | Field               | Description                                                                                                 | R/W |
+|-------+-------------+---------------------+-------------------------------------------------------------------------------------------------------------+-----|
+| 31:16 | -           | Reserved            | Reserved                                                                                                    | -   |
+|  15:0 | I2CM_TSUDAT | I2C Data Setup Time | データのSetup時間を設定するフィールドです。このフィールドはシステムクロックのサイクル数によって設定します。 | R/W |
+
+レジスタ設定によるData Setup Time(tSUDAT)は、次の式で計算できます。
+
+#+BEGIN_QUOTE
+$tSUDAT\ [s] = System\ Clock\ period\ [s] \times \left(I2CM\_TSUDAT +1\right)$
+#+END_QUOTE
+
+また、SCLのLow時間(tLOW)は、Data Hold TimeとData Setup Timeの和により決定されます。
+
+#+BEGIN_QUOTE
+$tLOW\ [s] = tHDDAT\ [s] + tSUDAT\ [s]$
+#+END_QUOTE
+
+このレジスタの設定を行う場合は「I2Cタイミングパラメータの設定」も参照してください。
+
+*** I2C Master Bus Free Timing Setting Register (Offset 0x0048)
+I2C Master Bus Free Timing Setting Registerは、I2C規格における ConditionとSTART Condition間のBus開放時間を設定するためのレジスタです。
+このレジスタは、I2C Master Enable RegisterのI2CM_ENビットが"0"の時のみ書き込みが可能です。
+
+#+CAPTION: I2C Master Bus Free Timing Setting Register ビットフィールド
+|   bit | Symbol    | Field             | Description                                                                                                 | R/W |
+|-------+-----------+-------------------+-------------------------------------------------------------------------------------------------------------+-----|
+| 31:16 | -         | Reserved          | Reserved                                                                                                    | -   |
+|  15:0 | I2CM_TBUF | I2C Bus Free Time | I2C Busの開放時間を設定するフィールドです。このフィールドはシステムクロックのサイクル数によって設定します。 | R/W |
+
+レジスタ設定によるBus Free Time(tBUF)は、次の式で計算できます。
+
+#+BEGIN_QUOTE
+$tBUF\ [s] = System\ Clock\ period\ [s] \times \left(I2CM\_TBUF +1\right)$
+#+END_QUOTE
+
+このレジスタの設定を行う場合は「I2Cタイミングパラメータの設定」も参照してください。
+
+*** I2C Master Bus Sampling Timing Setting Register (Offset 0x004C)
+I2C Master Bus Sampling Timing Setting Registerは、受信データのサンプリングタイミングを設定するためのレジスタです。
+
+SCLの立ち上がりタイミングを起点として、このレジスタに設定した遅延時間後に SDA信号のサンプリングを行います。
+このレジスタは、I2C Master Enable RegisterのI2CM_ENビットが"0"の時のみ書き込みが可能です。
+
+#+CAPTION: I2C Master Bus Sampling Timing Setting Register ビットフィールド
+|   bit | Symbol       | Field              | Description                                                                                                               | R/W |
+|-------+--------------+--------------------+---------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:16 | -            | Reserved           | Reserved                                                                                                                  | -   |
+|  15:0 | I2CM_SMPLDLY | I2C Sampling Delay | SDAをサンプリングするタイミングを設定するフィールドです。このフィールドはシステムクロックのサイクル数によって設定します。 | R/W |
+
+レジスタ設定によるSDAのサンプリング遅延時間は、次の式で計算できます。
+
+#+BEGIN_QUOTE
+$SDA Sampling Delay\ [s] = System\ Clock\ period\ [s] \times I2CM\_SMPLDLY$
+#+END_QUOTE
+
+*** I2C Master Controller IP Version Register (Offset: 0xF000)
+I2C Master Controller IPコアバージョンの管理レジスタです。
+
+#+CAPTION: I2C Master Controller IP Version Register ビットフィールド
+|   bit | Symbol | Field                                  | Description                                          | R/W |
+|-------+--------+----------------------------------------+------------------------------------------------------+-----|
+| 31:24 | MAJVER | I2C Master Controller IP Major Version | I2C Master ControllerコアのMajor Versionを示します。 | RO  |
+| 23:16 | MINVER | I2C Master Controller IP Minor Version | I2C Master ControllerコアのMinor Versionを示します。 | RO  |
+|  15:0 | PATVER | I2C Master Controller IP Patch Version | I2C Master ControllerコアのPatch Versionを示します。 | RO  |
+
+** I2Cアクセス手順
+この章では、I2C Master Controllerを使用するための、レジスタの制御手順を説明します。
+
+*** 初期設定操作手順例
+I2C Master Controllerの初期設定の手順について説明します。
+
+#+CAPTION: 初期設定フロー
+[[file:./images/i2cm_init_config_seq.png]]
+
+I2C Master ControllerのTiming Parameterは、システムクロックが 48 MHz、Fast-mode(ビットレート:400Kb/s)でのI2C通信に合わせて初期設定がされています。
+システムクロックが 48 MHz、Fast-mode(ビットレート:400Kb/s)で通信を行う場合はタイミングパラメータの設定変更を省略し、手順例8から設定を進めることが出来ます。
+それ以外の場合は、タイミングパラメータの設定変更(手順例1～7)を行う必要があります。
+
+手順例 1〜7のタイミングパラメータの設定順序に制限は無いため、この手順と異なる順序で設定しても問題ありません。
+タイミングパラメータ設定の詳細や、各モードにおける設定例については「I2Cタイミングパラメータの設定」を参照してください。
+
+1: I2C Master START Hold Timing Setting Registerの設定を行います。
+2: I2C Master STOP Setup Timing Setting Registerの設定を行います。
+3: I2C Master Repeated START Setup Timing Setting Registerの設定を行います。
+4: I2C Master Clock High Timing Setting Registerの設定を行います。
+5: I2C Master Data Hold Timing Setting Registerの設定を行います。
+6: I2C Master Data Setup Timing Setting Registerの設定を行います。
+7: I2C Master Bus Free Timing Setting Registerの設定を行います。
+8: I2C Master Interrupt Enable Registerの使用する割り込みステータスのイネーブルビットを"1"に設定します。
+9: I2C Master Enable RegisterのI2CM_ENビットを"1"に設定し、I2C Master Controllerを有効化します。
+
+**** I2Cタイミングパラメータの設定
+I2C Master ControllerによるI2C通信タイミングは、以下のレジスタ設定により決まります。
+- I2C Master START Hold Timing Setting Register: START ConditionおよびRepeated START ConditionのHold時間
+- I2C Master STOP Setup Timing Setting Register: STOP ConditionのSetup時間
+- I2C Master Repeated START Setup Timing Setting Register: Repeated START ConditionのSetup時間
+- I2C Master Clock High Timing Setting Register: I2Cクロック(SCL)のHigh期間
+- I2C Master Data Hold Timing Setting Register: I2Cデータ(SDA)のHold時間
+- I2C Master Data Setup Timing Setting Register: I2Cデータ(SDA)のSetup時間
+- I2C Master Bus Free Timing Setting Register: STOP ConditionからSTART Condition間のBus Free時間
+
+初期状態ではシステムクロック 48 MHz、Fast-mode(400Kb/s)で通信を行う場合のタイミングに設定されています。
+接続する I2Cデバイスが対応する通信レートやモードに応じ変更することが出来ます。
+
+各タイミングパラメータの設定により生成される、I2C Master Controllerのタイミングを以下に示します。
+
+#+CAPTION: I2Cバスタイミング
+[[file:./images/i2cm_timing.png]]
+
+#+CAPTION: I2Cバスタイミング(Repeated Start)
+[[file:./images/i2cm_timing_repsta.png]]
+
+I2Cクロック(SCL)のLow期間(tLOW)は、I2Cデータ(SDA)のSetup/Hold時間(I2CM_TSUDAT,I2CM_THDDAT)のTotal時間となります。
+I2C通信の1ビットは、I2Cクロック(SCL)のHigh期間(I2CM_THIGH)と I2Cクロック(SCL)のLow期間(tLOW)のTotal時間となります。
+
+システムクロックが96MHz, 48MHz, 24MHzにおいて、Standard-mode(100Kb/s)、Fast-mode(400Kb/s)、Fast-mode Plus(1Mb/s)で通信する場合の、タイミングパラメータ設定値の例を以下にします。
+
+
+#+CAPTION: I2C Master Controller タイミングパラメータの設定例 (システムクロック 96 MHz)
+| Parameter         | Standard-mode(100Kb/s) | Fast-mode(400Kb/s) | Fast-mode Plus(1Mb/s) |
+|-------------------+------------------------+--------------------+-----------------------|
+| I2CM_THDSTA[15:0] | 0x01DF(5us)            | 0x0063(1.04us)     | 0x0027(0.42us)        |
+| I2CM_TSUSTO[15:0] | 0x01DF(5us)            | 0x0063(1.04us)     | 0x0027(0.42us)        |
+| I2CM_TSUSTA[15:0] | 0x022F(5.83us)         | 0x0063(1.04us)     | 0x0027(0.42us)        |
+| I2CM_THIGH[15:0]  | 0x01CB(4.79us)         | 0x0072(1.20us)     | 0x002D(0.48us)        |
+| I2CM_THDDAT[15:0] | 0x0027(0.42us)         | 0x0009(0.10us)     | 0x0003(0.04us)        |
+| I2CM_TSUDAT[15:0] | 0x01CB(4.79us)         | 0x0072(1.20us)     | 0x002D(0.48us)        |
+| I2CM_TBUF[15:0]   | 0x022F(5.83us)         | 0x008B(1.46us)     | 0x0037(0.58us)        |
+
+#+CAPTION: I2C Master Controller タイミングパラメータの設定例 (システムクロック 48 MHz)
+| Parameter         | Standard-mode(100Kb/s) | Fast-mode(400Kb/s)[default] | Fast-mode Plus(1Mb/s) |
+|-------------------+------------------------+-----------------------------+-----------------------|
+| I2CM_THDSTA[15:0] | 0x00EF(5us)            | 0x0031(1.04us)              | 0x0013(0.42us)        |
+| I2CM_TSUSTO[15:0] | 0x00EF(5us)            | 0x0031(1.04us)              | 0x0013(0.42us)        |
+| I2CM_TSUSTA[15:0] | 0x0117(5.83us)         | 0x0031(1.04us)              | 0x0013(0.42us)        |
+| I2CM_THIGH[15:0]  | 0x00E5(4.79us)         | 0x0039(1.21us)              | 0x0015(0.46us)        |
+| I2CM_THDDAT[15:0] | 0x0013(0.42us)         | 0x0004(0.10us)              | 0x0003(0.08us)        |
+| I2CM_TSUDAT[15:0] | 0x00E5(4.79us)         | 0x0039(1.21us)              | 0x0015(0.46us)        |
+| I2CM_TBUF[15:0]   | 0x0117(5.83us)         | 0x0045(1.46us)              | 0x001B(0.58us)        |
+
+#+CAPTION: I2C Master Controller タイミングパラメータの設定例 (システムクロック 24 MHz)
+| Parameter         | Standard-mode(100Kb/s) | Fast-mode(400Kb/s) | Fast-mode Plus(1Mb/s) |
+|-------------------+------------------------+--------------------+-----------------------|
+| I2CM_THDSTA[15:0] | 0x0077(5us)            | 0x0018(1.04us)     | 0x0009(0.42us)        |
+| I2CM_TSUSTO[15:0] | 0x0077(5us)            | 0x0018(1.04us)     | 0x0009(0.42us)        |
+| I2CM_TSUSTA[15:0] | 0x008B(5.83us)         | 0x0018(1.04us)     | 0x0009(0.42us)        |
+| I2CM_THIGH[15:0]  | 0x0072(4.79us)         | 0x001B(1.17us)     | 0x0009(0.42us)        |
+| I2CM_THDDAT[15:0] | 0x0009(0.42us)         | 0x0003(0.17us)     | 0x0003(0.17us)        |
+| I2CM_TSUDAT[15:0] | 0x0072(4.79us)         | 0x001B(1.17us)     | 0x0009(0.42us)        |
+| I2CM_TBUF[15:0]   | 0x008B(5.83us)         | 0x0022(1.46us)     | 0x000D(0.58us)        |
+
+制限事項：
+1. データ処理に必要な時間として、I2C Master Clock High Timing Setting Register(I2CM_THIGH)の設定値は、必ず0x0004以上となるように設定してください。
+2. マルチマスター構成となる場合、または クロックストレッチ機能を持った I2Cデバイスと接続して通信する場合、以下のレジスタの設定値は、I2Cクロックの同期処理に必要な時間を確保するため 0x0003以上となるように設定する必要があります。
+  - I2C Master STOP Setup Timing Setting Register(I2CM_TSUSTO)
+  - I2C Master Repeated START Setup Timing Setting Register(I2CM_TSUSTA)
+  - I2C Master Data Hold Timing Setting Register(I2CM_THDDAT)
+
+*** I2C通信操作手順例
+この章では、I2C通信を行うための I2C Master Controllerのレジスタ制御手順を説明します。
+
+I2C Master Controllerは、マルチマスターに対応する実装のため、I2C Master Controllerと I2Cバスを切り離す機能と、I2C Busを監視する機能を持っています。
+この仕様により、I2C Master Enable RegisterのI2CM_ENビットが"1"で、且つ I2C BusがIdle状態の時のみ I2C通信を開始することができます。
+I2CM_ENビットが"0"、または、I2C BusがIdle状態でない場合は、I2C Master TX FIFO Registerにデータが書き込まれても I2C通信を開始せず、I2CM_ENビットが"1"、かつ、I2C BusがIdle状態になるまで Waitします。
+
+これ以降のレジスタアクセス手順は、I2CM_ENビットが "1"で I2C Busが Idle状態である事を前提に記載しています。
+
+**** データ書き込み操作手順
+本章では I2Cデバイスへのデータ書き込みを行う場合の手順を説明します。
+
+I2Cデバイスへデータ書き込みを行う場合の I2C Busの波形を以下に示します。
+
+#+CAPTION: I2C書き込みアクセス波形
+[[file:./images/i2cm_write_acc_seq.png]]
+
+A: TX FIFO(I2C Master TX FIFO RegisterのI2CM_TXDATAフィールド)の Bit7-1に I2Cデバイスのアドレスと Bit0(R/Wビット)に"0"(送信モード)を書き込みます。
+I2C Master ControllerはI2C書き込み動作を開始し、I2C BusにStart Condition, TX FIFOに書き込まれたアドレス, R/Wビットの順に送信します。
+データ送信後の次のサイクルは I2Cデバイスからの ACK受信を行います。
+
+B: 送信するデータを送信順に 1Byte単位でTX FIFOに書き込みます。
+書き込みが完了したデータから、順次 I2C Busに送信されます。
+なお、I2Cデバイスからの ACK受信は 1 Byte毎に毎回行います。
+
+C: 最終 Byteの送信データを TX FIFOに書き込む時、同時に I2C Master TX FIFO RegisterのI2CM_STOPビットに"1"をセットします。
+I2C Master Controllerは、最終 Byteのデータ送信と ACK受信の完了後に、I2C BusにSTOP Conditionを送信し、I2C Master Interrupt Status Registerの I2CM_COMP割り込みをセットして、書き込み動作を完了します。
+
+具体的な例として、I2Cデバイスのアドレス 0x67に、0x89, 0xAB, 0xCD, 0xEFのデータを書き込む場合には、I2C Master TX FIFO Registerに以下の書き込みを行います。
+1. Register Write, Address Offset: 0x0004, Write Data: 0x000000CE
+2. Register Write, Address Offset: 0x0004, Write Data: 0x00000089
+3. Register Write, Address Offset: 0x0004, Write Data: 0x000000AB
+4. Register Write, Address Offset: 0x0004, Write Data: 0x000000CD
+5. Register Write, Address Offset: 0x0004, Write Data: 0x000001EF
+
+TX FIFOの容量を超えるサイズのデータを送信する場合は、TX FIFOがOverflowしないよう書き込み間隔を調整する必要があります。
+TX FIFOのデータ格納量のステータスは、I2C Master FIFO Status Registerや TX FIFO関連の割り込みにより、ソフトウェアから確認することができます。
+I2C書き込み動作中に、I2CM_STOPビットがセットされない状態でTX FIFOが Emptyとなった場合、I2C通信を一時停止します。
+この時、TX FIFOに送信データが書き込まれると、I2C通信を再開します。
+
+次にRepeated Start Conditionを使用した書き込みアクセスの手順を説明します。
+この手順はデバイスアドレスとは別にレジスタアドレスを持つ I2Cデバイスとの通信時などで使用します。
+
+#+CAPTION: Repeated Startを使用したI2C書き込みアクセス波形
+[[file:./images/i2cm_write_acc_seq_repsta.png]]
+
+A: 前の手順と同様に TX FIFOのBit7-1に I2Cデバイスのアドレス、Bit0(R/Wビット)に"0"(送信モード)を書き込みます。
+
+B: TX FIFOに 送信データの書き込み(ここではI2Cデバイスのレジスタアドレスとします)と同時に、I2C Master TX FIFO RegisterのI2CM_RESTARTビットに"1"をセットします。
+I2C Master Controllerはレジスタアドレスの送信後のACK受信が完了すると、Repeated Start Conditionを送信します。
+
+C: Aの手順と同様、再度TX FIFOのBit7-1に I2Cデバイスのアドレスと、Bit0(R/Wビット)に"0"(送信モード)を書き込みます。
+
+D: 送信するデータを 1 Byte単位で送信順にTX FIFOに書き込みます。
+
+E: 最終 Byteの送信データを TX FIFOに書き込む時、同時にI2C Master TX FIFO Registerの I2CM_STOPビットに"1"をセットします。
+
+具体的な例として、アドレス 0x67のI2Cデバイスのレジスタアドレス 0xFEに、0xDC、0xBA、0x98、0x76、0x54のデータを書き込む場合には、I2C Master TX FIFO Registerに以下の書き込みを行います。
+1. Register Write, Address Offset: 0x0004, Write Data: 0x000000CE
+2. Register Write, Address Offset: 0x0004, Write Data: 0x000002FE
+3. Register Write, Address Offset: 0x0004, Write Data: 0x000000CE
+4. Register Write, Address Offset: 0x0004, Write Data: 0x000000DC
+5. Register Write, Address Offset: 0x0004, Write Data: 0x000000BA
+6. Register Write, Address Offset: 0x0004, Write Data: 0x00000098
+7. Register Write, Address Offset: 0x0004, Write Data: 0x00000076
+8. Register Write, Address Offset: 0x0004, Write Data: 0x00000154
+
+**** データ読み出し操作手順
+本章では I2Cデバイスからのデータ読み出しを行う場合の手順を説明します。
+
+I2Cデバイスからデータ読み出しを行う場合の I2C Busの波形を以下に示します。
+
+#+CAPTION: I2C読み出しアクセス波形
+[[file:./images/i2cm_read_acc_seq.png]]
+
+A: TX FIFO(I2C Master TX FIFO RegisterのI2CM_TXDATAフィールド)のBit7-1に I2Cデバイスのアドレス7と、Bit0(R/Wビット)に"1"を書き込みます。
+I2C Master ControllerはI2C読み出し動作を開始し、I2C BusにStart Condition送信後、TX FIFOに書き込まれたアドレスとR/Wビットを送信します。
+データ送信後の次のサイクルは I2Cデバイスからの ACK受信を行います。
+
+B: 受信するデータのByte数から 1を引いた値をTX FIFOに書き込みます。
+この時、同時に I2C Master TX FIFO RegisterのI2CM_STOPビットに"1"をセットします。
+TX FIFOに設定されたByte数分のデータ受信を行い、受信データを RX FIFOへ格納します。
+なお、I2Cデバイスから 1 Byteのデータを受信するたびに I2Cデバイスへの ACK送信を行います。
+
+C: I2C Master Controllerは、最終 Byteのデータ受信後 NACKを送信し、I2C BusにStop Conditionを送信します。
+また同時に、I2C Master Interrupt Status RegisterのI2CM_COMP割り込みをセットして、読み出し動作を完了します。
+
+I2C Master Controllerは、最終 Byteのデータ送信と ACK受信の完了後に、I2C BusにSTOP Conditionを送信し、I2C Master Interrupt Status Registerの I2CM_COMP割り込みをセットして、書き込み動作を完了します。
+
+具体的な例として、I2Cデバイスのアドレス 0x67から 4 Byteのデータ読み出す場合は、I2C Master TX FIFO Registerに以下の書き込みを行います。
+1. Register Write, Address Offset: 0x0004, Write Data: 0x000000CF
+2. Register Write, Address Offset: 0x0004, Write Data: 0x00000103
+
+受信データはI2C Master RX FIFO Registerを読み出すことにより取得できます。
+I2C読み出し動作中に、設定したByte数のデータ受信が完了しない状態で RX FIFOが Fullとなった場合、I2C通信を一時停止します。
+この時、RX FIFOから受信データが読み出されると、I2C通信を再開します。
+RX FIFOの容量を超えるサイズのデータを受信する場合は、RX FIFOのサイズを考慮し RX FIFOから定期的にデータ読み出す必要があります。
+RX_FIFOのデータ格納量のステータスは、I2C Master FIFO Status Registerや RX_FIFO関連の割り込みにより、ソフトウェアから確認することができます。
+
+
+次にRepeated Start Conditionを使用した読み出しアクセスの手順を説明します。
+この手順はデバイスアドレスとは別にレジスタアドレスを持つ場合や、10ビットアドレスの I2Cデバイスとの通信時に使用します。
+
+#+CAPTION: Repeated Startを使用したI2C読み出しアクセス波形
+[[file:./images/i2cm_read_acc_seq_repsta.png]]
+
+A: 前の手順と同様に、TX FIFOのBit7-1に I2Cデバイスのアドレス、Bit0(R/Wビット)に"0"(送信モード)を書き込みます。
+
+B: TX FIFOに送信データの書き込み(ここではI2Cデバイスのレジスタアドレスとします)と同時に、I2C Master TX FIFO RegisterのI2CM_RESTARTビットに"1"をセットします。
+I2C Master Controllerはレジスタアドレスの送信後のACK受信が完了すると、Repeated Start Conditionを送信します。
+
+C: TX FIFOのBit7-1に I2Cデバイスのアドレスと、Bit0(R/Wビット)に"1"を書き込みます。
+
+D: 受信するデータの Byte数から 1を引いた値のTX FIFOに書き込みます。この時 同時にI2C Master TX FIFO RegisterのI2CM_STOPビットに"1"をセットします。
+
+具体的な例として、アドレス 0x67のI2Cデバイスのレジスタアドレス 0xFEから 5 Byteのデータ読み出しを行いたい場合は、I2C Master TX FIFO Registerに以下の書き込みを行います。
+1. Register Write, Address Offset: 0x0004, Write Data: 0x000000CE
+2. Register Write, Address Offset: 0x0004, Write Data: 0x000002FE
+3. Register Write, Address Offset: 0x0004, Write Data: 0x000000CF
+4. Register Write, Address Offset: 0x0004, Write Data: 0x00000104
