@@ -120,6 +120,7 @@ Mission Bus SystemはユーザーがCubeSatのミッションを行うためのI
 | - UART Lite (Console Interface)          | 0x4F01_0000 - 0x4F01_FFFF | 　                |
 | - Internal I2C Master                    | 0x4F02_0000 - 0x4F02_FFFF | 　                |
 | - External I2C Master                    | 0x4F03_0000 - 0x4F03_FFFF | 　                |
+| - System Monitor                         | 0x4F04_0000 - 0x4F04_FFFF | 　                |
 | Mission(UDL) Bus                         | 0x5000_0000 - 0x5FFF_FFFF | 　                |
 | Internal Private peripheral bus (CM3)    | 0xE000_0000 - 0xE003_FFFF | 　                |
 | - ITM                                    | 0xE000_0000 - 0xE000_0FFF | 　                |
@@ -240,6 +241,67 @@ System Registerの IPコアバージョンの管理レジスタです。
 | 31:24 | MAJVER | System Register Core Major Version | System RegisterコアのMajor Versionです。 | RO  |
 | 23:16 | MINVER | System Register Core Minor Version | System RegisterコアのMinor Versionです。 | RO  |
 |  15:0 | PATVER | System Register Core Patch Version | System RegisterコアのPatch Versionです。 | RO  |
+
+* System Monitor
+System Monitorは、SC OBC FPGAのシステムを監視するためのモジュールです。
+
+SC OBCのシステムは、TRCHによって監視されます。
+SC OBC FPGAは System Monitorが収集した FPGA内部の状態を Watchdog signal (FPGA_WATCHDOG)を通じて TRCHに伝えます。
+TRCHは FPGAが出力する FPGA_WATCHDOG信号が定期的にトグルしている間、FPGAが健全に動作していると判断します。
+
+** レジスタ詳細
+System Monitorは、Base Address 0x4F04_0000に配置されています。
+
+#+CAPTION: System Monitorメモリマップ
+|    Address | Symbol            | Register                          |    Initial |
+|------------+-------------------+-----------------------------------+------------|
+| 0x4F040000 | SYSMON_WDOG_CTRL  | Watchdog Control Register         | 0x00000000 |
+| 0x4F040004 | SYSMON_WDOG_WSR   | Watchdog Service Register         | 0x00000000 |
+| 0x4F040010 | SYSMON_WDOG_SIVAL | Watchdog Signal Interval Register | 0x0003A97F |
+
+*** Watchdog Control Register (0x4F040000)
+Watchdog Control Registerは、SC OBC FPGAの Watchdogの制御を行うためのレジスタです。
+
+本レジスタの設定により Watchdogを動作させたり、Watchdog Counterが満了した時の挙動を設定する事ができます。
+
+#+CAPTION: Watchdog Control Register ビットフィールド
+|   bit | Symbol        | Field                     | Description                                                                                                                                                                                                                                      | R/W |
+|-------+---------------+---------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:20 | -             | Reserved                  | Reserved                                                                                                                                                                                                                                         | -   |
+| 19:16 | SW_WDOG_TIME  | Software Watchdog Time    | Software Watchdog Timerの満了時間を設定するためのフィールドです。0x0: 0.5 [sec] 0x1: 1.0 [sec] 0x2: 1.5 [sec] 〜 0xF: 8.0 [sec]                                                                                                                  | R/W |
+| 15:10 | -             | Reserved                  | Reserved                                                                                                                                                                                                                                         | -   |
+|     9 | HW_WDOG_RESET | Hardware Watchdog Reset   | System Monitorが H/W起因の問題を検出した時、システムにリセットを発行するか決定するためのビットです。このビットが"1"にセットされている時に H/Wの問題を検出すると、システム全体にリセットを発行します。                                            | R/W |
+|     8 | SW_WDOG_RESET | Software Watchdog Reset   | Software Watchdog Timerのカウント動作が満了した時、システムにリセットを発行するか決定するためのビットです。このビットが"1"にセットされている時に、Software Watchdog Timerがリロードされず満了すると、システム全体にリセットを発行します。        | R/W |
+|   7:5 | -             | Reserved                  | Reserved                                                                                                                                                                                                                                         | -   |
+|     4 | FPGA_WDOG_SE  | FPGA_WATCHDOG Stop Enable | System Monitorが SC-OBC-FPGAの異常を検出した時、FPGA_WATCHDOG信号のトグル動作を停止させるか設定するためのビットです。このビットに"1"がセットされている時に、H/W起因または S/W起因の問題を検出すると、FPGA_WATCHDOG信号のトグル動作を停止します。 | R/W |
+|   3:1 | -             | Reserved                  | Reserved                                                                                                                                                                                                                                         | -   |
+|     0 | WDOG_START    | Watchdog Start            | Watchdog機能を Enableにするためのビットです。このビットを"1"にセットするとWatchdog機能を有効化できます。Watchdog機能を有効化すると、このビットに"0"を書き込んでもWatchdog機能を無効化する事はできません。                                        | R/W |
+
+*** Watchdog Service Register (0x4F040004)
+Watchdog Service Registerは、Software Watchdog Timerをリロードするためのレジスタです。
+
+Watchdog Control Registerの Watchdog Startビットをセットした後は、Software Watchdog Timeフィールドで設定する間隔以内のタイミングで本レジスタに Writeアクセスを行い、Software Watchdog Timerをリロードしてください。
+
+#+CAPTION: Watchdog Control Register ビットフィールド
+|   bit | Symbol   | Field                     | Description                                                                                                                                                                            | R/W |
+|-------+----------+---------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:16 | -        | Reserved                  | Reserved                                                                                                                                                                               | -   |
+|  15:0 | WDOG_WSR | Watchdog Service Register | Software Watchdog Timerをリロードするためのフィールドです。Watchdog Startを"1"にセットした後、0x5A5Aと 0xA5A5を交互に書き込む事で、Software Watchdog Timerをリロードする事ができます。 | WO  |
+
+*** Watchdog Signal Interval Register (0x4F040010)
+Watchdog Signal Interval Registerは、FPGA_WATCHDOG信号のトグル間隔を設定するためのレジスタです。
+
+FPGA_WATCHDOGが Highレベル または Lowレベルとなるクロックサイクル数を規定します。Watchdog Signalのカウンタは 24 MHzで動作するため、以下の式で設定値を求める事ができます。
+
+#+BEGIN_QUOTE
+$WDOG\_SIVAL設定値 = \frac{FPGA\_WATCHDOG\ High/Lowレベル幅 [s]}{\frac{1}{24 \times 10^{6}}} - 1$
+#+END_QUOTE
+
+#+CAPTION: Watchdig Signal Interval Registerビットフィールド
+|   bit | Symbol     | Field                    | Description                                                                                                    | R/W |
+|-------+------------+--------------------------+----------------------------------------------------------------------------------------------------------------+-----|
+| 31:24 | -          | Reserved                 | Reserved                                                                                                       | -   |
+|  23:0 | WDOG_SIVAL | Watchdog Signal Interval | Watchdog Signalの Highレベルまたは Lowレベルの幅を設定するフィールドです。初期値は 10 [ms]に設定されています。 | R/W |
 
 * QSPI Controller
 QSPI Controllerは、SC OBCモジュールに搭載するメモリとSPIプロトコルによる通信を行うためのモジュールです。
