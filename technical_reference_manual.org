@@ -165,7 +165,7 @@ Cortex-M3の 割り込みコントローラの仕様については、ARM Cortex
 | Exception No. | IRQ Bit | Interrupt                              | Type  |
 |---------------+---------+----------------------------------------+-------|
 |            16 | [0]     | AHB UART Lite(Console)                 | Pulse |
-|            17 | [1]     | Reserved                               | Level |
+|            17 | [1]     | HRMEM (High-reliability Memory)        | Level |
 |            18 | [2]     | QSPI Controller (Configuration Memory) | Level |
 |            19 | [3]     | QSPI Controller (Flash Data Memory)    | Level |
 |            20 | [4]     | QSPI Controller (FeRAM)                | Level |
