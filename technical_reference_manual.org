@@ -109,12 +109,13 @@ Mission Bus SystemはユーザーがCubeSatのミッションを行うためのI
 | Field                                    | Address Space             | Comment           |
 |------------------------------------------+---------------------------+-------------------|
 | Instruction Tightly Coupled Memory (CM3) | 0x0000_0000 - 0x0000_1FFF | CFGITCMEN[0] is 1 |
-| Reserved (HRMEM)                         | 0x0000_0000 - 0x003F_FFFF | CFGITCMEM[0] is 0 |
+| HRMEM (High-reliability Memory)          | 0x0000_0000 - 0x003F_FFFF | CFGITCMEM[0] is 0 |
 | Main AXI Bus                             | 0x4000_0000 - 0x4FFF_FFFF | 　                |
 | - QSPI Controller (Configuration Memory) | 0x4000_0000 - 0x4000_FFFF | 　                |
 | - QSPI Controller (Data Memory)          | 0x4010_0000 - 0x4010_FFFF | 　                |
 | - QSPI Controller(FeRAM)                 | 0x4020_0000 - 0x4020_FFFF | 　                |
 | - CAN Controller                         | 0x4040_0000 - 0x4040_FFFF | 　                |
+| - HRMEM Register                         | 0x4050_0000 - 0x4050_FFFF | 　                |
 | Low Performance IP Bus                   | 0x4F00_0000 - 0x4FFF_FFFF | 　                |
 | - System Register                        | 0x4F00_0000 - 0x4F00_FFFF | 　                |
 | - UART Lite (Console Interface)          | 0x4F01_0000 - 0x4F01_FFFF | 　                |
@@ -122,6 +123,7 @@ Mission Bus SystemはユーザーがCubeSatのミッションを行うためのI
 | - External I2C Master                    | 0x4F03_0000 - 0x4F03_FFFF | 　                |
 | - System Monitor                         | 0x4F04_0000 - 0x4F04_FFFF | 　                |
 | Mission(UDL) Bus                         | 0x5000_0000 - 0x5FFF_FFFF | 　                |
+| HRMEM Memory Mirror                      | 0x6000_0000 - 0x603F_FFFF |                   |
 | Internal Private peripheral bus (CM3)    | 0xE000_0000 - 0xE003_FFFF | 　                |
 | - ITM                                    | 0xE000_0000 - 0xE000_0FFF | 　                |
 | - DWT                                    | 0xE000_1000 - 0xE000_1FFF | 　                |
