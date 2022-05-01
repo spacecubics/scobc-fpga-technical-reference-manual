@@ -366,6 +366,298 @@ Status Registerにアクセスするためのレジスタアドレスを以下�
 
 System Monitorの XADC Register Windowからは、XADCのすべてのレジスタ領域にアクセスする事ができますが、アラーム機能は現状実装されておりません。
 
+* HRMEM (High-reliability Memory)
+HRMEM (High-reliability Memory)は、SC-OBC-A1に実装される SRAMにアクセスを行うメモリコントローラモジュールです。
+
+HRMEMのメモリ空間は、Address 0x00000000をベースとする 4 MByteの領域に配置されており、CPU SubSystemの CPU Local Busを通じアクセスされます。
+また、Main AXI Bus Systemに接続されるAXIバスからアクセスが可能なミラーアドレスが、Base Address 0x60000000に配置されています。
+
+HRMEMは SC OBC FPGAのシステムにおいて、CPUが使用するメインメモリとして動作します。
+そのため、SC OBC FPGAに実装する CPUが効率的に動作できるよう、SRAMへのアクセスを最適化する機能が実装されています。
+
+HRMEMは SRAMからのデータ読み出し時に 1 bit ECCエラーの発生を検出すると、エラーを修復する機能を持っています。
+また、メモリスクラビング機能を持ち、SRAMの全領域のデータに対し定期的なエラーチェックとエラーの修復を行います。
+
+** レジスタ詳細
+HRMEMはデータを格納する Address 0x00000000からの 4 MByte空間とは別に、HRMEMを制御するために使用するレジスタが配置されています。
+HRMEMのレジスタは、Base Address 0x40500000に配置されています。
+
+#+CAPTION: HRMEM Register アドレスマップ
+| Offset | Symbol               | Register                                    |    Initial |
+|--------+----------------------+---------------------------------------------+------------|
+| 0x0000 | HRMEM_ECCENR         | ECC Enable Register                         | 0x00000001 |
+| 0x0004 | HRMEM_MEMSCRBENR     | Memory Scrubing Enable Register             | 0x00000000 |
+| 0x0008 | HRMEM_MEMSCRCTRLR    | Memory Scrubing Control Register            | 0x00000001 |
+| 0x0010 | HRMEM_ECC1ERRINTR    | ECC 1bit Error Interrupt Register           | 0x00000000 |
+| 0x0014 | HRMEM_ECC2ERRINTR    | ECC 2bit Error Interrupt Register           | 0x00000000 |
+| 0x0018 | HRMEM_ECCCDISINTR    | ECC Correct Data Discard Interrupt Register | 0x00000000 |
+| 0x001C | HRMEM_INTENR         | HRMEM Interrupt Enable Register             | 0x00000000 |
+| 0x0020 | HRMEM_ECCERRCNTR     | ECC Error Count Register                    | 0x00000000 |
+| 0x0024 | HRMEM_ECDISCNTR      | ECC Correct Data Discard Count Register     | 0x00000000 |
+| 0x0028 | HRMEM_ERRCNTCLRR     | Error Count Clear Register                  | 0x00000000 |
+| 0x0040 | HRMEM_AHBECC1ERRR    | AHB ECC 1bit Error Status Register          | 0x00000000 |
+| 0x0044 | HRMEM_AHBECC2ERRR    | AHB ECC 2bit Error Status Register          | 0x00000000 |
+| 0x0048 | HRMEM_ATRDECC1ERRR   | ATRD ECC 1bit Error Status Register         | 0x00000000 |
+| 0x004C | HRMEM_ATRDECC2ERRR   | ATRD ECC 2bit Error Status Register         | 0x00000000 |
+| 0x0050 | HRMEM_AHBECCERRCNTR  | AHB ECC Error Count Register                | 0x00000000 |
+| 0x0054 | HRMEM_ATRDECCERRCNTR | ATRD ECC Error Count Register               | 0x00000000 |
+| 0x0070 | HRMEM_PFEMDCTLR      | Prefetch Mode Control Register              | 0x00000001 |
+| 0x0074 | HRMEM_SPEPFENR       | Special Prefetch Enable Register            | 0x00000000 |
+| 0x007C | HRMEM_PFBUFFLUSHR    | Prefetch Buffer Flush Register              | 0x00000000 |
+| 0x0080 | HRMEM_SPEPFADRSETR1  | Special Prefetch Address Setting Register 1 | 0x00000000 |
+| 0x0084 | HRMEM_SPEPFADRSETR2  | Special Prefetch Address Setting Register 2 | 0x00000000 |
+| 0xF000 | HRMEM_VER            | HRMEM IP Version Register                   |          - |
+
+*** ECC Enable Register (Offset: 0x0000)
+ECC Enable Registerは、1bit ECCエラー検出時のメモリへの訂正データの書き戻し機能を設定するためのレジスタです。
+このレジスタのEnableをONにすると、訂正データの書き戻し機能が有効になります。
+
+#+CAPTION: ECC Enable Register ビットフィールド
+|  bit | Symbol   | Field                    | Description                                                                            | R/W |
+|------+----------+--------------------------+----------------------------------------------------------------------------------------+-----|
+| 31:1 | -        | Reserved                 | Reserved                                                                               | -   |
+|    0 | ECCCOLEN | ECC Error Collect Enable | 訂正データの書き戻し機能のEnable設定を行います。0: 書き戻し機能 OFF 1: 書き戻し機能 ON | R/W |
+
+*** Memory Scrubing Enable Register (Offset: 0x0004)
+Memory Scrubing Enable Registerは、メモリへのメモリスクラビング機能のON/OFFを設定するためのレジスタです。
+このレジスタのEnableをONにすると、メモリスクラビング機能による自動読み出しアクセスを行います。
+
+本機能を有効にする場合は、訂正データの書き戻し機能(ECC Enable RegisterのECCCOLEN)も合わせて有効にする必要があります。
+
+#+CAPTION: Memory Scrubing Enable Register ビットフィールド
+|  bit | Symbol    | Field                  | Description                                                                                                                        | R/W |
+|------+-----------+------------------------+------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:1 | -         | Reserved               | Reserved                                                                                                                           | -   |
+|    0 | MEMSCRBEN | Memory Scrubing Enable | メモリスクラビング機能による自動読み出しアクセスのEnable設定を行います。0: メモリスクラビング機能 OFF 1: メモリスクラビング機能 ON | R/W |
+
+*** Memory Scrubing Control Register (Offset: 0x0008)
+Memory Scrubing Control Registerは、メモリスクラビング機能制御に関する動作設定を行うためのレジスタです。
+
+#+CAPTION: Memory Scrubing Control Register ビットフィールド
+|   bit | Symbol      | Field                              | Description                                                                                                                                                   | R/W |
+|-------+-------------+------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:17 | -           | Reserved                           | Reserved                                                                                                                                                      | -   |
+|    16 | COLFSRDSTPB | Memory Scrubing Arbitration Enable | 書き戻しデータ用FIFOがFULL時のメモリスクラビング調停機能を設定する信号です。本ビットが0の時、書き戻しデータ用FIFOがFULLの時にメモリスクラビングを停止します。 | R/W |
+|  15:0 | MEMSCRCYC   | Memory Scrubing Cycle              | メモリスクラビングによる自動読み出しアクセスのWAIT Cycle間隔を設定する信号です。0: 設定禁止 1: 1Clock間隔(default) 2: 2Clock間隔 ... 65535: 65535Clock間隔    | R/W |
+
+*** ECC 1bit Error Interrupt Register (Offset: 0x0010)
+ECC 1bit Error Interrupt Registerは、1bit ECCエラー検出動作における割り込みステータスレジスタです。
+対象のビットに"1"をセットすると、割り込みをクリアする事ができます。
+
+#+CAPTION: ECC 1bit Error Interrupt Register ビットフィールド
+|  bit | Symbol   | Field          | Description                                                                       | R/W  |
+|------+----------+----------------+-----------------------------------------------------------------------------------+------|
+| 31:1 | -        | Reserved       | Reserved                                                                          | -    |
+|    0 | E1ERRINT | 1bit ECC Error | メモリからの読み出し時に1bit ECC Errorを検出すると本ビットが"1"にセットされます。 | R/WC |
+
+*** ECC 2bit Error Interrupt Register (Offset: 0x0014)
+ECC 2bit Error Interrupt Registerは、2bit ECCエラー検出動作における割り込みステータスレジスタです。
+対象のビットに"1"をセットすると、割り込みをクリアする事ができます。
+
+#+CAPTION: ECC 2bit Error Interrupt Register ビットフィールド
+|  bit | Symbol   | Field          | Description                                                                       | R/W  |
+|------+----------+----------------+-----------------------------------------------------------------------------------+------|
+| 31:1 | -        | Reserved       | Reserved                                                                          | -    |
+|    0 | E2ERRINT | 2bit ECC Error | メモリからの読み出し時に2bit ECC Errorを検出すると本ビットが"1"にセットされます。 | R/WC |
+
+*** ECC Correct Data Discard Interrupt Register (Offset: 0x0018)
+ECC Correct Data Discard Interrupt Registerは、メモリへのECC訂正データ廃棄動作における割り込みステータスレジスタです。
+対象のビットに"1"をセットすると、割り込みをクリアする事ができます。
+
+#+CAPTION: ECC Correct Data Discard Interrupt Register ビットフィールド
+|  bit | Symbol   | Field                    | Description                                                                                               | R/W  |
+|------+----------+--------------------------+-----------------------------------------------------------------------------------------------------------+------|
+| 31:1 | -        | Reserved                 | Reserved                                                                                                  | -    |
+|    0 | ECDISINT | ECC Correct Data Discard | 1bit ECCエラー検出時のメモリへのライトバック用訂正データの廃棄を検出すると本ビットが"1"にセットされます。 | R/WC |
+
+*** HRMEM Interrupt Enable Register (Offset: 0x001C)
+HRMEM Interrupt Enable Registerは、HRMEMの動作において発生した割り込みイベントを割り込み出力信号に通知するか設定するためのレジスタです。
+
+#+CAPTION: HRMEM Interrupt Enable Register ビットフィールド
+|  bit | Symbol      | Field                           | Description                                                                  | R/W |
+|------+-------------+---------------------------------+------------------------------------------------------------------------------+-----|
+| 31:3 | -           | Reserved                        | Reserved                                                                     | -   |
+|    2 | ECDISINTENB | ECC Correct Data Discard Enable | ECDISINTイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
+|    1 | E2ERRINTENB | 2bit ECC Error Enable           | E2ERRINTイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
+|    0 | E1ERRINTENB | 1bit ECC Error Enable           | E1ERRINTイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
+
+*** ECC Error Count Register (Offset: 0x0020)
+ECC Error Count Registerは、ECCエラー検出件数を表示するカウンターレジスタです。ECCエラーの検出毎に本カウンターをインクリメントします。
+
+カウンターが上限である 0xFFFFに達すると停止します。
+
+#+CAPTION: ECC Error Count Register ビットフィールド
+|   bit | Symbol   | Field                  | Description                                          | R/W |
+|-------+----------+------------------------+------------------------------------------------------+-----|
+| 31:16 | E2ERRCNT | 2bit ECC Error Counter | 2bit ECCエラーをカウントする 16bitのカウンターです。 | RO  |
+|  15:0 | E1ERRCNT | 1bit ECC Error Counter | 1bit ECCエラーをカウントする 16bitのカウンターです。 | RO  |
+
+*** ECC Correct Data Discard Count Register (Offset: 0x0024)
+ECC Correct Data Discard Count Registerは、メモリへのECC訂正データ廃棄件数を表示するカウンターレジスタです。ECC訂正データ廃棄の検出毎に本カウンターをインクリメントします。
+
+カウンターが上限である 0xFFFFに達すると停止します。
+
+#+CAPTION: ECC Correct Data Discard Count Register ビットフィールド
+|   bit | Symbol   | Field                            | Description                                             | R/W |
+|-------+----------+----------------------------------+---------------------------------------------------------+-----|
+| 31:16 | -        | Reserved                         | Reserved                                                | -   |
+|  15:0 | ECDISCNT | ECC Correct Data Discard Counter | ECC訂正データ廃棄をカウントする 16bitのカウンターです。 | RO  |
+
+*** Error Count Clear Register (Offset: 0x0028)
+Error Count Clear Registerは、HRMEM内の全てのカウンタをクリアするためのレジスタです。
+
+#+CAPTION: Error Count Clear Register ビットフィールド
+|  bit | Symbol  | Field             | Description                                                           | R/W |
+|------+---------+-------------------+-----------------------------------------------------------------------+-----|
+| 31:1 | -       | Reserved          | Reserved                                                              | -   |
+|    0 | ECNTCLR | Error Count Clear | 本ビットを1にセットすると、全てのカウンタレジスタの値をクリアします。 | WO  |
+
+*** AHB ECC 1bit Error Status Register (Offset: 0x0040)
+AHB ECC 1bit Error Status Registerは、AHBリードアクセスによる1bit ECCエラー検出動作におけるステータスレジスタです。
+対象のビットに"1"をセットすると、割り込みをクリアする事ができます。
+
+本レジスタはデバッグ用途で使用するため、このレジスタのセット状態は割り込み通知には影響しません。
+
+#+CAPTION: AHB ECC 1bit Error Status Register ビットフィールド
+|  bit | Symbol   | Field                     | Description                                                                    | R/W  |
+|------+----------+---------------------------+--------------------------------------------------------------------------------+------|
+| 31:1 | -        | Reserved                  | Reserved                                                                       | -    |
+|    0 | AHBE1ERR | AHB Access 1bit ECC Error | AHBリードアクセス時に1bit ECC Errorを検出すると本ビットが"1"にセットされます。 | R/WC |
+
+*** AHB ECC 2bit Error Status Register (Offset: 0x0044)
+AHB ECC 2bit Error Status Registerは、AHBリードアクセスによる2bit ECCエラー検出動作におけるステータスレジスタです。
+対象のビットに"1"をセットすると、割り込みをクリアする事ができます。
+
+本レジスタはデバッグ用途で使用するため、このレジスタのセット状態は割り込み通知には影響しません。
+
+#+CAPTION: AHB ECC 2bit Error Status Register ビットフィールド
+|  bit | Symbol   | Field                     | Description                                                                    | R/W  |
+|------+----------+---------------------------+--------------------------------------------------------------------------------+------|
+| 31:1 | -        | Reserved                  | Reserved                                                                       | -    |
+|    0 | AHBE2ERR | AHB Access 2bit ECC Error | AHBリードアクセス時に2bit ECC Errorを検出すると本ビットが"1"にセットされます。 | R/WC |
+
+*** ATRD ECC 1bit Error Status Register (Offset: 0x0048)
+ATRD ECC 1bit Error Status Registerは、メモリスクラビング機能の自動読み出しアクセスによる1bit ECCエラー検出動作におけるステータスレジスタです。
+対象のビットに"1"をセットすると、割り込みをクリアする事ができます。
+
+本レジスタはデバッグ用途で使用するため、このレジスタのセット状態は割り込み通知には影響しません。
+
+#+CAPTION: ATRD ECC 1bit Error Status Register ビットフィールド
+|  bit | Symbol    | Field                    | Description                                                                       | R/W  |
+|------+-----------+--------------------------+-----------------------------------------------------------------------------------+------|
+| 31:1 | -         | Reserved                 | Reserved                                                                          | -    |
+|    0 | ATRDE1ERR | Auto Read 1bit ECC Error | 自動読み出しアクセス時に1bit ECC Errorを検出すると本ビットが"1"にセットされます。 | R/WC |
+
+*** ATRD ECC 2bit Error Status Register (Offset: 0x004C)
+ATRD ECC 2bit Error Status Registerは、メモリスクラビング機能の自動読み出しアクセスによる2bit ECCエラー検出動作におけるステータスレジスタです。
+対象のビットに"1"をセットすると、割り込みをクリアする事ができます。
+
+本レジスタはデバッグ用途で使用するため、このレジスタのセット状態は割り込み通知には影響しません。
+
+#+CAPTION: ATRD ECC 2bit Error Status Register ビットフィールド
+|  bit | Symbol    | Field                    | Description                                                                       | R/W  |
+|------+-----------+--------------------------+-----------------------------------------------------------------------------------+------|
+| 31:1 | -         | Reserved                 | Reserved                                                                          | -    |
+|    0 | ATRDE2ERR | Auto Read 2bit ECC Error | 自動読み出しアクセス時に2bit ECC Errorを検出すると本ビットが"1"にセットされます。 | R/WC |
+
+*** AHB ECC Error Count Register (Offset: 0x0050)
+AHB ECC Error Count Registerは、AHBリードアクセスによるECCエラー検出件数を表示するカウンターレジスタです。ECCエラーの検出毎に本カウンターをインクリメントします。
+
+カウンターが上限である 0xFFFFに達すると停止します。
+
+本レジスタはデバッグ用途で使用します。
+
+#+CAPTION: AHB ECC Error Count Register ビットフィールド
+|   bit | Symbol      | Field                             | Description                                                               | R/W |
+|-------+-------------+-----------------------------------+---------------------------------------------------------------------------+-----|
+| 31:16 | AHBE2ERRCNT | AHB Access 2bit ECC Error Counter | AHBリードアクセス時の2bit ECCエラーをカウントする 16bitのカウンターです。 | RO  |
+|  15:0 | AHBE1ERRCNT | AHB Access 1bit ECC Error Counter | AHBリードアクセス時の1bit ECCエラーをカウントする 16bitのカウンターです。 | RO  |
+
+*** ATRD ECC Error Count Register (Offset: 0x0054)
+ATRD ECC Error Count Registerは、メモリスクラビング機能の自動読み出しアクセスによるECCエラー検出件数を表示するカウンターレジスタです。ECCエラーの検出毎に本カウンターをインクリメントします。
+
+カウンターが上限である 0xFFFFに達すると停止します。
+
+本レジスタはデバッグ用途で使用します。
+
+#+CAPTION: ATRD ECC Error Count Register ビットフィールド
+|   bit | Symbol       | Field                                   | Description                                                                  | R/W |
+|-------+--------------+-----------------------------------------+------------------------------------------------------------------------------+-----|
+| 31:16 | ATRDE2ERRCNT | Auto Read Access 2bit ECC Error Counter | 自動読み出しアクセス時の2bit ECCエラーをカウントする 16bitのカウンターです。 | RO  |
+|  15:0 | ATRDE1ERRCNT | Auto Read Access 1bit ECC Error Counter | 自動読み出しアクセス時の1bit ECCエラーをカウントする 16bitのカウンターです。 | RO  |
+
+*** Prefetch Mode Control Register (Offset: 0x0070)
+Prefetch Mode Control Registerは、Prefetch機能を設定するためのレジスタです。
+
+Prefetch機能が有効の場合は、Prefetch対象となるAHB Read Accessにより読み出されたアドレスのデータをPrefetch Bufferへ格納し、次回同じアドレスがAHB BusよりReadされた場合にPrefetch Bufferから即時読み出します。
+Prefetchは、AHB Read Accessがあったアドレスとそれ以降の同じLineアドレス内のまだPrefetchされていないインクリメントアドレスを対象として全てPrefetchを行います。
+Burst Read転送時はPrefetchを行いません。
+
+#+CAPTION: Prefetch Mode Control Register ビットフィールド
+|  bit | Symbol  | Field                 | Description                                                                                                                                                                                                      | R/W |
+|------+---------+-----------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:2 | -       | Reserved              | Reserved                                                                                                                                                                                                         | -   |
+|  1:0 | PFMDCTL | Prefetch Mode Control | Prefetch機能を設定します。 2b00: Prefetch機能無効  2b01: HPROT[0]=1b0の場合Prefetch実施  2b10: HPROT[0]=1b1 & HSIZE=2b10の場合Prefetch実施   2b11: HPROT[0]=1b0 or (HPROT[0]=1b1 & HSIZE=2b10)の場合Prefetch実施 | R/W |
+
+*** Special Prefetch Enable Register (Offset: 0x0074)
+Special Prefetch Enable Registerは、専用アドレスのPrefetch機能を設定するためのレジスタです。
+
+専用アドレスのPrefetch機能が有効の場合、Prefetch対象となるAHB Read Accessにより読み出されたベースアドレスがSpecial Prefetch Address Setting Registerに設定されたベースアドレスと一致した時に、そのデータをSpecial Prefetch Bufferへ格納します。
+Special Prefetch Bufferへ格納されたデータは、他のベースアドレスのPrefetchの実施により更新されることは無く、Prefetchデータを保持し続けることができます。
+
+専用アドレスのPrefetch機能を使用するベースアドレスは最大2種類まで設定出来ます。
+
+Prefetch Mode Control RegisterのPFMDCTLフィールドが2'b00に設定されている場合、本レジスタの設定は無効となります。
+
+#+CAPTION: Special Prefetch Enable Register ビットフィールド
+|  bit | Symbol  | Field                   | Description                                                                                                                                                                 | R/W |
+|------+---------+-------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:2 | -       | Reserved                | Reserved                                                                                                                                                                    | -   |
+|  1:0 | SPPFENB | Special Prefetch Enable | 専用アドレスのPrefetch機能を設定します。 2b00: Special Prefetch未使用  2b01: Special Prefetch1のみ使用  2b10: Special Prefetch2のみ使用   2b11: Special Prefetch1/2双方使用 | R/W |
+
+*** Prefetch Buffer Flush Register (Offset: 0x007C)
+Prefetch Buffer Flush Registerは、Prefetchデータをクリアするためのレジスタです。
+
+#+CAPTION: Prefetch Buffer Flush Register ビットフィールド
+|  bit | Symbol   | Field                 | Description                                                                                                           | R/W |
+|------+----------+-----------------------+-----------------------------------------------------------------------------------------------------------------------+-----|
+| 31:1 | -        | Reserved              | Reserved                                                                                                              | -   |
+|    0 | PFBFLUSH | Prefetch Buffer Flush | 本ビットを1にセットすると、全てのPrefetch BufferとSpecial Prefetch Bufferの格納状況ステータスとデータをクリアします。 | WO  |
+
+*** Special Prefetch Address Setting Register 1 (Offset: 0x0080)
+Special Prefetch Address Setting Register 1は、Special Prefetch Buffer1にPrefetchするアドレスを設定するためのレジスタです。
+
+Special Prefetch Enable RegisterのSPPFENB[0]ビットが1に設定されている場合、本レジスタの設定が有効となります。
+
+#+CAPTION: Special Prefetch Address Setting Register 1 ビットフィールド
+|   bit | Symbol   | Field                      | Description                                                        | R/W |
+|-------+----------+----------------------------+--------------------------------------------------------------------+-----|
+| 31:22 | -        | Reserved                   | Reserved                                                           | -   |
+|  21:5 | SPPFADR1 | Special Prefetch Address 1 | Special Prefetch Buffer1にPrefetchするベースアドレスを設定します。 | R/W |
+|   4:0 | -        | Reserved                   | Reserved                                                           | -   |
+
+*** Special Prefetch Address Setting Register 2 (Offset: 0x0084)
+Special Prefetch Address Setting Register 2は、Special Prefetch Buffer2にPrefetchするアドレスを設定するためのレジスタです。
+
+Special Prefetch Enable RegisterのSPPFENB[1]ビットが1に設定されている場合、本レジスタの設定が有効となります。
+
+#+CAPTION: Special Prefetch Address Setting Register 2 ビットフィールド
+|   bit | Symbol   | Field                      | Description                                                        | R/W |
+|-------+----------+----------------------------+--------------------------------------------------------------------+-----|
+| 31:22 | -        | Reserved                   | Reserved                                                           | -   |
+|  21:5 | SPPFADR2 | Special Prefetch Address 2 | Special Prefetch Buffer2にPrefetchするベースアドレスを設定します。 | R/W |
+|   4:0 | -        | Reserved                   | Reserved                                                           | -   |
+
+*** HRMEM IP Version Register (Offset: 0xF000)
+HRMEM IPのコアバージョンの管理レジスタです。
+
+#+CAPTION: HRMEM IP Version Register ビットフィールド
+|   bit | Symbol      | Field                  | Description                          | R/W |
+|-------+-------------+------------------------+--------------------------------------+-----|
+| 31:24 | HRMEMMAJVER | HRMEM IP Major Version | HRMEMコアのMajor Versionを示します。 | RO  |
+| 23:16 | HRMEMMINVER | HRMEM IP Minor Version | HRMEMコアのMinor Versionを示します。 | RO  |
+|  15:0 | HRMEMPATVER | HRMEM IP Patch Version | HRMEMコアのPatch Versionを示します。 | RO  |
+
 * QSPI Controller
 QSPI Controllerは、SC OBCモジュールに搭載するメモリとSPIプロトコルによる通信を行うためのモジュールです。
 QSPI Controllerは、Single SPIモード, Dual SPIモード, Quad SPIモードに対応しており、メモリとの高速な通信を行う事ができます。
