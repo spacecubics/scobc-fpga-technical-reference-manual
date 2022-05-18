@@ -133,6 +133,26 @@ Mission Bus SystemはユーザーがCubeSatのミッションを行うためのI
 | - External PPB                           | 0xE004_2000 - 0xE00F_EFFF | 　                |
 | - ROM Table                              | 0xE00F_F000 - 0xE00F_FFFF | 　                |
 
+CPUが使用する メインメモリーは アドレス 0x00000000にマッピングされています。
+メインメモリーは、ITCM (Instruction Tightly Coupled Memory)と HRMEM (High Reliability Memory)を選択する事ができます。
+ITCMと HRMEMの切り替えは Code Memory Select Registerの ITCMENビットによって行います。
+
+ITCMは FPGAの Block RAMで構成されています。
+このメモリは FPGAの Configurationデータ (Bit Streamデータ)にプログラムを格納する事で、FPGAの Configuration後 すぐに CPUが動作します。
+HRMEMは On Boardの SRAMで構成されています。
+このメモリを使用する場合には、電源の投入後にデータを書き込んで使用する必要があります。
+HRMEMは IPコアの内部に SRAMのデータが放射線によって破壊された場合に訂正する仕組みを実装しているため、通常はこのメモリを使って動作します。
+
+#+CAPTION: CPU Main Memory構成
+[[file:./images/itcm_hrmem_select.png]]
+
+FPGAの Configuration後、アドレス 0x00000000に ITCMがマッピングされています。
+ITCMには プログラムローダーを書き込んで使用します。
+プログラムローダーは NOR Flash Memoryに書き込まれているプログラムを HRMEMに転送するために使用します。
+HRMEMのアドレス 0x60000000番地は、アドレス 0x00000000番地のミラーとなっており、プログラムローダーによって 0x60000000に書き込まれたデータは、メインメモリーを HRMEMに切り替えた時に 0x00000000から読み出す事ができます。
+プログラムローダーが HRMEMへのプログラムを書き込む最後の手順として、Code Memory Select Registerの ITCMENビットを 0に書き込みます。
+ITCMENビットの書き込みにより、メインメモリーを切り替えるとシステムにリセットがかかり、切り替えたメモリのアドレス 0x00000000から書き込まれたデータで CPUが動作します。
+
 * Interrupt
 SC OBC FPGAは、Cortex-M3に組み込まれる割り込みコントローラの外部割り込みを使用し、IPコアの割り込みをCPUに伝えます。
 Cortex-M3の 割り込みコントローラの仕様については、ARM Cortex-M3 Technical Reference Manualを参照してください。
