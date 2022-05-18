@@ -189,6 +189,7 @@ System Registerは、Base Address 0x4F00_0000に配置されています。
 | 0x4F0000F8 | SYSREG_SPAD3     | Scratchpad 3 Register               | 0x00000000 |
 | 0x4F0000FC | SYSREG_SPAD4     | Scratchpad 4 Register               | 0x00000000 |
 | 0x4F00F000 | SYSREG_VER       | System Register IP Version Register |          - |
+| 0x4F00FF00 | SYSREG_BUILDINFO | Build Infomation Register           |          - |
 
 *** Code Memory Select Register (Offset 0x0000)
 Code Memory Select Registerは CPUの Instruction codeが格納されているメモリを選択するためのレジスタです。
@@ -261,6 +262,16 @@ System Registerの IPコアバージョンの管理レジスタです。
 | 31:24 | MAJVER | System Register Core Major Version | System RegisterコアのMajor Versionです。 | RO  |
 | 23:16 | MINVER | System Register Core Minor Version | System RegisterコアのMinor Versionです。 | RO  |
 |  15:0 | PATVER | System Register Core Patch Version | System RegisterコアのPatch Versionです。 | RO  |
+
+*** Build Infomation Register (Offset: 0xFF00)
+SC OBC FPGAのビルド情報を保持するレジスタです。
+現在動作しているFPGAデータが作られた gitのハッシュ値の 先頭 8文字が保持されます。
+git管理されていない環境から生成された場合は、このレジスタが 0x00000000を示します。
+
+#+CAPTION: Build Infomation Register ビットフィールド
+|  bit | Symbol     | Field                     | Description                                                                           | R/W |
+|------+------------+---------------------------+---------------------------------------------------------------------------------------+-----|
+| 31:0 | BUILD_INFO | Build Infomation Register | 動作しているFPGAデータが作られた gitのハッシュ値の 先頭 8桁が格納されるレジスタです。 | RO  |
 
 * System Monitor
 System Monitorは、SC OBC FPGAのシステムを監視するためのモジュールです。
