@@ -284,11 +284,12 @@ TRCHは FPGAが出力する FPGA_WATCHDOG信号が定期的にトグルしてい
 System Monitorは、Base Address 0x4F04_0000に配置されています。
 
 #+CAPTION: System Monitorメモリマップ
-|    Address | Symbol            | Register                          |    Initial |
-|------------+-------------------+-----------------------------------+------------|
-| 0x4F040000 | SYSMON_WDOG_CTRL  | Watchdog Control Register         | 0x00000000 |
-| 0x4F040004 | SYSMON_WDOG_WSR   | Watchdog Service Register         | 0x00000000 |
-| 0x4F040010 | SYSMON_WDOG_SIVAL | Watchdog Signal Interval Register | 0x0003A97F |
+|                 Address | Symbol            | Register                          |    Initial |
+|-------------------------+-------------------+-----------------------------------+------------|
+|              0x4F040000 | SYSMON_WDOG_CTRL  | Watchdog Control Register         | 0x00000000 |
+|              0x4F040004 | SYSMON_WDOG_WSR   | Watchdog Service Register         | 0x00000000 |
+|              0x4F040010 | SYSMON_WDOG_SIVAL | Watchdog Signal Interval Register | 0x0003A97F |
+| 0x4F041000 - 0x4F041FFF | SYSMON_XADC_REG   | XADC Register Window              | ---------- |
 
 *** Watchdog Control Register (0x4F040000)
 Watchdog Control Registerは、SC OBC FPGAの Watchdogの制御を行うためのレジスタです。
@@ -333,6 +334,35 @@ $WDOG\_SIVAL設定値 = \frac{FPGA\_WATCHDOG\ High/Lowレベル幅 [s]}{\frac{1}
 |-------+------------+--------------------------+----------------------------------------------------------------------------------------------------------------+-----|
 | 31:24 | -          | Reserved                 | Reserved                                                                                                       | -   |
 |  23:0 | WDOG_SIVAL | Watchdog Signal Interval | Watchdog Signalの Highレベルまたは Lowレベルの幅を設定するフィールドです。初期値は 10 [ms]に設定されています。 | R/W |
+
+*** XADC Register Window (0x4F041000 - 0x4F041FFF)
+XADC Register Fieldは、SC OBC FPGAに搭載されている Xilinxの ADCモジュールとのアクセスを行うための領域です。
+
+XADCは Xilinx 7シリーズ FPGAに搭載される ADCモジュールです。
+XADCには 12 bit、毎秒 1 Mサンプルの ADCとオンチップセンサーが含まれています。
+SC OBC FPGAでは、XADCのレジスタを読み出す事により、FPGAのダイの温度と入力電源の監視を行う事ができます。
+
+XADCの詳細は Xilinxのドキュメント (UG480: 7シリーズ FPGAおよび Zynq-7000 All Programmable SoC XADCデュアル 12ビット 1 MPSPS アナログ-デジタルコンバーター ユーザーズガイド)を参照してください。
+
+XADCのレジスタにアクセスするためには、ベースアドレスを 0x4F041000とし Bit 11:4に 対象となるXADCのレジスタアドレスを設定する事で行えます。
+Status Registerにアクセスするためのレジスタアドレスを以下に示します。
+
+|    Address | Name               | Description                                                                                                    |
+|------------+--------------------+----------------------------------------------------------------------------------------------------------------|
+| 0x4F041000 | Temperature Status | オンチップ温度センサーの測定結果が格納されます。Bit 15:4の 12 Bitが温度センサーの伝達関数に対応します。        |
+| 0x4F041010 | VCCINT Status      | オンチップVCCINT電圧モニターの測定結果が格納されます。Bit 15:4の 12 Bitが電圧センサーの伝達関数に対応します。  |
+| 0x4F041020 | VCCAUX Status      | オンチップVCCAUX電圧モニターの測定結果が格納されます。Bit 15:4の 12 Bitが電圧センサーの伝達関数に対応します。  |
+| 0x4F041060 | VCCBRAM Status     | オンチップVCCBRAM電圧モニターの測定結果が格納されます。Bit 15:4の 12 Bitが電圧センサーの伝達関数に対応します。 |
+| 0x4F041200 | Max Temperature    | 電源投入または最後に XADCをリセットしてから記録された最大温度測定値が格納されます。                            |
+| 0x4F041210 | Max VCCINT         | 電源投入または最後に XADCをリセットしてから記録された最大VCCINT測定値が格納されます。                          |
+| 0x4F041220 | Max VCCAUX         | 電源投入または最後に XADCをリセットしてから記録された最大VCCAUX測定値が格納されます。                          |
+| 0x4F041230 | Max VCCBRAM        | 電源投入または最後に XADCをリセットしてから記録された最大VCCBRAM測定値が格納されます。                         |
+| 0x4F041240 | Min Temperature    | 電源投入または最後に XADCをリセットしてから記録された最小温度測定値が格納されます。                            |
+| 0x4F041250 | Min VCCINT         | 電源投入または最後に XADCをリセットしてから記録された最小VCCINT測定値が格納されます。                          |
+| 0x4F041260 | Min VCCAUX         | 電源投入または最後に XADCをリセットしてから記録された最小VCCAUX測定値が格納されます。                          |
+| 0x4F041270 | Min VCCBRAM        | 電源投入または最後に XADCをリセットしてから記録された最小VCCBRAM測定値が格納されます。                         |
+
+System Monitorの XADC Register Windowからは、XADCのすべてのレジスタ領域にアクセスする事ができますが、アラーム機能は現状実装されておりません。
 
 * QSPI Controller
 QSPI Controllerは、SC OBCモジュールに搭載するメモリとSPIプロトコルによる通信を行うためのモジュールです。
