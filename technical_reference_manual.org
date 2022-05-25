@@ -106,34 +106,34 @@ Mission Bus SystemはユーザーがCubeSatのミッションを行うためのI
 [[file:./images/memory_map.png]]
 
 #+CAPTION: SC OBC FPGA メモリマップ
-| Field                                    | Address Space             | Comment           |
-|------------------------------------------+---------------------------+-------------------|
-| Instruction Tightly Coupled Memory (CM3) | 0x0000_0000 - 0x0000_1FFF | CFGITCMEN[0] is 1 |
-| HRMEM (High-reliability Memory)          | 0x0000_0000 - 0x003F_FFFF | CFGITCMEM[0] is 0 |
-| Main AXI Bus                             | 0x4000_0000 - 0x4FFF_FFFF | 　                |
-| - QSPI Controller (Configuration Memory) | 0x4000_0000 - 0x4000_FFFF | 　                |
-| - QSPI Controller (Data Memory)          | 0x4010_0000 - 0x4010_FFFF | 　                |
-| - QSPI Controller(FeRAM)                 | 0x4020_0000 - 0x4020_FFFF | 　                |
-| - CAN Controller                         | 0x4040_0000 - 0x4040_FFFF | 　                |
-| - HRMEM Register                         | 0x4050_0000 - 0x4050_FFFF | 　                |
-| Low Performance IP Bus                   | 0x4F00_0000 - 0x4FFF_FFFF | 　                |
-| - System Register                        | 0x4F00_0000 - 0x4F00_FFFF | 　                |
-| - UART Lite (Console Interface)          | 0x4F01_0000 - 0x4F01_FFFF | 　                |
-| - Internal I2C Master                    | 0x4F02_0000 - 0x4F02_FFFF | 　                |
-| - External I2C Master                    | 0x4F03_0000 - 0x4F03_FFFF | 　                |
-| - System Monitor                         | 0x4F04_0000 - 0x4F04_FFFF | 　                |
-| Mission(UDL) Bus                         | 0x5000_0000 - 0x5FFF_FFFF | 　                |
-| HRMEM Memory Mirror                      | 0x6000_0000 - 0x603F_FFFF |                   |
-| Internal Private peripheral bus (CM3)    | 0xE000_0000 - 0xE003_FFFF | 　                |
-| - ITM                                    | 0xE000_0000 - 0xE000_0FFF | 　                |
-| - DWT                                    | 0xE000_1000 - 0xE000_1FFF | 　                |
-| - FPB                                    | 0xE000_2000 - 0xE000_2FFF | 　                |
-| - SCS                                    | 0xE000_E000 - 0xE000_EFFF | 　                |
-| External Private peripheral bus (CM3)    | 0xE004_0000 - 0xE00F_FFFF | 　                |
-| - TPIU                                   | 0xE004_0000 - 0xE004_0FFF | 　                |
-| - ETM                                    | 0xE004_1000 - 0xE004_1FFF | 　                |
-| - External PPB                           | 0xE004_2000 - 0xE00F_EFFF | 　                |
-| - ROM Table                              | 0xE00F_F000 - 0xE00F_FFFF | 　                |
+| Field                                          | Address Space             | Comment           |
+|------------------------------------------------+---------------------------+-------------------|
+| Instruction Tightly Coupled Memory (Block RAM) | 0x0000_0000 - 0x0000_1FFF | CFGITCMEN[0] is 1 |
+| HRMEM (SRAM)                                   | 0x0000_0000 - 0x003F_FFFF | CFGITCMEM[0] is 0 |
+| Main AXI Bus                                   | 0x4000_0000 - 0x4EFF_FFFF |                   |
+| - QSPI Controller (Configuration Memory)       | 0x4000_0000 - 0x4000_FFFF |                   |
+| - QSPI Controller (Data Memory)                | 0x4010_0000 - 0x4010_FFFF |                   |
+| - QSPI Controller(FeRAM)                       | 0x4020_0000 - 0x4020_FFFF |                   |
+| - CAN Controller                               | 0x4040_0000 - 0x4040_FFFF |                   |
+| - HRMEM Register                               | 0x4050_0000 - 0x4050_FFFF |                   |
+| Low Performance IP Bus                         | 0x4F00_0000 - 0x4FFF_FFFF |                   |
+| - System Register                              | 0x4F00_0000 - 0x4F00_FFFF |                   |
+| - UART Lite (Console Interface)                | 0x4F01_0000 - 0x4F01_FFFF |                   |
+| - Internal I2C Master                          | 0x4F02_0000 - 0x4F02_FFFF |                   |
+| - External I2C Master                          | 0x4F03_0000 - 0x4F03_FFFF |                   |
+| - System Monitor                               | 0x4F04_0000 - 0x4F04_FFFF |                   |
+| Mission(UDL) Bus                               | 0x5000_0000 - 0x5FFF_FFFF |                   |
+| HRMEM Memory Mirror                            | 0x6000_0000 - 0x603F_FFFF |                   |
+| Coretex-M3 Internal Private peripheral bus     | 0xE000_0000 - 0xE003_FFFF |                   |
+| - ITM                                          | 0xE000_0000 - 0xE000_0FFF |                   |
+| - DWT                                          | 0xE000_1000 - 0xE000_1FFF |                   |
+| - FPB                                          | 0xE000_2000 - 0xE000_2FFF |                   |
+| - SCS                                          | 0xE000_E000 - 0xE000_EFFF |                   |
+| Coretex-M3 External Private peripheral bus     | 0xE004_0000 - 0xE00F_FFFF |                   |
+| - TPIU                                         | 0xE004_0000 - 0xE004_0FFF |                   |
+| - ETM                                          | 0xE004_1000 - 0xE004_1FFF |                   |
+| - External PPB                                 | 0xE004_2000 - 0xE00F_EFFF |                   |
+| - ROM Table                                    | 0xE00F_F000 - 0xE00F_FFFF |                   |
 
 CPUが使用する メインメモリーは アドレス 0x00000000にマッピングされています。
 メインメモリーは、ITCM (Instruction Tightly Coupled Memory)と HRMEM (High Reliability Memory)を選択する事ができます。
