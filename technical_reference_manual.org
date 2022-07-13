@@ -392,10 +392,6 @@ HRMEMのレジスタは、Base Address 0x40500000に配置されています。
 | 0x0020 | HRMEM_ECCERRCNTR     | ECC Error Count Register                    | 0x00000000 |
 | 0x0024 | HRMEM_ECDISCNTR      | ECC Correct Data Discard Count Register     | 0x00000000 |
 | 0x0028 | HRMEM_ERRCNTCLRR     | Error Count Clear Register                  | 0x00000000 |
-| 0x0040 | HRMEM_AHBECC1ERRR    | AHB ECC 1bit Error Status Register          | 0x00000000 |
-| 0x0044 | HRMEM_AHBECC2ERRR    | AHB ECC 2bit Error Status Register          | 0x00000000 |
-| 0x0048 | HRMEM_ATRDECC1ERRR   | ATRD ECC 1bit Error Status Register         | 0x00000000 |
-| 0x004C | HRMEM_ATRDECC2ERRR   | ATRD ECC 2bit Error Status Register         | 0x00000000 |
 | 0x0050 | HRMEM_AHBECCERRCNTR  | AHB ECC Error Count Register                | 0x00000000 |
 | 0x0054 | HRMEM_ATRDECCERRCNTR | ATRD ECC Error Count Register               | 0x00000000 |
 | 0x0070 | HRMEM_PFEMDCTLR      | Prefetch Mode Control Register              | 0x00000001 |
@@ -435,13 +431,19 @@ HRMEM Interrupt Status Registerは、HRMEMの割り込みステータスレジ�
 それぞれのビットは"1"をセットすると、割り込みをクリアする事ができます。
 
 #+CAPTION: HRMEM Interrupt Status Register ビットフィールド
-|  bit | Symbol   | Field                    | Description                                                                                               | R/W  |
-|------+----------+--------------------------+-----------------------------------------------------------------------------------------------------------+------|
-| 31:9 | -        | Reserved                 | Reserved                                                                                                  | -    |
-|    8 | ECDISINT | ECC Correct Data Discard | 1bit ECCエラー検出時のメモリへのライトバック用訂正データの廃棄を検出すると本ビットが"1"にセットされます。 | R/WC |
-|  7:2 | -        | Reserved                 | Reserved                                                                                                  | -    |
-|    1 | E2ERRINT | 2bit ECC Error           | メモリからの読み出し時に2bit ECC Errorを検出すると本ビットが"1"にセットされます。                         | R/WC |
-|    0 | E1ERRINT | 1bit ECC Error           | メモリからの読み出し時に1bit ECC Errorを検出すると本ビットが"1"にセットされます。                         | R/WC |
+|   bit | Symbol    | Field                     | Description                                                                                                                                                                           | R/W  |
+|-------+-----------+---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------|
+| 31:22 | -         | Reserved                  | Reserved                                                                                                                                                                              | -    |
+|    21 | ATRDE2ERR | Auto Read 2bit ECC Error  | メモリスクラビング機能の自動読み出しアクセス時に2bit ECC Errorを検出すると本ビットが"1"にセットされます。E2ERRINTビットの割り込みクリアを行うことで、本ビットの状態もクリアされます。 | RO   |
+|    20 | AHBE2ERR  | AHB Access 2bit ECC Error | AHBリードアクセス時に2bit ECC Errorを検出すると本ビットが"1"にセットされます。E2ERRINTビットの割り込みクリアを行うことで、本ビットの状態もクリアされます。                            | RO   |
+| 19:18 | -         | Reserved                  | Reserved                                                                                                                                                                              | -    |
+|    17 | ATRDE1ERR | Auto Read 1bit ECC Error  | メモリスクラビング機能の自動読み出しアクセス時に1bit ECC Errorを検出すると本ビットが"1"にセットされます。E1ERRINTビットの割り込みクリアを行うことで、本ビットの状態もクリアされます。 | RO   |
+|    16 | AHBE1ERR  | AHB Access 1bit ECC Error | AHBリードアクセス時に1bit ECC Errorを検出すると本ビットが"1"にセットされます。E1ERRINTビットの割り込みクリアを行うことで、本ビットの状態もクリアされます。                            | RO   |
+|  15:9 | -         | Reserved                  | Reserved                                                                                                                                                                              | -    |
+|     8 | ECDISINT  | ECC Correct Data Discard  | 1bit ECCエラー検出時のメモリへのライトバック用訂正データの廃棄を検出すると本ビットが"1"にセットされます。                                                                             | R/WC |
+|   7:2 | -         | Reserved                  | Reserved                                                                                                                                                                              | -    |
+|     1 | E2ERRINT  | 2bit ECC Error            | 2bit ECC Errorを検出すると本ビットが"1"にセットされます。                                                                                                                             | R/WC |
+|     0 | E1ERRINT  | 1bit ECC Error            | 1bit ECC Errorを検出すると本ビットが"1"にセットされます。                                                                                                                             | R/WC |
 
 *** HRMEM Interrupt Enable Register (Offset: 0x0014)
 HRMEM Interrupt Enable Registerは、HRMEMの動作において発生した割り込みイベントを割り込み出力信号に通知するか設定するためのレジスタです。
@@ -485,54 +487,6 @@ Error Count Clear Registerは、HRMEM内の全てのカウンタをクリアす�
 |------+---------+-------------------+-----------------------------------------------------------------------+-----|
 | 31:1 | -       | Reserved          | Reserved                                                              | -   |
 |    0 | ECNTCLR | Error Count Clear | 本ビットを1にセットすると、全てのカウンタレジスタの値をクリアします。 | WO  |
-
-*** AHB ECC 1bit Error Status Register (Offset: 0x0040)
-AHB ECC 1bit Error Status Registerは、AHBリードアクセスによる1bit ECCエラー検出動作におけるステータスレジスタです。
-対象のビットに"1"をセットすると、割り込みをクリアする事ができます。
-
-本レジスタはデバッグ用途で使用するため、このレジスタのセット状態は割り込み通知には影響しません。
-
-#+CAPTION: AHB ECC 1bit Error Status Register ビットフィールド
-|  bit | Symbol   | Field                     | Description                                                                    | R/W  |
-|------+----------+---------------------------+--------------------------------------------------------------------------------+------|
-| 31:1 | -        | Reserved                  | Reserved                                                                       | -    |
-|    0 | AHBE1ERR | AHB Access 1bit ECC Error | AHBリードアクセス時に1bit ECC Errorを検出すると本ビットが"1"にセットされます。 | R/WC |
-
-*** AHB ECC 2bit Error Status Register (Offset: 0x0044)
-AHB ECC 2bit Error Status Registerは、AHBリードアクセスによる2bit ECCエラー検出動作におけるステータスレジスタです。
-対象のビットに"1"をセットすると、割り込みをクリアする事ができます。
-
-本レジスタはデバッグ用途で使用するため、このレジスタのセット状態は割り込み通知には影響しません。
-
-#+CAPTION: AHB ECC 2bit Error Status Register ビットフィールド
-|  bit | Symbol   | Field                     | Description                                                                    | R/W  |
-|------+----------+---------------------------+--------------------------------------------------------------------------------+------|
-| 31:1 | -        | Reserved                  | Reserved                                                                       | -    |
-|    0 | AHBE2ERR | AHB Access 2bit ECC Error | AHBリードアクセス時に2bit ECC Errorを検出すると本ビットが"1"にセットされます。 | R/WC |
-
-*** ATRD ECC 1bit Error Status Register (Offset: 0x0048)
-ATRD ECC 1bit Error Status Registerは、メモリスクラビング機能の自動読み出しアクセスによる1bit ECCエラー検出動作におけるステータスレジスタです。
-対象のビットに"1"をセットすると、割り込みをクリアする事ができます。
-
-本レジスタはデバッグ用途で使用するため、このレジスタのセット状態は割り込み通知には影響しません。
-
-#+CAPTION: ATRD ECC 1bit Error Status Register ビットフィールド
-|  bit | Symbol    | Field                    | Description                                                                       | R/W  |
-|------+-----------+--------------------------+-----------------------------------------------------------------------------------+------|
-| 31:1 | -         | Reserved                 | Reserved                                                                          | -    |
-|    0 | ATRDE1ERR | Auto Read 1bit ECC Error | 自動読み出しアクセス時に1bit ECC Errorを検出すると本ビットが"1"にセットされます。 | R/WC |
-
-*** ATRD ECC 2bit Error Status Register (Offset: 0x004C)
-ATRD ECC 2bit Error Status Registerは、メモリスクラビング機能の自動読み出しアクセスによる2bit ECCエラー検出動作におけるステータスレジスタです。
-対象のビットに"1"をセットすると、割り込みをクリアする事ができます。
-
-本レジスタはデバッグ用途で使用するため、このレジスタのセット状態は割り込み通知には影響しません。
-
-#+CAPTION: ATRD ECC 2bit Error Status Register ビットフィールド
-|  bit | Symbol    | Field                    | Description                                                                       | R/W  |
-|------+-----------+--------------------------+-----------------------------------------------------------------------------------+------|
-| 31:1 | -         | Reserved                 | Reserved                                                                          | -    |
-|    0 | ATRDE2ERR | Auto Read 2bit ECC Error | 自動読み出しアクセス時に2bit ECC Errorを検出すると本ビットが"1"にセットされます。 | R/WC |
 
 *** AHB ECC Error Count Register (Offset: 0x0050)
 AHB ECC Error Count Registerは、AHBリードアクセスによるECCエラー検出件数を表示するカウンターレジスタです。ECCエラーの検出毎に本カウンターをインクリメントします。
