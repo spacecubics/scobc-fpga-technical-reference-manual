@@ -387,9 +387,7 @@ HRMEMのレジスタは、Base Address 0x40500000に配置されています。
 |--------+----------------------+---------------------------------------------+------------|
 | 0x0000 | HRMEM_ECCCOLENR      | ECC Error Collect Enable Register           | 0x00000001 |
 | 0x0008 | HRMEM_MEMSCRCTRLR    | Memory Scrubing Control Register            | 0x00010000 |
-| 0x0010 | HRMEM_ECC1ERRINTR    | ECC 1bit Error Interrupt Register           | 0x00000000 |
-| 0x0014 | HRMEM_ECC2ERRINTR    | ECC 2bit Error Interrupt Register           | 0x00000000 |
-| 0x0018 | HRMEM_ECCCDISINTR    | ECC Correct Data Discard Interrupt Register | 0x00000000 |
+| 0x0010 | HRMEM_INTSTR         | HRMEM Interrupt Status Register             | 0x00000000 |
 | 0x001C | HRMEM_INTENR         | HRMEM Interrupt Enable Register             | 0x00000000 |
 | 0x0020 | HRMEM_ECCERRCNTR     | ECC Error Count Register                    | 0x00000000 |
 | 0x0024 | HRMEM_ECDISCNTR      | ECC Correct Data Discard Count Register     | 0x00000000 |
@@ -432,35 +430,18 @@ Memory Scrubing Control Registerは、メモリへのメモリスクラビング
 |   7:1 | -           | Reserved                           | Reserved                                                                                                                                                      | -   |
 |     0 | MEMSCRBEN   | Memory Scrubing Enable             | メモリスクラビング機能による自動読み出しアクセスのEnable設定を行います。0: メモリスクラビング機能 OFF 1: メモリスクラビング機能 ON                            | R/W |
 
-*** ECC 1bit Error Interrupt Register (Offset: 0x0010)
-ECC 1bit Error Interrupt Registerは、1bit ECCエラー検出動作における割り込みステータスレジスタです。
-対象のビットに"1"をセットすると、割り込みをクリアする事ができます。
+*** HRMEM Interrupt Status Register (Offset: 0x0010)
+HRMEM Interrupt Status Registerは、HRMEMの割り込みステータスレジスタです。
+それぞれのビットは"1"をセットすると、割り込みをクリアする事ができます。
 
-#+CAPTION: ECC 1bit Error Interrupt Register ビットフィールド
-|  bit | Symbol   | Field          | Description                                                                       | R/W  |
-|------+----------+----------------+-----------------------------------------------------------------------------------+------|
-| 31:1 | -        | Reserved       | Reserved                                                                          | -    |
-|    0 | E1ERRINT | 1bit ECC Error | メモリからの読み出し時に1bit ECC Errorを検出すると本ビットが"1"にセットされます。 | R/WC |
-
-*** ECC 2bit Error Interrupt Register (Offset: 0x0014)
-ECC 2bit Error Interrupt Registerは、2bit ECCエラー検出動作における割り込みステータスレジスタです。
-対象のビットに"1"をセットすると、割り込みをクリアする事ができます。
-
-#+CAPTION: ECC 2bit Error Interrupt Register ビットフィールド
-|  bit | Symbol   | Field          | Description                                                                       | R/W  |
-|------+----------+----------------+-----------------------------------------------------------------------------------+------|
-| 31:1 | -        | Reserved       | Reserved                                                                          | -    |
-|    0 | E2ERRINT | 2bit ECC Error | メモリからの読み出し時に2bit ECC Errorを検出すると本ビットが"1"にセットされます。 | R/WC |
-
-*** ECC Correct Data Discard Interrupt Register (Offset: 0x0018)
-ECC Correct Data Discard Interrupt Registerは、メモリへのECC訂正データ廃棄動作における割り込みステータスレジスタです。
-対象のビットに"1"をセットすると、割り込みをクリアする事ができます。
-
-#+CAPTION: ECC Correct Data Discard Interrupt Register ビットフィールド
+#+CAPTION: HRMEM Interrupt Status Register ビットフィールド
 |  bit | Symbol   | Field                    | Description                                                                                               | R/W  |
 |------+----------+--------------------------+-----------------------------------------------------------------------------------------------------------+------|
-| 31:1 | -        | Reserved                 | Reserved                                                                                                  | -    |
-|    0 | ECDISINT | ECC Correct Data Discard | 1bit ECCエラー検出時のメモリへのライトバック用訂正データの廃棄を検出すると本ビットが"1"にセットされます。 | R/WC |
+| 31:9 | -        | Reserved                 | Reserved                                                                                                  | -    |
+|    8 | ECDISINT | ECC Correct Data Discard | 1bit ECCエラー検出時のメモリへのライトバック用訂正データの廃棄を検出すると本ビットが"1"にセットされます。 | R/WC |
+|  7:2 | -        | Reserved                 | Reserved                                                                                                  | -    |
+|    1 | E2ERRINT | 2bit ECC Error           | メモリからの読み出し時に2bit ECC Errorを検出すると本ビットが"1"にセットされます。                         | R/WC |
+|    0 | E1ERRINT | 1bit ECC Error           | メモリからの読み出し時に1bit ECC Errorを検出すると本ビットが"1"にセットされます。                         | R/WC |
 
 *** HRMEM Interrupt Enable Register (Offset: 0x001C)
 HRMEM Interrupt Enable Registerは、HRMEMの動作において発生した割り込みイベントを割り込み出力信号に通知するか設定するためのレジスタです。
