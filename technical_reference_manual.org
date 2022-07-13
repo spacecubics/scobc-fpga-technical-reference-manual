@@ -386,8 +386,7 @@ HRMEMのレジスタは、Base Address 0x40500000に配置されています。
 | Offset | Symbol               | Register                                    |    Initial |
 |--------+----------------------+---------------------------------------------+------------|
 | 0x0000 | HRMEM_ECCCOLENR      | ECC Error Collect Enable Register           | 0x00000001 |
-| 0x0004 | HRMEM_MEMSCRBENR     | Memory Scrubing Enable Register             | 0x00000000 |
-| 0x0008 | HRMEM_MEMSCRCTRLR    | Memory Scrubing Control Register            | 0x00000001 |
+| 0x0008 | HRMEM_MEMSCRCTRLR    | Memory Scrubing Control Register            | 0x00010000 |
 | 0x0010 | HRMEM_ECC1ERRINTR    | ECC 1bit Error Interrupt Register           | 0x00000000 |
 | 0x0014 | HRMEM_ECC2ERRINTR    | ECC 2bit Error Interrupt Register           | 0x00000000 |
 | 0x0018 | HRMEM_ECCCDISINTR    | ECC Correct Data Discard Interrupt Register | 0x00000000 |
@@ -418,27 +417,20 @@ ECC Error Collect Enable Registerは、1bit ECCエラー検出時のメモリへ
 | 31:1 | -        | Reserved                 | Reserved                                                                               | -   |
 |    0 | ECCCOLEN | ECC Error Collect Enable | 訂正データの書き戻し機能のEnable設定を行います。0: 書き戻し機能 OFF 1: 書き戻し機能 ON | R/W |
 
-*** Memory Scrubing Enable Register (Offset: 0x0004)
-Memory Scrubing Enable Registerは、メモリへのメモリスクラビング機能のON/OFFを設定するためのレジスタです。
-このレジスタのEnableをONにすると、メモリスクラビング機能による自動読み出しアクセスを行います。
-
-本機能を有効にする場合は、訂正データの書き戻し機能(ECC Error Collect Enable RegisterのECCCOLEN)も合わせて有効にする必要があります。
-
-#+CAPTION: Memory Scrubing Enable Register ビットフィールド
-|  bit | Symbol    | Field                  | Description                                                                                                                        | R/W |
-|------+-----------+------------------------+------------------------------------------------------------------------------------------------------------------------------------+-----|
-| 31:1 | -         | Reserved               | Reserved                                                                                                                           | -   |
-|    0 | MEMSCRBEN | Memory Scrubing Enable | メモリスクラビング機能による自動読み出しアクセスのEnable設定を行います。0: メモリスクラビング機能 OFF 1: メモリスクラビング機能 ON | R/W |
-
 *** Memory Scrubing Control Register (Offset: 0x0008)
-Memory Scrubing Control Registerは、メモリスクラビング機能制御に関する動作設定を行うためのレジスタです。
+Memory Scrubing Control Registerは、メモリへのメモリスクラビング機能のON/OFF、および、メモリスクラビング機能制御に関する動作設定を行うためのレジスタです。
+このレジスタのMemory Scrubing EnableをONにすると、メモリスクラビング機能による自動読み出しアクセスを行います。
+
+メモリスクラビング機能を有効にする場合は、訂正データの書き戻し機能(ECC Error Collect Enable RegisterのECCCOLEN)も合わせて有効にする必要があります。
 
 #+CAPTION: Memory Scrubing Control Register ビットフィールド
 |   bit | Symbol      | Field                              | Description                                                                                                                                                   | R/W |
 |-------+-------------+------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
-| 31:17 | -           | Reserved                           | Reserved                                                                                                                                                      | -   |
-|    16 | COLFSRDSTPB | Memory Scrubing Arbitration Enable | 書き戻しデータ用FIFOがFULL時のメモリスクラビング調停機能を設定する信号です。本ビットが0の時、書き戻しデータ用FIFOがFULLの時にメモリスクラビングを停止します。 | R/W |
-|  15:0 | MEMSCRCYC   | Memory Scrubing Cycle              | メモリスクラビングによる自動読み出しアクセスのWAIT Cycle間隔を設定する信号です。0: 設定禁止 1: 1Clock間隔(default) 2: 2Clock間隔 ... 65535: 65535Clock間隔    | R/W |
+| 31:16 | MEMSCRCYC   | Memory Scrubing Cycle              | メモリスクラビングによる自動読み出しアクセスのWAIT Cycle間隔を設定する信号です。0: 設定禁止 1: 1Clock間隔(default) 2: 2Clock間隔 ... 65535: 65535Clock間隔    | R/W |
+|  15:9 | -           | Reserved                           | Reserved                                                                                                                                                      | -   |
+|     8 | COLFSRDSTPB | Memory Scrubing Arbitration Enable | 書き戻しデータ用FIFOがFULL時のメモリスクラビング調停機能を設定する信号です。本ビットが0の時、書き戻しデータ用FIFOがFULLの時にメモリスクラビングを停止します。 | R/W |
+|   7:1 | -           | Reserved                           | Reserved                                                                                                                                                      | -   |
+|     0 | MEMSCRBEN   | Memory Scrubing Enable             | メモリスクラビング機能による自動読み出しアクセスのEnable設定を行います。0: メモリスクラビング機能 OFF 1: メモリスクラビング機能 ON                            | R/W |
 
 *** ECC 1bit Error Interrupt Register (Offset: 0x0010)
 ECC 1bit Error Interrupt Registerは、1bit ECCエラー検出動作における割り込みステータスレジスタです。
