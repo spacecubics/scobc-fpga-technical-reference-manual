@@ -385,7 +385,7 @@ HRMEMのレジスタは、Base Address 0x40500000に配置されています。
 #+CAPTION: HRMEM Register アドレスマップ
 | Offset | Symbol               | Register                                    |    Initial |
 |--------+----------------------+---------------------------------------------+------------|
-| 0x0000 | HRMEM_ECCENR         | ECC Enable Register                         | 0x00000001 |
+| 0x0000 | HRMEM_ECCCOLENR      | ECC Error Collect Enable Register           | 0x00000001 |
 | 0x0004 | HRMEM_MEMSCRBENR     | Memory Scrubing Enable Register             | 0x00000000 |
 | 0x0008 | HRMEM_MEMSCRCTRLR    | Memory Scrubing Control Register            | 0x00000001 |
 | 0x0010 | HRMEM_ECC1ERRINTR    | ECC 1bit Error Interrupt Register           | 0x00000000 |
@@ -408,11 +408,11 @@ HRMEMのレジスタは、Base Address 0x40500000に配置されています。
 | 0x0084 | HRMEM_SPEPFADRSETR2  | Special Prefetch Address Setting Register 2 | 0x00000000 |
 | 0xF000 | HRMEM_VER            | HRMEM IP Version Register                   |          - |
 
-*** ECC Enable Register (Offset: 0x0000)
-ECC Enable Registerは、1bit ECCエラー検出時のメモリへの訂正データの書き戻し機能を設定するためのレジスタです。
+*** ECC Error Collect Enable Register (Offset: 0x0000)
+ECC Error Collect Enable Registerは、1bit ECCエラー検出時のメモリへの訂正データの書き戻し機能を設定するためのレジスタです。
 このレジスタのEnableをONにすると、訂正データの書き戻し機能が有効になります。
 
-#+CAPTION: ECC Enable Register ビットフィールド
+#+CAPTION: ECC Error Collect Enable Register ビットフィールド
 |  bit | Symbol   | Field                    | Description                                                                            | R/W |
 |------+----------+--------------------------+----------------------------------------------------------------------------------------+-----|
 | 31:1 | -        | Reserved                 | Reserved                                                                               | -   |
@@ -422,7 +422,7 @@ ECC Enable Registerは、1bit ECCエラー検出時のメモリへの訂正デ�
 Memory Scrubing Enable Registerは、メモリへのメモリスクラビング機能のON/OFFを設定するためのレジスタです。
 このレジスタのEnableをONにすると、メモリスクラビング機能による自動読み出しアクセスを行います。
 
-本機能を有効にする場合は、訂正データの書き戻し機能(ECC Enable RegisterのECCCOLEN)も合わせて有効にする必要があります。
+本機能を有効にする場合は、訂正データの書き戻し機能(ECC Error Collect Enable RegisterのECCCOLEN)も合わせて有効にする必要があります。
 
 #+CAPTION: Memory Scrubing Enable Register ビットフィールド
 |  bit | Symbol    | Field                  | Description                                                                                                                        | R/W |
