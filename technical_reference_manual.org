@@ -388,7 +388,7 @@ HRMEMのレジスタは、Base Address 0x40500000に配置されています。
 | 0x0000 | HRMEM_ECCCOLENR      | ECC Error Collect Enable Register           | 0x00000001 |
 | 0x0008 | HRMEM_MEMSCRCTRLR    | Memory Scrubing Control Register            | 0x00010000 |
 | 0x0010 | HRMEM_INTSTR         | HRMEM Interrupt Status Register             | 0x00000000 |
-| 0x001C | HRMEM_INTENR         | HRMEM Interrupt Enable Register             | 0x00000000 |
+| 0x0014 | HRMEM_INTENR         | HRMEM Interrupt Enable Register             | 0x00000000 |
 | 0x0020 | HRMEM_ECCERRCNTR     | ECC Error Count Register                    | 0x00000000 |
 | 0x0024 | HRMEM_ECDISCNTR      | ECC Correct Data Discard Count Register     | 0x00000000 |
 | 0x0028 | HRMEM_ERRCNTCLRR     | Error Count Clear Register                  | 0x00000000 |
@@ -443,14 +443,15 @@ HRMEM Interrupt Status Registerは、HRMEMの割り込みステータスレジ�
 |    1 | E2ERRINT | 2bit ECC Error           | メモリからの読み出し時に2bit ECC Errorを検出すると本ビットが"1"にセットされます。                         | R/WC |
 |    0 | E1ERRINT | 1bit ECC Error           | メモリからの読み出し時に1bit ECC Errorを検出すると本ビットが"1"にセットされます。                         | R/WC |
 
-*** HRMEM Interrupt Enable Register (Offset: 0x001C)
+*** HRMEM Interrupt Enable Register (Offset: 0x0014)
 HRMEM Interrupt Enable Registerは、HRMEMの動作において発生した割り込みイベントを割り込み出力信号に通知するか設定するためのレジスタです。
 
 #+CAPTION: HRMEM Interrupt Enable Register ビットフィールド
 |  bit | Symbol      | Field                           | Description                                                                  | R/W |
 |------+-------------+---------------------------------+------------------------------------------------------------------------------+-----|
-| 31:3 | -           | Reserved                        | Reserved                                                                     | -   |
-|    2 | ECDISINTENB | ECC Correct Data Discard Enable | ECDISINTイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
+| 31:9 | -           | Reserved                        | Reserved                                                                     | -   |
+|    8 | ECDISINTENB | ECC Correct Data Discard Enable | ECDISINTイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
+|  7:2 | -           | Reserved                        | Reserved                                                                     | -   |
 |    1 | E2ERRINTENB | 2bit ECC Error Enable           | E2ERRINTイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
 |    0 | E1ERRINTENB | 1bit ECC Error Enable           | E1ERRINTイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
 
