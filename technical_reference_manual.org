@@ -383,23 +383,22 @@ HRMEMはデータを格納する Address 0x00000000からの 4 MByte空間とは
 HRMEMのレジスタは、Base Address 0x40500000に配置されています。
 
 #+CAPTION: HRMEM Register アドレスマップ
-| Offset | Symbol               | Register                                    |    Initial |
-|--------+----------------------+---------------------------------------------+------------|
-| 0x0000 | HRMEM_ECCCOLENR      | ECC Error Collect Enable Register           | 0x00000001 |
-| 0x0008 | HRMEM_MEMSCRCTRLR    | Memory Scrubing Control Register            | 0x00010000 |
-| 0x0010 | HRMEM_INTSTR         | HRMEM Interrupt Status Register             | 0x00000000 |
-| 0x0014 | HRMEM_INTENR         | HRMEM Interrupt Enable Register             | 0x00000000 |
-| 0x0020 | HRMEM_ECCERRCNTR     | ECC Error Count Register                    | 0x00000000 |
-| 0x0024 | HRMEM_ECDISCNTR      | ECC Correct Data Discard Count Register     | 0x00000000 |
-| 0x0028 | HRMEM_ERRCNTCLRR     | Error Count Clear Register                  | 0x00000000 |
-| 0x0050 | HRMEM_AHBECCERRCNTR  | AHB ECC Error Count Register                | 0x00000000 |
-| 0x0054 | HRMEM_ATRDECCERRCNTR | ATRD ECC Error Count Register               | 0x00000000 |
-| 0x0070 | HRMEM_PFEMDCTLR      | Prefetch Mode Control Register              | 0x00000001 |
-| 0x0074 | HRMEM_SPEPFENR       | Special Prefetch Enable Register            | 0x00000000 |
-| 0x007C | HRMEM_PFBUFFLUSHR    | Prefetch Buffer Flush Register              | 0x00000000 |
-| 0x0080 | HRMEM_SPEPFADRSETR1  | Special Prefetch Address Setting Register 1 | 0x00000000 |
-| 0x0084 | HRMEM_SPEPFADRSETR2  | Special Prefetch Address Setting Register 2 | 0x00000000 |
-| 0xF000 | HRMEM_VER            | HRMEM IP Version Register                   |          - |
+| Offset | Symbol              | Register                                    |    Initial |
+|--------+---------------------+---------------------------------------------+------------|
+| 0x0000 | HRMEM_ECCCOLENR     | ECC Error Collect Enable Register           | 0x00000001 |
+| 0x0008 | HRMEM_MEMSCRCTRLR   | Memory Scrubing Control Register            | 0x00010000 |
+| 0x0010 | HRMEM_INTSTR        | HRMEM Interrupt Status Register             | 0x00000000 |
+| 0x0014 | HRMEM_INTENR        | HRMEM Interrupt Enable Register             | 0x00000000 |
+| 0x0020 | HRMEM_ECC1ERRCNTR   | 1Bit ECC Error Count Register               | 0x00000000 |
+| 0x0024 | HRMEM_ECC2ERRCNTR   | 2Bit ECC Error Count Register               | 0x00000000 |
+| 0x0028 | HRMEM_ECDISCNTR     | ECC Correct Data Discard Count Register     | 0x00000000 |
+| 0x002C | HRMEM_ERRCNTCLRR    | Error Count Clear Register                  | 0x00000000 |
+| 0x0070 | HRMEM_PFEMDCTLR     | Prefetch Mode Control Register              | 0x00000001 |
+| 0x0074 | HRMEM_SPEPFENR      | Special Prefetch Enable Register            | 0x00000000 |
+| 0x007C | HRMEM_PFBUFFLUSHR   | Prefetch Buffer Flush Register              | 0x00000000 |
+| 0x0080 | HRMEM_SPEPFADRSETR1 | Special Prefetch Address Setting Register 1 | 0x00000000 |
+| 0x0084 | HRMEM_SPEPFADRSETR2 | Special Prefetch Address Setting Register 2 | 0x00000000 |
+| 0xF000 | HRMEM_VER           | HRMEM IP Version Register                   |          - |
 
 *** ECC Error Collect Enable Register (Offset: 0x0000)
 ECC Error Collect Enable Registerは、1bit ECCエラー検出時のメモリへの訂正データの書き戻し機能を設定するためのレジスタです。
@@ -457,18 +456,29 @@ HRMEM Interrupt Enable Registerは、HRMEMの動作において発生した割�
 |    1 | E2ERRINTENB | 2bit ECC Error Enable           | E2ERRINTイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
 |    0 | E1ERRINTENB | 1bit ECC Error Enable           | E1ERRINTイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
 
-*** ECC Error Count Register (Offset: 0x0020)
-ECC Error Count Registerは、ECCエラー検出件数を表示するカウンターレジスタです。ECCエラーの検出毎に本カウンターをインクリメントします。
+*** 1Bit ECC Error Count Register (Offset: 0x0020)
+1Bit ECC Error Count Registerは、1Bit ECCエラー検出件数を表示するカウンターレジスタです。1Bit ECCエラーの検出毎に本カウンターをインクリメントします。
 
 カウンターが上限である 0xFFFFに達すると停止します。
 
-#+CAPTION: ECC Error Count Register ビットフィールド
-|   bit | Symbol   | Field                  | Description                                          | R/W |
-|-------+----------+------------------------+------------------------------------------------------+-----|
-| 31:16 | E2ERRCNT | 2bit ECC Error Counter | 2bit ECCエラーをカウントする 16bitのカウンターです。 | RO  |
-|  15:0 | E1ERRCNT | 1bit ECC Error Counter | 1bit ECCエラーをカウントする 16bitのカウンターです。 | RO  |
+#+CAPTION: 1Bit ECC Error Count Register ビットフィールド
+|   bit | Symbol       | Field                                   | Description                                                                                          | R/W |
+|-------+--------------+-----------------------------------------+------------------------------------------------------------------------------------------------------+-----|
+| 31:16 | ATRDE1ERRCNT | Auto Read Access 1bit ECC Error Counter | メモリスクラビング機能の自動読み出しアクセス時の1bit ECCエラーをカウントする 16bitのカウンターです。 | RO  |
+|  15:0 | AHBE1ERRCNT  | AHB Access 1bit ECC Error Counter       | AHBリードアクセス時の1bit ECCエラーをカウントする 16bitのカウンターです。                            | RO  |
 
-*** ECC Correct Data Discard Count Register (Offset: 0x0024)
+*** 2Bit ECC Error Count Register (Offset: 0x0024)
+2Bit ECC Error Count Registerは、2Bit ECCエラー検出件数を表示するカウンターレジスタです。2Bit ECCエラーの検出毎に本カウンターをインクリメントします。
+
+カウンターが上限である 0xFFFFに達すると停止します。
+
+#+CAPTION: 2Bit ECC Error Count Register ビットフィールド
+|   bit | Symbol       | Field                                   | Description                                                                                          | R/W |
+|-------+--------------+-----------------------------------------+------------------------------------------------------------------------------------------------------+-----|
+| 31:16 | ATRDE2ERRCNT | Auto Read Access 2bit ECC Error Counter | メモリスクラビング機能の自動読み出しアクセス時の2bit ECCエラーをカウントする 16bitのカウンターです。 | RO  |
+|  15:0 | AHBE2ERRCNT  | AHB Access 2bit ECC Error Counter       | AHBリードアクセス時の2bit ECCエラーをカウントする 16bitのカウンターです。                            | RO  |
+
+*** ECC Correct Data Discard Count Register (Offset: 0x0028)
 ECC Correct Data Discard Count Registerは、メモリへのECC訂正データ廃棄件数を表示するカウンターレジスタです。ECC訂正データ廃棄の検出毎に本カウンターをインクリメントします。
 
 カウンターが上限である 0xFFFFに達すると停止します。
@@ -479,7 +489,7 @@ ECC Correct Data Discard Count Registerは、メモリへのECC訂正データ�
 | 31:16 | -        | Reserved                         | Reserved                                                | -   |
 |  15:0 | ECDISCNT | ECC Correct Data Discard Counter | ECC訂正データ廃棄をカウントする 16bitのカウンターです。 | RO  |
 
-*** Error Count Clear Register (Offset: 0x0028)
+*** Error Count Clear Register (Offset: 0x002C)
 Error Count Clear Registerは、HRMEM内の全てのカウンタをクリアするためのレジスタです。
 
 #+CAPTION: Error Count Clear Register ビットフィールド
@@ -487,32 +497,6 @@ Error Count Clear Registerは、HRMEM内の全てのカウンタをクリアす�
 |------+---------+-------------------+-----------------------------------------------------------------------+-----|
 | 31:1 | -       | Reserved          | Reserved                                                              | -   |
 |    0 | ECNTCLR | Error Count Clear | 本ビットを1にセットすると、全てのカウンタレジスタの値をクリアします。 | WO  |
-
-*** AHB ECC Error Count Register (Offset: 0x0050)
-AHB ECC Error Count Registerは、AHBリードアクセスによるECCエラー検出件数を表示するカウンターレジスタです。ECCエラーの検出毎に本カウンターをインクリメントします。
-
-カウンターが上限である 0xFFFFに達すると停止します。
-
-本レジスタはデバッグ用途で使用します。
-
-#+CAPTION: AHB ECC Error Count Register ビットフィールド
-|   bit | Symbol      | Field                             | Description                                                               | R/W |
-|-------+-------------+-----------------------------------+---------------------------------------------------------------------------+-----|
-| 31:16 | AHBE2ERRCNT | AHB Access 2bit ECC Error Counter | AHBリードアクセス時の2bit ECCエラーをカウントする 16bitのカウンターです。 | RO  |
-|  15:0 | AHBE1ERRCNT | AHB Access 1bit ECC Error Counter | AHBリードアクセス時の1bit ECCエラーをカウントする 16bitのカウンターです。 | RO  |
-
-*** ATRD ECC Error Count Register (Offset: 0x0054)
-ATRD ECC Error Count Registerは、メモリスクラビング機能の自動読み出しアクセスによるECCエラー検出件数を表示するカウンターレジスタです。ECCエラーの検出毎に本カウンターをインクリメントします。
-
-カウンターが上限である 0xFFFFに達すると停止します。
-
-本レジスタはデバッグ用途で使用します。
-
-#+CAPTION: ATRD ECC Error Count Register ビットフィールド
-|   bit | Symbol       | Field                                   | Description                                                                  | R/W |
-|-------+--------------+-----------------------------------------+------------------------------------------------------------------------------+-----|
-| 31:16 | ATRDE2ERRCNT | Auto Read Access 2bit ECC Error Counter | 自動読み出しアクセス時の2bit ECCエラーをカウントする 16bitのカウンターです。 | RO  |
-|  15:0 | ATRDE1ERRCNT | Auto Read Access 1bit ECC Error Counter | 自動読み出しアクセス時の1bit ECCエラーをカウントする 16bitのカウンターです。 | RO  |
 
 *** Prefetch Mode Control Register (Offset: 0x0070)
 Prefetch Mode Control Registerは、Prefetch機能を設定するためのレジスタです。
