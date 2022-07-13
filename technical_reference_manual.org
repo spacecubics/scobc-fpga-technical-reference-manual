@@ -393,6 +393,7 @@ HRMEMのレジスタは、Base Address 0x40500000に配置されています。
 | 0x0024 | HRMEM_ECC2ERRCNTR   | 2Bit ECC Error Count Register               | 0x00000000 |
 | 0x0028 | HRMEM_ECDISCNTR     | ECC Correct Data Discard Count Register     | 0x00000000 |
 | 0x002C | HRMEM_ERRCNTCLRR    | Error Count Clear Register                  | 0x00000000 |
+| 0x0030 | HRMEM_ECCERRADMR    | ECC Error Address Monitor Register          | 0x00000000 |
 | 0x0070 | HRMEM_PFEMDCTLR     | Prefetch Mode Control Register              | 0x00000001 |
 | 0x0074 | HRMEM_SPEPFENR      | Special Prefetch Enable Register            | 0x00000000 |
 | 0x007C | HRMEM_PFBUFFLUSHR   | Prefetch Buffer Flush Register              | 0x00000000 |
@@ -497,6 +498,18 @@ Error Count Clear Registerは、HRMEM内の全てのカウンタをクリアす�
 |------+---------+-------------------+-----------------------------------------------------------------------+-----|
 | 31:1 | -       | Reserved          | Reserved                                                              | -   |
 |    0 | ECNTCLR | Error Count Clear | 本ビットを1にセットすると、全てのカウンタレジスタの値をクリアします。 | WO  |
+
+*** ECC Error Address Monitor Register (Offset: 0x0030)
+ECC Error Address Monitor Registerは、ECC Errorを検出したアドレスを表示するためのレジスタです。
+
+最後にECC Errorを検出したアドレスが常に表示されます。
+アドレスの値は、アクセス時の転送Byteのサイズに関わらず、Word(32Bit)アクセスの単位で表示されます。
+
+#+CAPTION: ECC Error Address Monitor Register ビットフィールド
+|   bit | Symbol    | Field             | Description                                                      | R/W |
+|-------+-----------+-------------------+------------------------------------------------------------------+-----|
+| 31:22 | -         | Reserved          | Reserved                                                         | -   |
+|  21:0 | ECCERRADR | ECC Error Address | 1Bit ECC Errorおよび2Bit ECC Errorを検出したアドレスを示します。 | RO  |
 
 *** Prefetch Mode Control Register (Offset: 0x0070)
 Prefetch Mode Control Registerは、Prefetch機能を設定するためのレジスタです。
