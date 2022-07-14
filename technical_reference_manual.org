@@ -386,7 +386,7 @@ HRMEMのレジスタは、Base Address 0x40500000に配置されています。
 | Offset | Symbol              | Register                                    |    Initial |
 |--------+---------------------+---------------------------------------------+------------|
 | 0x0000 | HRMEM_ECCCOLENR     | ECC Error Collect Enable Register           | 0x00000001 |
-| 0x0008 | HRMEM_MEMSCRCTRLR   | Memory Scrubing Control Register            | 0x00010000 |
+| 0x0008 | HRMEM_MEMSCRCTRLR   | Memory Scrubing Control Register            | 0x06FF0000 |
 | 0x0010 | HRMEM_INTSTR        | HRMEM Interrupt Status Register             | 0x00000000 |
 | 0x0014 | HRMEM_INTENR        | HRMEM Interrupt Enable Register             | 0x00000000 |
 | 0x0020 | HRMEM_ECC1ERRCNTR   | 1Bit ECC Error Count Register               | 0x00000000 |
@@ -418,13 +418,13 @@ Memory Scrubing Control Registerは、メモリへのメモリスクラビング
 メモリスクラビング機能を有効にする場合は、訂正データの書き戻し機能(ECC Error Collect Enable RegisterのECCCOLEN)も合わせて有効にする必要があります。
 
 #+CAPTION: Memory Scrubing Control Register ビットフィールド
-|   bit | Symbol      | Field                              | Description                                                                                                                                                   | R/W |
-|-------+-------------+------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
-| 31:16 | MEMSCRCYC   | Memory Scrubing Cycle              | メモリスクラビングによる自動読み出しアクセスのWAIT Cycle間隔を設定する信号です。0: 設定禁止 1: 1Clock間隔(default) 2: 2Clock間隔 ... 65535: 65535Clock間隔    | R/W |
-|  15:9 | -           | Reserved                           | Reserved                                                                                                                                                      | -   |
-|     8 | COLFSRDSTPB | Memory Scrubing Arbitration Enable | 書き戻しデータ用FIFOがFULL時のメモリスクラビング調停機能を設定する信号です。本ビットが0の時、書き戻しデータ用FIFOがFULLの時にメモリスクラビングを停止します。 | R/W |
-|   7:1 | -           | Reserved                           | Reserved                                                                                                                                                      | -   |
-|     0 | MEMSCRBEN   | Memory Scrubing Enable             | メモリスクラビング機能による自動読み出しアクセスのEnable設定を行います。0: メモリスクラビング機能 OFF 1: メモリスクラビング機能 ON                            | R/W |
+|   bit | Symbol      | Field                              | Description                                                                                                                                                                                                | R/W |
+|-------+-------------+------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:16 | MEMSCRCYC   | Memory Scrubing Cycle              | メモリスクラビングによる自動読み出しアクセスのWAIT Cycle間隔を設定する信号です。0: 設定禁止 1: 1Clock間隔(default) 2: 2Clock間隔 ... 65535: 65535Clock間隔 初期状態では、1791Cycle間隔に設定されています。 | R/W |
+|  15:9 | -           | Reserved                           | Reserved                                                                                                                                                                                                   | -   |
+|     8 | COLFSRDSTPB | Memory Scrubing Arbitration Enable | 書き戻しデータ用FIFOがFULL時のメモリスクラビング調停機能を設定する信号です。本ビットが0の時、書き戻しデータ用FIFOがFULLの時にメモリスクラビングを停止します。                                              | R/W |
+|   7:1 | -           | Reserved                           | Reserved                                                                                                                                                                                                   | -   |
+|     0 | MEMSCRBEN   | Memory Scrubing Enable             | メモリスクラビング機能による自動読み出しアクセスのEnable設定を行います。0: メモリスクラビング機能 OFF 1: メモリスクラビング機能 ON                                                                         | R/W |
 
 *** HRMEM Interrupt Status Register (Offset: 0x0010)
 HRMEM Interrupt Status Registerは、HRMEMの割り込みステータスレジスタです。
