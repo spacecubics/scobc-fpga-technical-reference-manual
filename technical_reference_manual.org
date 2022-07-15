@@ -430,15 +430,15 @@ HRMEM Interrupt Status Registerは、HRMEMの割り込みステータスレジ�
 それぞれのビットは"1"をセットすると、割り込みをクリアする事ができます。
 
 #+CAPTION: HRMEM Interrupt Status Register ビットフィールド
-|   bit | Symbol    | Field                     | Description                                                                                                                                                                           | R/W  |
-|-------+-----------+---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------|
-| 31:18 | -         | Reserved                  | Reserved                                                                                                                                                                              | -    |
-|    17 | ATRDE1ERR | Auto Read 1bit ECC Error  | メモリスクラビング機能の自動読み出しアクセス時に1bit ECC Errorを検出すると本ビットが"1"にセットされます。E1ERRINTビットの割り込みクリアを行うことで、本ビットの状態もクリアされます。 | RO   |
-|    16 | AHBE1ERR  | AHB Access 1bit ECC Error | AHBリードアクセス時に1bit ECC Errorを検出すると本ビットが"1"にセットされます。E1ERRINTビットの割り込みクリアを行うことで、本ビットの状態もクリアされます。                            | RO   |
-|  15:9 | -         | Reserved                  | Reserved                                                                                                                                                                              | -    |
-|     8 | ECDISINT  | ECC Correct Data Discard  | 1bit ECCエラー検出時のメモリへのライトバック用訂正データの廃棄を検出すると本ビットが"1"にセットされます。                                                                             | R/WC |
-|   7:1 | -         | Reserved                  | Reserved                                                                                                                                                                              | -    |
-|     0 | E1ERRINT  | 1bit ECC Error            | 1bit ECC Errorを検出すると本ビットが"1"にセットされます。                                                                                                                             | R/WC |
+|   bit | Symbol     | Field                                  | Description                                                                                                                                                                                         | R/W  |
+|-------+------------+----------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------|
+| 31:18 | -          | Reserved                               | Reserved                                                                                                                                                                                            | -    |
+|    17 | ATRDE1ERR  | Auto Read Access 1bit ECC Error        | メモリスクラビング機能による自動読み出しアクセスが行われた時に1bit ECC Errorを検出すると本ビットが"1"にセットされます。E1ERRINTビットの割り込みクリアを行うことで、本ビットの状態もクリアされます。 | RO   |
+|    16 | BUSRDE1ERR | AHB/AXI Bus Read Access 1bit ECC Error | AHB/AXI Busよりリードアクセスが行われた時に1bit ECC Errorを検出すると本ビットが"1"にセットされます。E1ERRINTビットの割り込みクリアを行うことで、本ビットの状態もクリアされます。                    | RO   |
+|  15:9 | -          | Reserved                               | Reserved                                                                                                                                                                                            | -    |
+|     8 | ECDISINT   | ECC Correct Data Discard               | 1bit ECCエラー検出時のメモリへのライトバック用訂正データの廃棄を検出すると本ビットが"1"にセットされます。                                                                                           | R/WC |
+|   7:1 | -          | Reserved                               | Reserved                                                                                                                                                                                            | -    |
+|     0 | E1ERRINT   | 1bit ECC Error                         | 1bit ECC Errorを検出すると本ビットが"1"にセットされます。                                                                                                                                           | R/WC |
 
 *** HRMEM Interrupt Enable Register (Offset: 0x0014)
 HRMEM Interrupt Enable Registerは、HRMEMの動作において発生した割り込みイベントを割り込み出力信号に通知するか設定するためのレジスタです。
@@ -457,10 +457,10 @@ HRMEM Interrupt Enable Registerは、HRMEMの動作において発生した割�
 カウンターが上限である 0xFFFFに達すると停止します。
 
 #+CAPTION: 1Bit ECC Error Count Register ビットフィールド
-|   bit | Symbol       | Field                                   | Description                                                                                          | R/W |
-|-------+--------------+-----------------------------------------+------------------------------------------------------------------------------------------------------+-----|
-| 31:16 | ATRDE1ERRCNT | Auto Read Access 1bit ECC Error Counter | メモリスクラビング機能の自動読み出しアクセス時の1bit ECCエラーをカウントする 16bitのカウンターです。 | RO  |
-|  15:0 | AHBE1ERRCNT  | AHB Access 1bit ECC Error Counter       | AHBリードアクセス時の1bit ECCエラーをカウントする 16bitのカウンターです。                            | RO  |
+|   bit | Symbol        | Field                                          | Description                                                                                                                | R/W |
+|-------+---------------+------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:16 | ATRDE1ERRCNT  | Auto Read Access 1bit ECC Error Counter        | メモリスクラビング機能による自動読み出しアクセスが行われた時に発生した1bit ECCエラーをカウントする 16bitのカウンターです。 | RO  |
+|  15:0 | BUSRDE1ERRCNT | AHB/AXI Bus Read Access 1bit ECC Error Counter | AHB/AXI Busよりリードアクセスが行われた時に発生した1bit ECCエラーをカウントする 16bitのカウンターです。                    | RO  |
 
 *** ECC Correct Data Discard Count Register (Offset: 0x0028)
 ECC Correct Data Discard Count Registerは、メモリへのECC訂正データ廃棄件数を表示するカウンターレジスタです。ECC訂正データ廃棄の検出毎に本カウンターをインクリメントします。
