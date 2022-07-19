@@ -395,7 +395,6 @@ HRMEMのレジスタは、Base Address 0x40500000に配置されています。
 | 0x0030 | HRMEM_ECCERRADMR    | ECC Error Address Monitor Register          | 0x00000000 |
 | 0x0070 | HRMEM_PFEMDCTLR     | Prefetch Mode Control Register              | 0x00000001 |
 | 0x0074 | HRMEM_SPEPFENR      | Special Prefetch Enable Register            | 0x00000000 |
-| 0x007C | HRMEM_PFBUFFLUSHR   | Prefetch Buffer Flush Register              | 0x00000000 |
 | 0x0080 | HRMEM_SPEPFADRSETR1 | Special Prefetch Address Setting Register 1 | 0x00000000 |
 | 0x0084 | HRMEM_SPEPFADRSETR2 | Special Prefetch Address Setting Register 2 | 0x00000000 |
 | 0xF000 | HRMEM_VER           | HRMEM IP Version Register                   |          - |
@@ -522,15 +521,6 @@ Prefetch Mode Control RegisterのPFMDCTLフィールドが2'b00に設定され�
 |------+---------+-------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
 | 31:2 | -       | Reserved                | Reserved                                                                                                                                                                    | -   |
 |  1:0 | SPPFENB | Special Prefetch Enable | 専用アドレスのPrefetch機能を設定します。 2b00: Special Prefetch未使用  2b01: Special Prefetch1のみ使用  2b10: Special Prefetch2のみ使用   2b11: Special Prefetch1/2双方使用 | R/W |
-
-*** Prefetch Buffer Flush Register (Offset: 0x007C)
-Prefetch Buffer Flush Registerは、Prefetchデータをクリアするためのレジスタです。
-
-#+CAPTION: Prefetch Buffer Flush Register ビットフィールド
-|  bit | Symbol   | Field                 | Description                                                                                                           | R/W |
-|------+----------+-----------------------+-----------------------------------------------------------------------------------------------------------------------+-----|
-| 31:1 | -        | Reserved              | Reserved                                                                                                              | -   |
-|    0 | PFBFLUSH | Prefetch Buffer Flush | 本ビットを1にセットすると、全てのPrefetch BufferとSpecial Prefetch Bufferの格納状況ステータスとデータをクリアします。 | WO  |
 
 *** Special Prefetch Address Setting Register 1 (Offset: 0x0080)
 Special Prefetch Address Setting Register 1は、Special Prefetch Buffer1にPrefetchするアドレスを設定するためのレジスタです。
