@@ -502,10 +502,10 @@ Prefetchは、AHB Read Accessがあったアドレスとそれ以降の同じLin
 Burst Read転送時はPrefetchを行いません。
 
 #+CAPTION: Prefetch Mode Control Register ビットフィールド
-|  bit | Symbol  | Field                 | Description                                                                                                                                                                                                      | R/W |
-|------+---------+-----------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
-| 31:2 | -       | Reserved              | Reserved                                                                                                                                                                                                         | -   |
-|  1:0 | PFMDCTL | Prefetch Mode Control | Prefetch機能を設定します。 2b00: Prefetch機能無効  2b01: HPROT[0]=1b0の場合Prefetch実施  2b10: HPROT[0]=1b1 & HSIZE=2b10の場合Prefetch実施   2b11: HPROT[0]=1b0 or (HPROT[0]=1b1 & HSIZE=2b10)の場合Prefetch実施 | R/W |
+|  bit | Symbol  | Field                 | Description                                                                                                                                                                                                                                         | R/W |
+|------+---------+-----------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:2 | -       | Reserved              | Reserved                                                                                                                                                                                                                                            | -   |
+|  1:0 | PFMDCTL | Prefetch Mode Control | Prefetch機能を設定します。 2b00: Prefetch機能無効  2b01: Instruction fetch の場合Prefetch実施  2b10: Data access かつ Word size access の場合Prefetch実施   2b11: (Instruction fetch) または (Data access かつ Word size access) の場合Prefetch実施 | R/W |
 
 *** Special Prefetch Enable Register (Offset: 0x0074)
 Special Prefetch Enable Registerは、専用アドレスのPrefetch機能を設定するためのレジスタです。
