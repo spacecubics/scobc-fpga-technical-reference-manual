@@ -290,7 +290,7 @@ System Monitorは、Base Address 0x4F04_0000に配置されています。
 |-------------------------+-------------------+-----------------------------------+------------|
 |              0x4F040000 | SYSMON_WDOG_CTRL  | Watchdog Control Register         | 0x00070000 |
 |              0x4F040004 | SYSMON_WDOG_WSR   | Watchdog Service Register         | 0x00000000 |
-|              0x4F040010 | SYSMON_WDOG_SIVAL | Watchdog Signal Interval Register | 0x0003A97F |
+|              0x4F040010 | SYSMON_WDOG_SIVAL | Watchdog Signal Interval Register | 0x00B71AFF |
 | 0x4F041000 - 0x4F041FFF | SYSMON_XADC_REG   | XADC Register Window              | ---------- |
 
 *** Watchdog Control Register (Offset 0x0000)
@@ -328,10 +328,10 @@ $WDOG\_SIVAL設定値 = \frac{FPGA\_WATCHDOG\ High/Lowレベル幅 [s]}{\frac{1}
 #+END_QUOTE
 
 #+CAPTION: Watchdig Signal Interval Registerビットフィールド
-|   bit | Symbol     | Field                    | Description                                                                                                    | R/W |
-|-------+------------+--------------------------+----------------------------------------------------------------------------------------------------------------+-----|
-| 31:24 | -          | Reserved                 | Reserved                                                                                                       | -   |
-|  23:0 | WDOG_SIVAL | Watchdog Signal Interval | Watchdog Signalの Highレベルまたは Lowレベルの幅を設定するフィールドです。初期値は 10 [ms]に設定されています。 | R/W |
+|   bit | Symbol     | Field                    | Description                                                                                                     | R/W |
+|-------+------------+--------------------------+-----------------------------------------------------------------------------------------------------------------+-----|
+| 31:24 | -          | Reserved                 | Reserved                                                                                                        | -   |
+|  23:0 | WDOG_SIVAL | Watchdog Signal Interval | Watchdog Signalの Highレベルまたは Lowレベルの幅を設定するフィールドです。初期値は 500 [ms]に設定されています。 | R/W |
 
 *** XADC Register Window (Offset 0x1000-1FFF)
 XADC Register Fieldは、SC OBC FPGAに搭載されている Xilinxの ADCモジュールとのアクセスを行うための領域です。
