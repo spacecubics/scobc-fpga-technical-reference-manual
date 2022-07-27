@@ -288,7 +288,7 @@ System Monitorは、Base Address 0x4F04_0000に配置されています。
 #+CAPTION: System Monitorメモリマップ
 |                 Address | Symbol            | Register                          |    Initial |
 |-------------------------+-------------------+-----------------------------------+------------|
-|              0x4F040000 | SYSMON_WDOG_CTRL  | Watchdog Control Register         | 0x00000000 |
+|              0x4F040000 | SYSMON_WDOG_CTRL  | Watchdog Control Register         | 0x00070000 |
 |              0x4F040004 | SYSMON_WDOG_WSR   | Watchdog Service Register         | 0x00000000 |
 |              0x4F040010 | SYSMON_WDOG_SIVAL | Watchdog Signal Interval Register | 0x0003A97F |
 | 0x4F041000 - 0x4F041FFF | SYSMON_XADC_REG   | XADC Register Window              | ---------- |
@@ -297,13 +297,15 @@ System Monitorは、Base Address 0x4F04_0000に配置されています。
 Watchdog Control Registerは、SC OBC FPGAの Watchdogの制御を行うためのレジスタです。
 
 本レジスタにより Watchdog Counterの満了時間を設定する事ができます。
+初期状態では、Watchdog Counterの満了時間は 128 [sec] に設定されています。
+ソフトウェアが、定期的にSoftware Watchdog Timerをリロードできる状態となった後に、Software Watchdog Timeフィールドを適切な値に変更してください。
 
 #+CAPTION: Watchdog Control Register ビットフィールド
-|   bit | Symbol       | Field                  | Description                                                                                                                     | R/W |
-|-------+--------------+------------------------+---------------------------------------------------------------------------------------------------------------------------------+-----|
-| 31:20 | -            | Reserved               | Reserved                                                                                                                        | -   |
-| 19:16 | SW_WDOG_TIME | Software Watchdog Time | Software Watchdog Timerの満了時間を設定するためのフィールドです。0x0: 0.5 [sec] 0x1: 1.0 [sec] 0x2: 1.5 [sec] 〜 0xF: 8.0 [sec] | R/W |
-|  15:0 | -            | Reserved               | Reserved                                                                                                                        | -   |
+|   bit | Symbol       | Field                  | Description                                                                                                                                                                   | R/W |
+|-------+--------------+------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:19 | -            | Reserved               | Reserved                                                                                                                                                                      | -   |
+| 18:16 | SW_WDOG_TIME | Software Watchdog Time | Software Watchdog Timerの満了時間を設定するためのフィールドです。0x0: 1 [sec] 0x1: 2 [sec] 0x2: 4 [sec] 0x3: 8 [sec] 0x4: 16 [sec] 0x5: 32 [sec] 0x6: 64 [sec] 0x7: 128 [sec] | R/W |
+|  15:0 | -            | Reserved               | Reserved                                                                                                                                                                      | -   |
 
 *** Watchdog Service Register (Offset 0x0004)
 Watchdog Service Registerは、Software Watchdog Timerをリロードするためのレジスタです。
