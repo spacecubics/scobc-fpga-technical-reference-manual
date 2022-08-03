@@ -186,6 +186,7 @@ System Registerは、Base Address 0x4F00_0000に配置されています。
 |------------+------------------+-------------------------------------+------------|
 | 0x4F000000 | SYSREG_CODEMSEL  | Code Memory Select Register         | 0x00000001 |
 | 0x4F000004 | SYSREG_SYSCLKCTL | System Clock Control Register       | 0x00000001 |
+| 0x4F000010 | SYSREG_CFGMEMCTL | Configuration Memory Register       | 0x000x0000 |
 | 0x4F0000F0 | SYSREG_SPAD1     | Scratchpad 1 Register               | 0x00000000 |
 | 0x4F0000F4 | SYSREG_SPAD2     | Scratchpad 2 Register               | 0x00000000 |
 | 0x4F0000F8 | SYSREG_SPAD3     | Scratchpad 3 Register               | 0x00000000 |
@@ -230,6 +231,34 @@ CLKMODE信号の設定値と、PLLの状態 及び システムクロック周�
 | 0b01            | Normal Operation | 24 MHz (Reference Clock) | 48 MHz (PLL Output)      | 48 MHz (PLL Output)      | RTLパラメータにより設定 (PLL Output)              |
 | 0b10            | Normal Operation | 24 MHz (Reference Clock) | 96 MHz (PLL Output)      | 96 MHz (PLL Output)      | RTLパラメータにより設定 (PLL Output)              |
 | 0b11 (設定禁止) | -                | -                        | -                        | -                        | -                                                 |
+
+*** Configuration Memory Register (Offset 0x0010)
+Configuration Memory Registerは SC OBC Moduleに実装される 2つの Configuration Memory (NOR FLash Memory)に関する制御を行うためのレジスタです。
+
+#+CAPTION: Configuration Memory Register ビットフィールド
+|   bit | Symbol      | Field                        | Description                                                                                                                                                                                                                                                                                                                          | R/W |
+|-------+-------------+------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:13 | -           | Reserved                     | Reserved                                                                                                                                                                                                                                                                                                                             | -   |
+|    12 | CFGBOOTMEM  | Boot Memory                  | SC OBC FPGAが Configurationsに使用した Configuration Memoryを示すビットです。このフィールドを読み出す事で、SC OBC FPGAがどちらの Configuration Memoryから起動したか知る事ができます。SC OBC FPGAの Configuration後 Resetが解除される時に確定します。                                                                                 | RO  |
+|  11:6 | -           | Reserved                     | Reserved                                                                                                                                                                                                                                                                                                                             | -   |
+|     5 | CFGMEMMON   | Configuration Memory Monitor | 現在選択されている Configuration Memoryの選択状態を示すビットです。                                                                                                                                                                                                                                                                  | RO  |
+|     4 | CFGMEMSEL   | Configuration Memory Select  | Configuration Memoryを選択するためのビットです。CFGMEMOWNERフィールドが "0"にクリアされている時のみ、このビットが有効になります。0: Configuration Memory 0を選択. 1: Configuration Memory 1を選択                                                                                                                                    | R/W |
+|   3:1 | -           | Reserved                     | Reserved                                                                                                                                                                                                                                                                                                                             | -   |
+|     0 | CFGMEMOWNER | Configuration Memory Owner   | Configuration Memoryの選択をレジスタによって選択するか、QSPIコアによって選択するかを決定するフィールドです。0: Configuration Memoryは CFGMEMSELビットにより選択される. 1: Configuration Memoryは QSPIコアにより選択される. QSPIコアによる Configuration Memoryのメモリパトロールを行う場合は、このビットを "1"にセットしてください。 | R/W |
+
+Configuration Memoryの選択は、以下の 3つの制御状態を持っています。
+
+| 状態               | 選択条件                                                           |
+|--------------------+--------------------------------------------------------------------|
+| TRCHによる選択     | OBC Moduleへの電源投入後、TRCHが FPGAの 起動完了を認識するまでの間 |
+| レジスタによる選択 | TRCHが FPGAの Configuration完了を認識し、且つ CFGMEMOWNER=0の場合  |
+| QSPIコアによる選択 | TRCHが FPGAの Configuration完了を認識し、且つ CFGMEMOWNER=1の場合  |
+
+SC OBC FPGAが Configurationし TRCHが FPGAの起動完了を認識する間、Configuration Memoryの選択は TRCHによって行われます。
+この仕様により、SC OBC FPGAが Configurationするための Memoryは TRCHによって選択されます。
+
+TRCHが FPGAの起動完了を認識すると、Configuration Memoryの制御権は FPGAに移行します。
+FPGAは CFGMEMSELビットの設定によって、ソフトウェアによる選択を行うか、QSPIコアによる選択を行うかを決定します。
 
 *** Scratchpad 1-4 Register (Offset 0x00F0-0x00FC)
 Scratchpad 1-4 Registerは、ソフトウェアがワークスペースとして使用する為のレジスタです。
