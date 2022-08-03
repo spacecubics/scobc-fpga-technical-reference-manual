@@ -386,7 +386,7 @@ HRMEMのレジスタは、Base Address 0x40500000に配置されています。
 | Offset | Symbol              | Register                                    |    Initial |
 |--------+---------------------+---------------------------------------------+------------|
 | 0x0000 | HRMEM_ECCCOLENR     | ECC Error Collect Enable Register           | 0x00000001 |
-| 0x0008 | HRMEM_MEMSCRCTRLR   | Memory Scrubing Control Register            | 0x06FF0000 |
+| 0x0008 | HRMEM_MEMSCRCTRLR   | Memory Scrubing Control Register            | 0x06FF0001 |
 | 0x0010 | HRMEM_INTSTR        | HRMEM Interrupt Status Register             | 0x00000000 |
 | 0x0014 | HRMEM_INTENR        | HRMEM Interrupt Enable Register             | 0x00000000 |
 | 0x0020 | HRMEM_ECC1ERRCNTR   | 1Bit ECC Error Count Register               | 0x00000000 |
