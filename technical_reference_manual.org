@@ -187,6 +187,7 @@ System Registerは、Base Address 0x4F00_0000に配置されています。
 | 0x4F000000 | SYSREG_CODEMSEL  | Code Memory Select Register         | 0x00000001 |
 | 0x4F000004 | SYSREG_SYSCLKCTL | System Clock Control Register       | 0x00000001 |
 | 0x4F000010 | SYSREG_CFGMEMCTL | Configuration Memory Register       | 0x000x0000 |
+| 0x4F000020 | SYSREG_PWRCYCLE  | Power Cycle Register                | 0x00000000 |
 | 0x4F0000F0 | SYSREG_SPAD1     | Scratchpad 1 Register               | 0x00000000 |
 | 0x4F0000F4 | SYSREG_SPAD2     | Scratchpad 2 Register               | 0x00000000 |
 | 0x4F0000F8 | SYSREG_SPAD3     | Scratchpad 3 Register               | 0x00000000 |
@@ -259,6 +260,18 @@ SC OBC FPGAが Configurationし TRCHが FPGAの起動完了を認識する間、
 
 TRCHが FPGAの起動完了を認識すると、Configuration Memoryの制御権は FPGAに移行します。
 FPGAは CFGMEMSELビットの設定によって、ソフトウェアによる選択を行うか、QSPIコアによる選択を行うかを決定します。
+
+*** Power Cycle Register (Offset 0x0020)
+Power Cycle Registerは SC OBC FPGAに対する Power Cycle要求を発行するためのレジスタです。
+
+このレジスタの制御により Power Cycleを要求すると、TRCHによって Power Cycleが実行されます。
+
+#+CAPTION: Power Cycle Register ビットフィールド
+|   bit | Symbol      | Field                       | Description                                                                                                                                                                                                                         | R/W |
+|-------+-------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:16 | PWRCYCLEPKC | Power Cycle Protect Keycode | PWRCYCLEREQビットの書き込みプロテクトフィールドです。PWRCYCLEREQビットに書き込みを行う場合は、このフィールドに0x5A5Aを書き込んでください。このフィールドに0x5A5A以外が設定された場合、PWRCYCLEREQビットへの書き込みは無視されます。 | WO  |
+|  15:1 | -           | Reserved                    | Reserved                                                                                                                                                                                                                            | -   |
+|     0 | PWRCYCLEREQ | Power Cycle Request         | TRCHに対し Power Cycle Requestを発行するためのビットです。このビットに "1"を書き込むと TRCHによる FPGAの Power Cycleが実行されます。このビットへの "0"の書き込みは何も影響しません。                                                | R/W |
 
 *** Scratchpad 1-4 Register (Offset 0x00F0-0x00FC)
 Scratchpad 1-4 Registerは、ソフトウェアがワークスペースとして使用する為のレジスタです。
