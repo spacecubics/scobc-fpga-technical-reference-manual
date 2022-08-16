@@ -75,8 +75,8 @@ Mission Bus SystemはユーザーがCubeSatのミッションを行うためのI
 |                                 | - CPU Revision r2p1                                                                         |
 |                                 | - ARMv7-M architecture profile                                                              |
 |                                 | - Maximum operation frequency up to 96 MHz (T.B.D.)                                         |
-| On Chip SRAM (ITCM for Boot)    | 128 KByte (Revision A)                                                                      |
-| HRMEM [High-reliability Memory] | 4 MByte (Revision Aでは実装されていません)                                                  |
+| On Chip SRAM (ITCM for Boot)    | 8 KByte                                                                                     |
+| HRMEM [High-reliability Memory] | 4 MByte                                                                                     |
 |                                 | - ECC Memory Protection                                                                     |
 |                                 | - Memory Scrubbing                                                                          |
 | Internal System Bus             | CPU Local Bus: AMBA AHB3 32 bitMain Bus: AMBA AXI4 32bit                                    |
@@ -84,12 +84,12 @@ Mission Bus SystemはユーザーがCubeSatのミッションを行うためのI
 |                                 | Low Performance IP Bus: AMBA AHB3 32 bit                                                    |
 | DMA                             | Not Support                                                                                 |
 | Interrupt Support               | 16 User interrupt signal                                                                    |
-| Watchdog Timer                  | Revision Aでは実装されていません                                                            |
+| Watchdog Timer                  | Space Cubics TRCH-FPGA watchdog system                                                      |
 | FPGA Configuration Memory       | 32 MByte/Redundancy (S25FL256L)                                                             |
 | Data Memory                     | 32 MByte/Redundancy (S25FL256L)                                                             |
 | FeRAM                           | 512 kByte x 2 (CY15B104QSN)                                                                 |
 | Control Area Network (CAN)      | Conforms to the ISO 11898-1, CAN2.0A, and CAN2.0B standards Supports bit rates up to 1 Mb/s |
-| Space Communication Bus (SCBus) | Revision Aでは実装されていません                                                            |
+| Space Communication Bus (SCBus) | Revision Cでは実装されていません                                                            |
 |                                 | Compliant with the USB-based communication interface proposed by Space Cubics (T.B.D.)      |
 |                                 | - Supports bit rates 12 Mbps (USB Full-Speed)                                               |
 | I2C Interface                   | SC OBC On Board I2C x 1 channel                                                             |
