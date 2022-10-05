@@ -172,7 +172,8 @@ Cortex-M3の 割り込みコントローラの仕様については、ARM Cortex
 |            21 | [5]     | CAN Controller                         | Level |
 |            22 | [6]     | Internal I2C Master                    | Level |
 |            23 | [7]     | External I2C Master                    | Level |
-|       24 - 31 | [15:8]  | Reserved (OBC System Interrupt Area)   | -     |
+|            24 | [8]     | System Monitor Hardware Error          | Level |
+|       25 - 31 | [15:8]  | Reserved (OBC System Interrupt Area)   | -     |
 |       32 - 47 | [31:16] | Reserved (UDL IP Interrupt Area)       | -     |
 
 * System Register
@@ -328,11 +329,18 @@ TRCHは FPGAが出力する FPGA_WATCHDOG信号が定期的にトグルしてい
 System Monitorは、Base Address 0x4F04_0000に配置されています。
 
 #+CAPTION: System Monitorメモリマップ
-|                 Address | Symbol            | Register                          |    Initial |
-|-------------------------+-------------------+-----------------------------------+------------|
-|              0x4F040000 | SYSMON_WDOG_CTRL  | Watchdog Control Register         | 0x00075A5A |
-|              0x4F040010 | SYSMON_WDOG_SIVAL | Watchdog Signal Interval Register | 0x00B71AFF |
-| 0x4F041000 - 0x4F041FFF | SYSMON_XADC_REG   | XADC Register Window              | ---------- |
+|                 Address | Symbol              | Register                                 |    Initial |
+|-------------------------+---------------------+------------------------------------------+------------|
+|              0x4F040000 | SYSMON_WDOG_CTRL    | Watchdog Control Register                | 0x00075A5A |
+|              0x4F040010 | SYSMON_WDOG_SIVAL   | Watchdog Signal Interval Register        | 0x00B71AFF |
+|              0x4F040030 | SYSMON_INT_STATUS   | System Monitor Interrupt Status Register | 0x00000000 |
+|              0x4F040034 | SYSMON_INT_ENABLE   | System Monitor Interrupt Enable Register | 0x00000000 |
+|              0x4F040040 | SYSMON_SEM_STATE    | SEM Controller State Register            | 0x00000000 |
+|              0x4F040044 | SYSMON_SEM_ECCOUNT  | SEM Error Correction Count Register      | 0x00000000 |
+|              0x4F040048 | SYSMON_SEM_HTIMEOUT | SEM Heartbeat Timeout Register           | 0x000000FF |
+|              0x4F040050 | SYSMON_SEM_EINJECT1 | SEM Error Injection Command Register 1   | 0x00000000 |
+|              0x4F040054 | SYSMON_SEM_EINJECT2 | SEM Error Injection Command Register 2   | 0x00000000 |
+| 0x4F041000 - 0x4F041FFF | SYSMON_XADC_REG     | XADC Register Window                     | ---------- |
 
 *** Watchdog Control Register (Offset 0x0000)
 Watchdog Control Registerは、SC OBC FPGAの Watchdogの制御を行うためのレジスタです。
@@ -366,6 +374,100 @@ $WDOG\_SIVAL設定値 = \frac{FPGA\_WATCHDOG\ High/Lowレベル幅 [s]}{\frac{1}
 |-------+------------+--------------------------+-----------------------------------------------------------------------------------------------------------------+-----|
 | 31:24 | -          | Reserved                 | Reserved                                                                                                        | -   |
 |  23:0 | WDOG_SIVAL | Watchdog Signal Interval | Watchdog Signalの Highレベルまたは Lowレベルの幅を設定するフィールドです。初期値は 500 [ms]に設定されています。 | R/W |
+
+*** System Monitor Interrupt Status Register (Offset 0x0030)
+System Monitor Interrupt Status Registerは、System Monitorの割り込みステータスレジスタです。
+それぞれのビットは"1"をセットすると、割り込みをクリアする事ができます。
+
+SEM Controllerの異常を示すビット (bit 9、bit 10、bit 11) は、"1"をセットすると割り込みをクリアする事はできますが、SEM Controllerの異常が取り除かれるわけではないため、システムの再起動を行う必要があります。
+
+#+CAPTION: System Monitor Interrupt Status Registerビットフィールド
+|  bit | Symbol            | Field                           | Description                                                                                                                                                                                                         | R/W  |
+|------+-------------------+---------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------|
+| 31:5 | -                 | Reserved                        | Reserved                                                                                                                                                                                                            | -    |
+|   11 | SEM_HTIMEOUT_INT  | SEM Heartbeat Timeout Interrupt | SEM Controllerの Heartbeat信号が Timeoutしたときにセットされる割り込みビットです。SEM Controllerが出力する Heartbeat信号が SEM Heartbeat Timeout Registerで設定するクロック数アサートされなかった時セットされます。 | R/WC |
+|   10 | SEM_HALTED_INT    | SEM Halted Interrupt            | SEM Controllerが Fatal Errorにより Haltしたときにセットされる割り込みビットです。SEM Current State Registerの全ての有効ビットがセットされたとき、この割り込みがセットされます。                                     | R/WC |
+|    9 | SEM_UNCORRECT_INT | SEM Uncorrectable Interrupt     | SEM Controllerが訂正不能なエラーを検出したときセットされる割り込みビットです。この割り込みがセットされたとき、SEM Controllerは IDLEステートに遷移し コンフィギュレーションメモリの監視を停止します。                | R/WC |
+|    8 | SEM_ECORRECT_INT  | SEM Error Correction Interrupt  | SEM Controllerがエラーを訂正したときセットされる割り込みビットです。                                                                                                                                                | R/WC |
+|  7:0 | -                 | Reserved                        | Reserved                                                                                                                                                                                                            | -    |
+
+*** System Monitor Interrupt Enable Register (Offset 0x0034)
+System Monitor Interrupt Enable Registerは、System Monitorが監視するイベントを割り込み出力信号に通知するか設定するためのレジスタです。
+
+#+CAPTION: System Monitor Interrupt Enable Registerビットフィールド
+|  bit | Symbol            | Field                                  | Description                                                                           | R/W |
+|------+-------------------+----------------------------------------+---------------------------------------------------------------------------------------+-----|
+| 31:5 | -                 | Reserved                               | Reserved                                                                              | -   |
+|   11 | SEM_HTIMEOUT_ENB  | SEM Heartbeat Timeout Interrupt Enable | SEM_HTIMEOUT_INTイベントが発生した時、割り込み信号を発生させるかどうかを設定します。  | R/W |
+|   10 | SEM_HALTED_ENB    | SEM Halted Interrupt Enable            | SEM_HALTED_INTイベントが発生した時、割り込み信号を発生させるかどうかを設定します。    | R/W |
+|    9 | SEM_UNCORRECT_ENB | SEM Uncorrectable Interrupt Enable     | SEM_UNCORRECT_INTイベントが発生した時、割り込み信号を発生させるかどうかを設定します。 | R/W |
+|    8 | SEM_ECORRECT_ENB  | SEM Error Correction Interrupt Enable  | SEM_ECORRECT_INTイベントが発生した時、割り込み信号を発生させるかどうかを設定します。  | R/W |
+|  7:0 | -                 | Reserved                               | Reserved                                                                              | -   |
+
+*** SEM Controller State Register (0ffset 0x0040)
+SEM Controller State Registerは SC OBC FPGAに実装する、SEM Controllerのステートを示すレジスタです。
+
+セットされているビットを確認する事により、ソフトウェアは SEM Controllerがどのような状況にあるか把握する事ができます。
+また、Currentステートと Previousステートを比較する事によって、ステートの遷移を把握する事ができます。
+
+Currentステート、Previousステートの全てのビットが Highにセットされているとき、SEM Controllerに重大なエラーが起きた事を示します。
+また、全てのビットが Lowにクリアされているとき、SEM Controllerは IDLE状態である事を示します。
+
+#+CAPTION: SEM Controller State Registerビットフィールド
+|   bit | Symbol            | Field                             | Description                                                                                                                                                                                                              | R/W |
+|-------+-------------------+-----------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:21 | -                 | Reserved                          | Reserved                                                                                                                                                                                                                 | -   |
+|    20 | SEM_PRE_INJECT    | SEM Previous Injection State      | SEM Controllerの前のステートがエラー挿入ステートだった事を示します。                                                                                                                                                     | RO  |
+|    19 | SEM_PRE_CLASSIFIC | SEM Previous Classification State | SEM Controllerの前のステートが分類ステートだった事を示します。                                                                                                                                                           | RO  |
+|    18 | SEM_PRE_CORRECT   | SEM Previous Correction State     | SEM Controllerの前のステートが訂正ステートだった事を示します。                                                                                                                                                           | RO  |
+|    17 | SEM_PRE_OBSERVE   | SEM Previous Oveservation State   | SEM Controllerの前のステートが監視ステートだった事を示します。                                                                                                                                                           | RO  |
+|    16 | SEM_PRE_INIT      | SEM Previous Initilize State      | SEM Controllerの前のステートが初期化ステートだった事を示します。                                                                                                                                                         | RO  |
+|  15:5 | -                 | Reserved                          | Reserved                                                                                                                                                                                                                 | -   |
+|     4 | SEM_CUR_INJECT    | SEM Current Error Injection State | SEM Controllerがエラー挿入ステートである事を示します。このビットのみが Highにセットされているとき、SEM Controllerはエラー挿入ステートです。                                                                              | RO  |
+|     3 | SEM_CUR_CLASSIFIC | SEM Current Classification State  | SEM Controllerが分類ステートである事を示します。このビットのみが Highにセットされているとき、SEM Controllerは分類ステートです。                                                                                          | RO  |
+|     2 | SEM_CUR_CORRECT   | SEM Current Correction State      | SEM Controllerが訂正ステートである事を示します。このビットのみが Highにセットされているとき、SEM Controllerは訂正ステートです。                                                                                          | RO  |
+|     1 | SEM_CUR_OBSERVE   | SEM Current Oveservation State    | SEM Controllerが監視ステートである事を示します。このビットのみが Highにセットされているとき、SEM Controllerは監視ステートです。                                                                                          | RO  |
+|     0 | SEM_CUR_INIT      | SEM Current Initilize State       | SEM Controllerが初期化ステートである事を示します。このビットのみが Highにセットされているとき、SEM Controllerは初期化ステートです。このビットは FPGAが動作を開始した後に 1度だけ発生する初期化の間アクティブになります。 | RO  |
+
+*** SEM Error Correction Count Register (Offset 0x0044)
+SEM Error Correction Count Registerは、SEM Controllerが行ったエラー訂正数をカウントします。
+
+#+CAPTION: SEM Error Correction Count Registerビットフィールド
+|   bit | Symbol    | Field                | Description                                                                                                                        | R/W  |
+|-------+-----------+----------------------+------------------------------------------------------------------------------------------------------------------------------------+------|
+| 31:16 | -         | Reserved             | Reserved                                                                                                                           | -    |
+|  15:0 | SEMCCOUNT | SEM Correction Count | SEM Controllerが訂正したエラーの数を保持します。このレジスタに書き込みを行うと、書き込む値によらずカウント値が 0にクリアされます。 | R/WC |
+
+*** SEM Heartbeat Timeout Register (Offset 0x0048)
+SEM Heartbeat Timeout Registeは SEM Controllerが出力する Heartbeat信号の Timeout時間を設定するレジスタです。
+Xilinxの SEM Controller (v4.1)では、Heartbeat信号のアサート間隔は 150クロックと規定されており、本レジスタの値は修正する必要はありません。
+
+#+CAPTION: SEM Heartbeat Timeout Registerビットフィールド
+|  bit | Symbol   | Field                   | Description                                                                                                                                                                                                                                   | R/W |
+|------+----------+-------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:8 | -        | Reserved                | Reserved                                                                                                                                                                                                                                      | -   |
+|  7:0 | HTIMEOUT | Heartbeat Timeout Value | SEM Controllerが出力する Heartbeat信号の受信Timeout時間を設定します。SEM Controllerのステートが、監視ステートのとき このレジスタに設定されるカウント値まで Heartbeat信号がアサートされないとき、SEM Heartbeat Timeout割り込みを発生させます。 | R/W |
+
+*** SEM Error Injection Command Register 1/2 (Offset 0x0050/0x0054)
+SEM Error Injection Command Register は、SEM Controller のエラー挿入機能を使用するためのレジスタです。 
+このレジスタを使用し、SEM Controllerのエラー挿入インターフェースにコマンドを入力する事により、エラー挿入機能を使用する事ができます。
+
+このレジスタは試験専用レジスタであり、FPGA インプリ時のコンフィギュレーションにより、無効化する事ができます。 
+
+SEM Controller へのコマンド送信は、SEM Error Injection Command Register 2 への書き込みをきっかけに行われます。
+そのため、SEM Error Injection Command Register 1 への書き込みは、必ず SEM Error Injection Command Register 2 の書き込み前に行ってください。
+
+#+CAPTION: SEM Error Injection Command Register 1ビットフィールド
+|  bit | Symbol   | Field             | Description                                                                                                                                        | R/W |
+|------+----------+-------------------+----------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:8 | -        | Reserved          | Reserved                                                                                                                                           | -   |
+|  7:0 | EINJECT1 | Error Injection 1 | SEM Controllerのエラー挿入インターフェースにコマンドを入力するためのフィールドです。このフィールドにはエラー挿入コマンドの Bit 31:0 を設定します。 | R/W |
+
+#+CAPTION: SEM Error Injection Command Register 2ビットフィールド
+|  bit | Symbol   | Field             | Description                                                                                                                                                                                                                                                           | R/W |
+|------+----------+-------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:8 | -        | Reserved          | Reserved                                                                                                                                                                                                                                                              | -   |
+|  7:0 | EINJECT2 | Error Injection 2 | SEM Controllerのエラー挿入インターフェースにコマンドを入力するためのフィールドです。このフィールドにはエラー挿入コマンドの Bit 39:32 を設定します。このフィールドをセットすると SEM Error Injection 1 の設定値と合わせ SEM Controllerにエラーコマンドが送信されます。 | R/W |
 
 *** XADC Register Window (Offset 0x1000-1FFF)
 XADC Register Fieldは、SC OBC FPGAに搭載されている Xilinxの ADCモジュールとのアクセスを行うための領域です。
