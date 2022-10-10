@@ -460,8 +460,7 @@ SEM Controller へのコマンド送信は、SEM Error Injection Command Registe
 #+CAPTION: SEM Error Injection Command Register 1ビットフィールド
 |  bit | Symbol   | Field             | Description                                                                                                                                        | R/W |
 |------+----------+-------------------+----------------------------------------------------------------------------------------------------------------------------------------------------+-----|
-| 31:8 | -        | Reserved          | Reserved                                                                                                                                           | -   |
-|  7:0 | EINJECT1 | Error Injection 1 | SEM Controllerのエラー挿入インターフェースにコマンドを入力するためのフィールドです。このフィールドにはエラー挿入コマンドの Bit 31:0 を設定します。 | R/W |
+| 31:0 | EINJECT1 | Error Injection 1 | SEM Controllerのエラー挿入インターフェースにコマンドを入力するためのフィールドです。このフィールドにはエラー挿入コマンドの Bit 31:0 を設定します。 | R/W |
 
 #+CAPTION: SEM Error Injection Command Register 2ビットフィールド
 |  bit | Symbol   | Field             | Description                                                                                                                                                                                                                                                           | R/W |
