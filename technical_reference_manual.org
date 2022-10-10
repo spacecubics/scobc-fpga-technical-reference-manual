@@ -325,6 +325,51 @@ SC OBCのシステムは、TRCHによって監視されます。
 SC OBC FPGAは System Monitorが収集した FPGA内部の状態を Watchdog signal (FPGA_WATCHDOG)を通じて TRCHに伝えます。
 TRCHは FPGAが出力する FPGA_WATCHDOG信号が定期的にトグルしている間、FPGAが健全に動作していると判断します。
 
+** SEM Controller
+SEM (Soft Error Mitigation) Controllerは、Xilinx FPGAのコンフィギュレーションメモリで発生したソフトエラーの検出 及び訂正を行う、Xilinxから提供されるソリューションです。
+SC OBC FPGAはこの機能をシステムに組み込み、SEM Controllerの状態を System Monitorのレジスタから読み出す機能を持っています。
+
+CPUが正常に動作している場合でも、SEM Controllerが訂正不能なエラーを検出した場合や、SEM Controller自体に障害が発生した場合には、SC OBC FPGAに深刻な障害が発生する可能性があります。
+そのため、深刻な障害が発生する前に再起動することにより、システムを健全な状態に保つ事が可能です。
+
+SC OBC FPGAは以下の構成でSEM Controllerを実装しています。
+
+| 項目                | 設定       | 説明                                                                                                                                                           |
+|---------------------+------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| エラー訂正/修復方法 | 拡張修復   | ECCおよび CRCアルゴリズムに基づく訂正を行います。1ビットのエラーまたは、隣接する 2ビットのエラーを訂正します。                                                 |
+| エラー分類機能      | 未サポート | 検出したすべてのエラーがエッセンシャルビットか非エッセンシャルビットかの分類はできません。全てエッセンシャルビットと判断します。                               |
+| エラーモニタ機能    | 未サポート | SEM Controllerが持つモニターインタフェースは実装していません。System Monitorのレジスタから簡易的なステータスを参照することにより、SEM Controllerを管理します。 |
+| エラー挿入機能      | サポート   | ソフトウェアのテストのため、エラーを強制的に挿入する機能を持っています。                                                                                       |
+
+SEM Controllerの仕様詳細については、Xilinxドキュメント「PG036: LogicCORE IP Soft Error Mitigation Controller v4.1 製品ガイド」を参照してください。
+
+*** SEM Controller Interrupt
+SEM Controllerは 4つの要因の割り込みを出力します。
+SEM Controllerの割り込みは、System Monitor Interrupt Registerのビット 11:8にマッピングされています。
+
+- SEM Error Correction Interrupt
+SEM Controllerがコンフィギュレーションメモリのエラーを検知し、訂正・修復した事を示す通知ビットです。
+この割り込みは、SEM Controllerが正常にコンフィギュレーションメモリのエラーを訂正し修復した事を示すものであり、システムは健全に保たれている事を示します。
+この割り込みがセットされる時、SEM Error Correction Count Registerの値が +1されます。
+
+- SEM Uncorrectable Interrupt
+SEM Controllerがコンフィギュレーションメモリに訂正不能なエラーを検出した事を示す通知ビットです。
+この割り込みが発生した時、コンフィギュレーションメモリには障害が発生しています。
+エッセンシャルビットに障害が起きた場合、FPGAの回路が不正な状態となっている可能性があります。
+そのため、このエラーが発生した場合はシステムを再起動する事を推奨します。
+
+- SEM Halted Interrupt
+SEM Controllerが Haltした事を示す通知ビットです。
+この割り込みは何らかの異常により、SEM Controllerに自体に障害が起き、動作を停止した事を示します。
+このエラーが発生した後は、SEM Controllerによるコンフィギュレーションメモリのエラー検出と訂正は行われません。
+そのため、このエラーが発生した場合はシステムを再起動する事を推奨します。
+
+- SEM Heartbeat Timeout Interrupt
+SEM Controllerの Heartbeat信号が停止した事を示す通知ビットです。
+この割り込みは何らかの異常により、SEM Controllerに障害が起き、Heartbeat信号を出力できなくなった事を示します。
+このエラーが発生した後は、SEM Controllerが正常に動作していない可能性があります。
+そのため、このエラーが発生した場合はシステムを再起動する事を推奨します。
+
 ** レジスタ詳細
 System Monitorは、Base Address 0x4F04_0000に配置されています。
 
