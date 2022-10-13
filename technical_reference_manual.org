@@ -122,6 +122,7 @@ Mission Bus SystemはユーザーがCubeSatのミッションを行うためのI
 | - Internal I2C Master                          | 0x4F02_0000 - 0x4F02_FFFF |                   |
 | - External I2C Master                          | 0x4F03_0000 - 0x4F03_FFFF |                   |
 | - System Monitor                               | 0x4F04_0000 - 0x4F04_FFFF |                   |
+| - General Purpose Timer                        | 0x4F05_0000 - 0x4F05_FFFF |                   |
 | Mission(UDL) Bus                               | 0x5000_0000 - 0x5FFF_FFFF |                   |
 | HRMEM Memory Mirror                            | 0x6000_0000 - 0x603F_FFFF |                   |
 | Coretex-M3 Internal Private peripheral bus     | 0xE000_0000 - 0xE003_FFFF |                   |
