@@ -421,6 +421,45 @@ $WDOG\_SIVAL設定値 = \frac{FPGA\_WATCHDOG\ High/Lowレベル幅 [s]}{\frac{1}
 | 31:24 | -          | Reserved                 | Reserved                                                                                                        | -   |
 |  23:0 | WDOG_SIVAL | Watchdog Signal Interval | Watchdog Signalの Highレベルまたは Lowレベルの幅を設定するフィールドです。初期値は 500 [ms]に設定されています。 | R/W |
 
+*** Clock Monitor Register (Offset 0x0020)
+Clock Monitor Registerは、SC OBC FPGAのクロック状態を示すレジスタです。
+
+#+CAPTION: Clock Monitor Register ビットフィールド
+|   bit | Symbol      | Field                       | Description                                                                                                                                                                                         | R/W |
+|-------+-------------+-----------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:17 | -           | Reserved                    | Reserved                                                                                                                                                                                            | -   |
+|    16 | PLL_LOCK    | PLL Lock Status             | SC OBC FPGAの PLLの状態を示します。0: PLL Unlock 1: PLL LOCK                                                                                                                                        | RO  |
+| 15:13 | -           | Reserved                    | Reserved                                                                                                                                                                                            | -   |
+|    12 | UCLK2_STS   | User Clock 2 Status         | User Clock 2のクロックの動作状態を示します。 0: クロック停止中 1: クロック動作中                                                                                                                    | RO  |
+|    11 | UCLK1_STS   | User Clock 1 Status         | User Clock 1のクロックの動作状態を示します。 0: クロック停止中 1: クロック動作中                                                                                                                    | RO  |
+|    10 | ULPICLK_STS | ULPI Reference Clock Status | ULPI Reference Clockのクロックの動作状態を示します。 0: クロック停止中 1: クロック動作中                                                                                                            | RO  |
+|     9 | MAXICLK_STS | Main AXI Clock Status       | Main AXI Clockのクロックの動作状態を示します。 0: クロック停止中 1: クロック動作中                                                                                                                  | RO  |
+|     8 | SYSCLK_STS  | System Clock Status         | System Clockのクロックの動作状態を示します。 0: クロック停止中 1: クロック動作中                                                                                                                    | RO  |
+|   7:2 | -           | Reserved                    | Reserved                                                                                                                                                                                            | -   |
+|   1:0 | OSC_CLKEN   | OSC Clock Enable            | SC OBC FPGAの入力クロック (源発信クロック)の Enable信号の状態を示します。bit 0: Oscillator 1の状態を示します。 bit 1: Oscillator 2の状態を示します。これらのビットが "1"の時、クロックは Enableです。 | RO  |
+
+*** Hardware Status 1/2 Register (Offset 0x0024/Offset 0x0028)
+Hardware Status Registerは、SC OBC FPGAのハードウェアの状態を示すレジスタです。
+
+このレジスタは、ソフトウェアから見ると、Scratchpadとして動作します。
+Loaderによって、ハードウェアの健全性が確認されるとこのレジスタに書き込みを行います。
+Flight Softwareは、起動時にこのレジスタを読み出す事で、ハードウェアの健全性を知る事ができます。
+
+このレジスタは、SC OBC FPGAの Configuration後に一度だけ初期化されます。
+Code Memory Select Registerの ITCMENビットがセットされた時に発行されるシステムリセットでは、このレジスタはクリアされません。
+
+このレジスタのフィールドの詳細は未定です。
+
+#+CAPTION: Hardware Status 1 Register ビットフィールド
+|  bit | Symbol        | Field             | Description | R/W |
+|------+---------------+-------------------+-------------+-----|
+| 31:0 | HWARE_STATUS1 | Hardware Status 1 | T.B.D.      | R/W |
+
+#+CAPTION: Hardware Status 2 Register ビットフィールド
+|  bit | Symbol        | Field             | Description | R/W |
+|------+---------------+-------------------+-------------+-----|
+| 31:0 | HWARE_STATUS2 | Hardware Status 2 | T.B.D.      | R/W |
+
 *** System Monitor Interrupt Status Register (Offset 0x0030)
 System Monitor Interrupt Status Registerは、System Monitorの割り込みステータスレジスタです。
 それぞれのビットは"1"をセットすると、割り込みをクリアする事ができます。
@@ -435,7 +474,13 @@ SEM Controllerの異常を示すビット (bit 9、bit 10、bit 11) は、"1"を
 |   10 | SEM_HALTED_INT    | SEM Halted Interrupt            | SEM Controllerが Fatal Errorにより Haltしたときにセットされる割り込みビットです。SEM Current State Registerの全ての有効ビットがセットされたとき、この割り込みがセットされます。                                     | R/WC |
 |    9 | SEM_UNCORRECT_INT | SEM Uncorrectable Interrupt     | SEM Controllerが訂正不能なエラーを検出したときセットされる割り込みビットです。この割り込みがセットされたとき、SEM Controllerは IDLEステートに遷移し コンフィギュレーションメモリの監視を停止します。                | R/WC |
 |    8 | SEM_ECORRECT_INT  | SEM Error Correction Interrupt  | SEM Controllerがエラーを訂正したときセットされる割り込みビットです。                                                                                                                                                | R/WC |
-|  7:0 | -                 | Reserved                        | Reserved                                                                                                                                                                                                            | -    |
+|    7 | PLL_UNLOCK_INT    | PLL Unlock Interrupt            | PLLが異常により Unlockしたときセットされる割り込みビットです。                                                                                                                                                      | R/WC |
+|  6:5 | -                 | Reserved                        | Reserved                                                                                                                                                                                                            | -    |
+|    4 | UCLK2_STOP_INT    | User Clock 2 Stop Interrupt     | User Clock 2が異常により停止したときセットされる割り込みビットです。                                                                                                                                                | R/WC |
+|    3 | UCLK1_STOP_INT    | User Clock 1 Stop Interrupt     | User Clock 1が異常により停止したときセットされる割り込みビットです。                                                                                                                                                | R/WC |
+|    2 | ULPICLK_STOP_INT  | ULPI Clock Stop Interrupt       | ULPI Clockが異常により停止したときセットされる割り込みビットです。                                                                                                                                                  | R/WC |
+|    1 | MAXICLK_STOP_INT  | Main AXI Clock Stop Interrupt   | Main AXI Clockが異常により停止したときセットされる割り込みビットです。                                                                                                                                              | R/WC |
+|    0 | SYSCLK_STOP_INT   | System Clock Stop Interrupt     | System Clockが異常により停止したときセットされる割り込みビットです。                                                                                                                                                | R/WC |
 
 *** System Monitor Interrupt Enable Register (Offset 0x0034)
 System Monitor Interrupt Enable Registerは、System Monitorが監視するイベントを割り込み出力信号に通知するか設定するためのレジスタです。
@@ -448,7 +493,13 @@ System Monitor Interrupt Enable Registerは、System Monitorが監視するイ�
 |   10 | SEM_HALTED_ENB    | SEM Halted Interrupt Enable            | SEM_HALTED_INTイベントが発生した時、割り込み信号を発生させるかどうかを設定します。    | R/W |
 |    9 | SEM_UNCORRECT_ENB | SEM Uncorrectable Interrupt Enable     | SEM_UNCORRECT_INTイベントが発生した時、割り込み信号を発生させるかどうかを設定します。 | R/W |
 |    8 | SEM_ECORRECT_ENB  | SEM Error Correction Interrupt Enable  | SEM_ECORRECT_INTイベントが発生した時、割り込み信号を発生させるかどうかを設定します。  | R/W |
-|  7:0 | -                 | Reserved                               | Reserved                                                                              | -   |
+|    7 | PLL_UNLOCK_ENB    | PLL Unlock Interrupt Enable            | PLL_UNLOCK_INTイベントが発生した時、割り込み信号を発生させるかどうか設定します。      | R/W |
+|  6:5 | -                 | Reserved                               | Reserved                                                                              | -   |
+|    4 | UCLK2_STOP_ENB    | User Clock 2 Stop Interrupt Enable     | UCLK2_STOP_INTイベントが発生した時、割り込み信号を発生させるかどうか設定します。      | R/W |
+|    3 | UCLK1_STOP_ENB    | User Clock 1 Stop Interrupt Enable     | UCLK1_STOP_INTイベントが発生した時、割り込み信号を発生させるかどうか設定します。      | R/W |
+|    2 | ULPICLK_STOP_ENB  | ULPI Clock Stop Interrupt Enable       | ULPICLK_STOP_INTイベントが発生した時、割り込み信号を発生させるかどうかを設定します。  | R/W |
+|    1 | MAXICLK_STOP_ENB  | Main AXI Clock Stop Interrupt Enable   | MAXICLK_STOP_INTイベントが発生した時、割り込み信号を発生させるかどうかを設定します。  | R/W |
+|    0 | SYSCLK_STOP_ENB   | System Clock Stop Interrupt Enable     | SYSCLK_STOP_INTイベントが発生した時、割り込み信号を発生させるかどうかを設定します。   | R/W |
 
 *** SEM Controller State Register (0ffset 0x0040)
 SEM Controller State Registerは SC OBC FPGAに実装する、SEM Controllerのステートを示すレジスタです。
