@@ -279,6 +279,9 @@ Power Cycle Registerは SC OBC FPGAに対する Power Cycle要求を発行する
 Scratchpad 1-4 Registerは、ソフトウェアがワークスペースとして使用する為のレジスタです。
 このレジスタの書き込みは、SC OBC FPGAの機能に一切影響を与えません。
 
+このレジスタは、SC OBC FPGAの Configuration後に一度だけ初期化されます。
+Code Memory Select Registerの ITCMENビットが変更された時に発行されるシステムリセットでは、このレジスタはクリアされません。
+
 #+CAPTION: Scratchpad 1 Register ビットフィールド (Offset: 0x00F0)
 |  bit | Symbol | Field        | Description                       | R/W |
 |------+--------+--------------+-----------------------------------+-----|
