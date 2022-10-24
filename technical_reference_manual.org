@@ -1497,10 +1497,6 @@ Rx FIFO Registerは、UARTの受信データを読み出すためのレジスタ
 
 Rx FIFOは受信したデータを 1 Byte単位で最大 16エントリまで格納できます。
 
-Rx FIFOが Emptyの時にこのレジスタの読み出しを行うと、Cortex-M3がBusFaultを起こしてしまいます。
-そのため Rx FIFOが Empty状態での読み出しアクセスが発生しないよう、Status Registerの Rx FIFO Valid Dataビットを確認しながら受信を行ってください。
-Rx FIFOの読み出しにより BusFaultが発生する仕様は今後変更される予定です。
-
 #+CAPTION: Rx FIFO Register ビットフィールド
 |  bit | Symbol | Field        | Description                                                                                         | R/W |
 |------+--------+--------------+-----------------------------------------------------------------------------------------------------+-----|
@@ -1526,20 +1522,21 @@ Tx FIFOの書き込みにより BusFaultが発生する仕様は今後変更さ�
 *** Status Register (Offset 0x0008)
 Status Registerは、AHB UART Liteの Errorや FIFOのステータスを確認するためのレジスタです。
 
-Control Registerの INTENACTLが "1"にセットされている時、RXFIFOVALビットまたは TXFIFOEMPビットが "0"から "1"に変化するたびに CPUに対しエッジ割り込みが出力されます。
+Control Registerの INTENACTLが "1"にセットされている時、RXFIFOVALビット・TXFIFOEMPビット・RXUNDERRUNERRビットのいずれかが "0"から "1"に変化するたびに CPUに対しエッジ割り込みが出力されます。
 
 #+CAPTION: Status Register ビットフィールド
-|  bit | Symbol     | Field               | Description                                                                                                                                                                                                                                            | R/W |
-|------+------------+---------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
-| 31:8 | -          | Reserved            | Reserved                                                                                                                                                                                                                                               | -   |
-|    7 | PRTYERR    | Parity Error        | 受信したUARTフレームでParityエラーが発生したことを示すビットです。このビットは 読み出すとクリアされます。0: Parityエラー未発生 1: Parityエラー発生 このビットはUARTがParity無しで設定されている場合はアサートしません。                                | RC  |
-|    6 | FRAMEERR   | Frame Error         | 受信したUARTフレームで Frameエラーが発生したことを示すビットです。このビットは 読み出すとクリアされます。0: Frameエラー未発生 1: Frameエラー発生　Frameエラー発生時の受信データは無効となり、Rx FIFOに格納されません。                                 | RC  |
-|    5 | OVERRUNERR | Overrun Error       | Rx FIFO FULL時にUART受信したことによりRx FIFOでOverrunエラーが発生したことを示すビットです。このビットは 読み出すとクリアされます。0: Overrunエラー未発生 1: Overrunエラー発生  Overrunエラー発生時の受信データは無効となり、Rx FIFOに格納されません。 | RC  |
-|    4 | INTENAMON  | Int Enabled Monitor | 割り込み通知ステータスを示します。Control Registerの INTENACTLが "1"にセットされている時、このビットは "1"になります。0: 割り込み通知は無効 1: 割り込み通知は有効                                                                                      | RO  |
-|    3 | TXFIFOFULL | Tx FIFO Full        | Tx FIFOのFull状態を示します。0: Tx FIFOは Full状態でない 1: Tx FIFOは Full状態                                                                                                                                                                         | RO  |
-|    2 | TXFIFOEMP  | Tx FIFO Empty       | Tx FIFOのEmpty状態を示します。0: Tx FIFOは Empty状態でない 1: Tx FIFOは Empty状態                                                                                                                                                                      | RO  |
-|    1 | RXFIFOFULL | Rx FIFO Full        | Rx FIFOのFull状態を示します。0: Rx FIFOは Full状態でない 1: Rx FIFOはFull状態                                                                                                                                                                          | RO  |
-|    0 | RXFIFOVAL  | Rx FIFO Valid Data  | Rx FIFOの有効データ格納状態を示します。0: Rx FIFOにデータ無し 1: Rx FIFOにデータ有り                                                                                                                                                                   | RO  |
+|  bit | Symbol        | Field                  | Description                                                                                                                                                                                                                                                                                                  | R/W |
+|------+---------------+------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:9 | -             | Reserved               | Reserved                                                                                                                                                                                                                                                                                                     | -   |
+|    8 | RXUNDERRUNERR | Rx FIFO Underrun Error | Rx FIFOが Emptyの時に Rx FIFO Registerを読み出したことにより Rx FIFOで Underrunエラーが発生したことを示すビットです。このビットは 読み出すとクリアされます。0: Rx FIFO Underrunエラー未発生 1: Rx FIFO Underrunエラー発生  Rx FIFO Underrunエラー発生時の Rx FIFO Registerからは無効データが読み出されます。 | RC  |
+|    7 | PRTYERR       | Parity Error           | 受信したUARTフレームでParityエラーが発生したことを示すビットです。このビットは 読み出すとクリアされます。0: Parityエラー未発生 1: Parityエラー発生 このビットはUARTがParity無しで設定されている場合はアサートしません。                                                                                      | RC  |
+|    6 | FRAMEERR      | Frame Error            | 受信したUARTフレームで Frameエラーが発生したことを示すビットです。このビットは 読み出すとクリアされます。0: Frameエラー未発生 1: Frameエラー発生　Frameエラー発生時の受信データは無効となり、Rx FIFOに格納されません。                                                                                       | RC  |
+|    5 | OVERRUNERR    | Overrun Error          | Rx FIFO FULL時にUART受信したことによりRx FIFOでOverrunエラーが発生したことを示すビットです。このビットは 読み出すとクリアされます。0: Overrunエラー未発生 1: Overrunエラー発生  Overrunエラー発生時の受信データは無効となり、Rx FIFOに格納されません。                                                       | RC  |
+|    4 | INTENAMON     | Int Enabled Monitor    | 割り込み通知ステータスを示します。Control Registerの INTENACTLが "1"にセットされている時、このビットは "1"になります。0: 割り込み通知は無効 1: 割り込み通知は有効                                                                                                                                            | RO  |
+|    3 | TXFIFOFULL    | Tx FIFO Full           | Tx FIFOのFull状態を示します。0: Tx FIFOは Full状態でない 1: Tx FIFOは Full状態                                                                                                                                                                                                                               | RO  |
+|    2 | TXFIFOEMP     | Tx FIFO Empty          | Tx FIFOのEmpty状態を示します。0: Tx FIFOは Empty状態でない 1: Tx FIFOは Empty状態                                                                                                                                                                                                                            | RO  |
+|    1 | RXFIFOFULL    | Rx FIFO Full           | Rx FIFOのFull状態を示します。0: Rx FIFOは Full状態でない 1: Rx FIFOはFull状態                                                                                                                                                                                                                                | RO  |
+|    0 | RXFIFOVAL     | Rx FIFO Valid Data     | Rx FIFOの有効データ格納状態を示します。0: Rx FIFOにデータ無し 1: Rx FIFOにデータ有り                                                                                                                                                                                                                         | RO  |
 
 *** Control Register (Offset 0x000C)
 Control Registerは、Tx FIFO/Rx FIFOのリセット制御と割り込み通知の設定を行うためのレジスタです。
