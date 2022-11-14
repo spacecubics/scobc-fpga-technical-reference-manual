@@ -196,6 +196,8 @@ System Registerは、Base Address 0x4F00_0000に配置されています。
 | 0x4F0000FC | SYSREG_SPAD4     | Scratchpad 4 Register               | 0x00000000 |
 | 0x4F00F000 | SYSREG_VER       | System Register IP Version Register |          - |
 | 0x4F00FF00 | SYSREG_BUILDINFO | Build Infomation Register           |          - |
+| 0x4F00FF10 | SYSREG_DNA1      | Device DNA 1 Register               |          - |
+| 0x4F00FF14 | SYSREG_DNA2      | Device DNA 2 Register               |          - |
 
 *** Code Memory Select Register (Offset 0x0000)
 Code Memory Select Registerは CPUの Instruction codeが格納されているメモリを選択するためのレジスタです。
@@ -321,6 +323,26 @@ git管理されていない環境から生成された場合は、このレジ�
 |  bit | Symbol     | Field                     | Description                                                                           | R/W |
 |------+------------+---------------------------+---------------------------------------------------------------------------------------+-----|
 | 31:0 | BUILD_INFO | Build Infomation Register | 動作しているFPGAデータが作られた gitのハッシュ値の 先頭 8桁が格納されるレジスタです。 | RO  |
+
+*** Device DNA 1/2 Register (Offset: 0xFF04/0xFF08)
+Device DNA 1/2 Registerは、FPGAの Device DNAの値を保持するレジスタです。
+
+Artix-7は、デバイスの eFuse領域に FUSE_DNAと呼ばれる、64 bitのデバイス固有値を保持しています。
+FUSE_DNAは、FPGAの工場出荷時にプログラミングされるものであり、値を変える事はできません。
+
+FPGAからは、FUSE_DNAのうち 63 bitから 7 bitを、Device DNAとして読み出す事ができます。
+ユーザーは Device DNA 1/2 Registerを読み出す事によって、Device DNAの値を知る事ができます。
+
+#+CAPTION: Device DNA 1 Register ビットフィールド
+|  bit | Symbol  | Field               | Description                                     | R/W |
+|------+---------+---------------------+-------------------------------------------------+-----|
+| 31:7 | DNA_LSB | Device DNA LSB side | Device DNAの bit 31:7が格納されるレジスタです。 | RO  |
+|  6:0 | -       | Reserved            | Reserved                                        | -   |
+
+#+CAPTION: Device DNA 2 Register ビットフィールド
+|  bit | Symbol  | Field               | Description                                      | R/W |
+|------+---------+---------------------+--------------------------------------------------+-----|
+| 31:0 | DNA_MSB | Device DNA MAB side | Device DNAの bit 63:32が格納されるレジスタです。 | RO  |
 
 * System Monitor
 System Monitorは、SC OBC FPGAのシステムを監視するためのモジュールです。
