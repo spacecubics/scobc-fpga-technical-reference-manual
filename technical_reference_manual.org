@@ -1881,10 +1881,14 @@ B: QSPI TX Data Registerに 1 ByteのInstruction(Quad I/O Read:0xEB)を書き込
 
 C: Bで書き込んだデータの送信完了後に、QSPI Access Control Registerに0x00020001を書き込み、SPI I/O ModeをQuad-IO SPIモードに変更します。
 
-D: QSPI TX Data Registerに 3 ByteのAddress、1 ByteのMode、4 Byte分のダミーデータを 1 Byte単位で書き込みます。TX FIFOに格納します。
+D: QSPI TX Data Registerに 3 Byteの Address、1 Byteの Modeを 1 Byte単位で書き込み、TX FIFOに格納します。
 QSPI TX Data Registerに書き込まれたデータからSPIデバイスに順次送信されます。
+続けて、QSPI RX Data Registerに 4 Byte分の書き込みを行います。
+この操作を行うことで、8 Cycleのダミーサイクル区間で IO信号を入力モードにして SPIクロックを駆動します。
 
-E: QSPI RX Data Registerに書き込みを行いFlash MemoryからのReadデータをRX FIFOに格納します。
+E: QSPI RX Data Registerの読み出しを 4 Byte分行い、ダミーサイクル区間に RX FIFOに格納されたデータの読み出しを行います。
+ダミーサイクル区間に格納されたデータは全て無効なデータであるため破棄してください。
+4 Byte分全ての無効データの読み出しを行った後に、 QSPI RX Data Registerに書き込みを行い Flash Memoryからの Readデータを RX FIFOに格納します。
 受信データはQSPI RX Data Registerを読み出すことにより受信順に取得されます。
 RX FIFOは受信したデータを最大16Byteまで格納できます。
 RX FIFOの容量を超えるサイズのデータを受信する場合は、RX FIFOが OverflowしないようQSPI TX Data Registerの書き込みと読み出しの順序を考慮する必要があります。
