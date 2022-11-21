@@ -334,7 +334,7 @@ git管理されていない環境から生成された場合は、このレジ�
 |------+------------+----------------------------+---------------------------------------------------------------------------------------+-----|
 | 31:0 | BUILD_INFO | Build Information Register | 動作しているFPGAデータが作られた gitのハッシュ値の 先頭 8桁が格納されるレジスタです。 | RO  |
 
-*** Device DNA 1/2 Register (Offset: 0xFF04/0xFF08)
+*** Device DNA 1/2 Register (Offset: 0xFF10/0xFF14)
 Device DNA 1/2 Registerは、FPGAの Device DNAの値を保持するレジスタです。
 
 Artix-7は、デバイスの eFuse領域に FUSE_DNAと呼ばれる、64 bitのデバイス固有値を保持しています。
