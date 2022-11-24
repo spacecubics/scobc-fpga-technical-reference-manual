@@ -447,6 +447,7 @@ System Monitorは、Base Address 0x4F04_0000に配置されています。
 |              0x4F042080 | BHM_PSCR            | BHM Prescale Setting Register                       | 0x00000077 |
 |              0x4F042084 | BHM_ACCCNTR         | BHM Retry Count Setting Register                    | 0x000001DF |
 |              0x4F0420C0 | BHM_ASR             | BHM Access Status Register                          | 0x00000000 |
+|              0x4F04F000 | SYSMON_VER          | System Monitor IP Version Register                  |          - |
 
 *** Watchdog Control Register (Offset 0x0000)
 Watchdog Control Registerは、SC OBC FPGAの Watchdogの制御を行うためのレジスタです。
@@ -1008,6 +1009,16 @@ BHM Access Status Registerは、BHM機能が持つ I2Cバスの状態を示す�
 |    2 | BHM_TEMP1_BUSY | Temperature Sensor1 Access Busy      | BHMが Temperature Sensor 1に対して行う自動アクセスの状態を示すビットです。センサーの初期化時とデータ読み出し時に、このビットは "1"を示します。        | RO  |
 |    1 | BHM_CVM2_BUSY  | Current Voltage Monitor2 Access Busy | BHMが Current Voltage Monitor 2に対して行う自動アクセスの状態を示すビットです。センサーの初期化時とデータの読み出し時に、このビットは "1"を示します。 | RO  |
 |    0 | BHM_CVM1_BUSY  | Current Voltage Monitor1 Access Busy | BHMが Current Voltage Monitor 1に対して行う自動アクセスの状態を示すビットです。センサーの初期化時とデータの読み出し時に、このビットは "1"を示します。 | RO  |
+
+*** System Monitor IP Version Register (Offset: 0xF000)
+System Monitor IP Version Registerは、System Monitorの IPコアバージョンを示すレジスタです。
+
+#+CAPTION: System Monitor IP Version Register ビットフィールド
+|   bit | Symbol        | Field                           | Description                                   | R/W |
+|-------+---------------+---------------------------------+-----------------------------------------------+-----|
+| 31:24 | SYSMON_MAJVER | System Monitor IP Major Version | System MonitorコアのMajor Versionを示します。 | RO  |
+| 23:16 | SYSMON_MINVER | System Monitor IP Minor Version | System MonitorコアのMinor Versionを示します。 | RO  |
+|  15:0 | SYSMON_PATVER | System Monitor IP Patch Version | System MonitorコアのPatch Versionを示します。 | RO  |
 
 * General Purpose Timer
 General Purpose Timerは、SC OBC FPGAの運用時間の管理や、FPGA内の CPUや IPコアへのタイミング通知を行うためのタイマーモジュールです。
