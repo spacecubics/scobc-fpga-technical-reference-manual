@@ -164,19 +164,22 @@ Cortex-M3の 割り込みコントローラの仕様については、ARM Cortex
 以下に、SC OBC FPGAの IPコアが出力する割り込みの割り当てを示します。
 
 #+CAPTION: SC OBC FPGA割り込みリスト
-| Exception No. | IRQ Bit | Interrupt                              | Type  |
-|---------------+---------+----------------------------------------+-------|
-|            16 | [0]     | AHB UART Lite(Console)                 | Pulse |
-|            17 | [1]     | HRMEM (High-reliability Memory)        | Level |
-|            18 | [2]     | QSPI Controller (Configuration Memory) | Level |
-|            19 | [3]     | QSPI Controller (Flash Data Memory)    | Level |
-|            20 | [4]     | QSPI Controller (FeRAM)                | Level |
-|            21 | [5]     | CAN Controller                         | Level |
-|            22 | [6]     | Internal I2C Master                    | Level |
-|            23 | [7]     | External I2C Master                    | Level |
-|            24 | [8]     | System Monitor Hardware Error          | Level |
-|       25 - 31 | [15:8]  | Reserved (OBC System Interrupt Area)   | -     |
-|       32 - 47 | [31:16] | Reserved (UDL IP Interrupt Area)       | -     |
+| Exception No. | IRQ Bit | Interrupt                                        | Type  |
+|---------------+---------+--------------------------------------------------+-------|
+|            16 | [0]     | AHB UART Lite(Console)                           | Pulse |
+|            17 | [1]     | HRMEM (High-reliability Memory)                  | Level |
+|            18 | [2]     | QSPI Controller (Configuration Memory)           | Level |
+|            19 | [3]     | QSPI Controller (Flash Data Memory)              | Level |
+|            20 | [4]     | QSPI Controller (FeRAM)                          | Level |
+|            21 | [5]     | CAN Controller                                   | Level |
+|            22 | [6]     | Reserved (OBC System Interrupt Area)             | -     |
+|            23 | [7]     | External I2C Master                              | Level |
+|            24 | [8]     | System Monitor (Hardware Error)                  | Level |
+|            25 | [9]     | System Monitor (Board Health Monitor)            | Level |
+|            26 | [10]    | General Purpose Timer (Global Timer)             | Level |
+|            27 | [11]    | General Purpose Timer (Software Interrupt Timer) | Level |
+|       28 - 31 | [15:12] | Reserved (OBC System Interrupt Area)             | -     |
+|       32 - 47 | [31:16] | Reserved (UDL IP Interrupt Area)                 | -     |
 
 * System Register
 System Registerは、SC OBC FPGAのシステム制御を司るレジスタで構成されるモジュールです。
