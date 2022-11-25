@@ -1027,10 +1027,23 @@ General Purpose Timerは、Global Timer・Software Interrupt Timer・Hardware In
 Global Timerは、FPGAのリセット解除から動作する Free Run Timerです。
 リセットの解除後からの時刻を数えるために使われます。
 Global Timerの最小時間は 0.0625秒であり、最大 268435455.9375秒(約 8年 186日)までカウントする事ができます。
+Software Interrupt Timerと Hardware Interrupt Timerの最小時間は Prescalerにより設定する事ができます。
 
 Global Timerと Software Interrupt Timerは、CPUに割り込みを発生させるタイマーとして使用します。
+Global Timerは タイマーに対し 4つの比較チャネルを持っており、Software Timerは 8つの比較チャネルを持っています。
+
 Hardware Interrupt Timerは、SC OBC FPGAの内部のIPコアに対しイベントを通知する、Hardware Schedulerとして使用します。
-Software Interrupt Timerと Hardware Interrupt Timerの最小時間は Prescalerにより設定する事ができます。
+Hardware Interrupt Timerは タイマーに対し 8つの比較チャネルを持っており、そのうち 7つを IPコアへのイベントトリガに使用する事ができます。
+
+Hardware Interrupt Timerの出力チャネルと、接続されている IP Coreの対応を以下に示します。
+
+#+CAPTION: Hardware Interrupt Timerの割り込み出力
+| Output Compare Channel | IP Core                                   | Function                                                |
+|------------------------+-------------------------------------------+---------------------------------------------------------|
+|                      1 | None                                      | Hardware Schedulerの周期を決めるタイマーとして使用      |
+|                      2 | System Monitor  (Hardware Health Monitor) | Current Voltage Monitorからのデータ読み出しアクセス要求 |
+|                      3 | System Monitor  (Hardware Health Monitor) | Temperature Sensorからのデータ読み出しアクセス要求      |
+|                    4-8 | Reserved                                  | -                                                       |
 
 ** レジスタ詳細
 General Purpose Timerは、Base Address 0x4F05_0000に配置されています。
