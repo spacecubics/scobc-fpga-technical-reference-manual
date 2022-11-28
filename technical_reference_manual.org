@@ -1860,6 +1860,9 @@ CPOL=0、CPHA=0に設定した時のSPI Interface波形と手順を以下に示�
 #+ATTR_HTML: :width 600
 [[file:./images/quad_page_program_acc_seq.png]]
 
+以下の手順は、メモリ 1にアクセスする場合のレジスタ設定例を示しています。
+Configurationデータ格納用 NOR Flash Memoryを除き、メモリ 2にアクセスする場合は、QSPI Access Control Registerの SPISSCTLを 0x01から 0x02に置き換えて下さい。
+
 A: QSPI Access Control Registerを設定します。
 SPI I/O Modeは Standard(Single)-IO SPIモード、SPI SS Controlは"1"とするため、0x00000001を書き込みます。
 書き込み後、SPI_CS信号がアクティブ状態(Low level)に変化します。
@@ -1888,6 +1891,9 @@ CPOL=0、CPHA=0に設定した時のSPI Interfaceの波形と手順を以下に�
 #+CAPTION: Quad I/O Read アクセス波形
 #+ATTR_HTML: :width 650
 [[file:./images/quad_io_read_acc_seq.png]]
+
+以下の手順は、メモリ 1にアクセスする場合のレジスタ設定例を示しています。
+Configurationデータ格納用 NOR Flash Memoryを除き、メモリ 2にアクセスする場合は、QSPI Access Control Registerの SPISSCTLを 0x01から 0x02に置き換えて下さい。
 
 A: QSPI Access Control Registerを設定します。
 SPI I/O ModeはStandard(Single)-IO SPIモード、SPI SS Controlは1とするため、0x00000001を書き込みます。
