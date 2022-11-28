@@ -1990,21 +1990,14 @@ AHB UART Lite IPのバージョン管理用レジスタです。
 |  15:0 | PATVER     | AHB UART Lite IP Patch Version | AHB UART LiteコアのPatch Versionです。  | RO  |
 
 * I2C Master Controller
-I2C Master Controllerは、I2Cデバイスとの通信を行うためのモジュールです。
+I2C Master Controllerは、OBC Moduleの外部に実装される I2Cデバイスに通信するために使用する External I2C Interfaceを制御するためのモジュールです。
 
-SC OBCには、SC OBC Module上の I2Cデバイスにアクセスするための I2C Interface(Internal I2C)と、SC OBC Moduleの Board to Boardコネクタを介した外部の I2Cデバイスにアクセスするための I2C Interface(External I2C)が準備されています。
-これら 2つの I2C Interfaceを制御するため、SC OBC FPGAには 2個の I2C Master Controllerが搭載されています。
+OBC Moduleは、OBC Module上のセンサーにアクセスするための I2C Interface (Internal I2C)と、OBC Moduleの外部の I2Cデバイスにアクセスするための I2C Interface (External I2C)を持っています。
+Internal I2Cの制御は、System Monitorに搭載されている Board Health Monitor機能により行います。
+Board Health Monitor機能に関する詳細は、「System Monitor」の章を参照してください。
 
 ** レジスタ詳細
-I2C Master Controller Registerは、それぞれ以下のアドレスに配置されています。
-
-#+CAPTION: I2C Master Controller メモリマップ
-| Target                  | Base Address |
-|-------------------------+--------------|
-| Internal I2C Controller | 0x4F02_0000  |
-| External I2C Controller | 0x4F03_0000  |
-
-I2C Master Controllerには以下のレジスタが実装されています。
+I2C Master Controllerは、Base Address 0x4F03_0000に配置されています。
 
 #+CAPTION: I2C Master Controller Register アドレスマップ
 | Offset | Symbol       | Register                                                |    Initial |
