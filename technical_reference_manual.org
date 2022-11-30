@@ -400,18 +400,43 @@ SEM Controllerの Heartbeat信号が停止した事を示す通知ビットで�
 System Monitorは、Base Address 0x4F04_0000に配置されています。
 
 #+CAPTION: System Monitorメモリマップ
-|                 Address | Symbol              | Register                                 |    Initial |
-|-------------------------+---------------------+------------------------------------------+------------|
-|              0x4F040000 | SYSMON_WDOG_CTRL    | Watchdog Control Register                | 0x00075A5A |
-|              0x4F040010 | SYSMON_WDOG_SIVAL   | Watchdog Signal Interval Register        | 0x00B71AFF |
-|              0x4F040030 | SYSMON_INT_STATUS   | System Monitor Interrupt Status Register | 0x00000000 |
-|              0x4F040034 | SYSMON_INT_ENABLE   | System Monitor Interrupt Enable Register | 0x00000000 |
-|              0x4F040040 | SYSMON_SEM_STATE    | SEM Controller State Register            | 0x00000000 |
-|              0x4F040044 | SYSMON_SEM_ECCOUNT  | SEM Error Correction Count Register      | 0x00000000 |
-|              0x4F040048 | SYSMON_SEM_HTIMEOUT | SEM Heartbeat Timeout Register           | 0x000000FF |
-|              0x4F040050 | SYSMON_SEM_EINJECT1 | SEM Error Injection Command Register 1   | 0x00000000 |
-|              0x4F040054 | SYSMON_SEM_EINJECT2 | SEM Error Injection Command Register 2   | 0x00000000 |
-| 0x4F041000 - 0x4F041FFF | SYSMON_XADC_REG     | XADC Register Window                     | ---------- |
+|                 Address | Symbol              | Register                                            |    Initial |
+|-------------------------+---------------------+-----------------------------------------------------+------------|
+|              0x4F040000 | SYSMON_WDOG_CTRL    | Watchdog Control Register                           | 0x00075A5A |
+|              0x4F040010 | SYSMON_WDOG_SIVAL   | Watchdog Signal Interval Register                   | 0x00B71AFF |
+|              0x4F040030 | SYSMON_INT_STATUS   | System Monitor Interrupt Status Register            | 0x00000000 |
+|              0x4F040034 | SYSMON_INT_ENABLE   | System Monitor Interrupt Enable Register            | 0x00000000 |
+|              0x4F040040 | SYSMON_SEM_STATE    | SEM Controller State Register                       | 0x00000000 |
+|              0x4F040044 | SYSMON_SEM_ECCOUNT  | SEM Error Correction Count Register                 | 0x00000000 |
+|              0x4F040048 | SYSMON_SEM_HTIMEOUT | SEM Heartbeat Timeout Register                      | 0x000000FF |
+|              0x4F040050 | SYSMON_SEM_EINJECT1 | SEM Error Injection Command Register 1              | 0x00000000 |
+|              0x4F040054 | SYSMON_SEM_EINJECT2 | SEM Error Injection Command Register 2              | 0x00000000 |
+| 0x4F041000 - 0x4F041FFF | SYSMON_XADC_REG     | XADC Register Window                                | ---------- |
+|              0x4F042000 | BHM_INICTLR         | Board Health Initialization Access Control Register | 0x0000001F |
+|              0x4F042004 | BHM_MONCTLR         | Board Health Monitoring Access Control Register     | 0x00000000 |
+|              0x4F042010 | BHM_ISR             | Board Health Interrupt Status Register              | 0x00000000 |
+|              0x4F042014 | BHM_IER             | Board Health Interrupt Enable Register              | 0x00000000 |
+|              0x4F042020 | BHM_1V0_SNTVR       | BHM VDD_1V0 Shunt Voltage Monitor Register          | 0x80000000 |
+|              0x4F042024 | BHM_1V0_BUSVR       | BHM VDD_1V0 Bus Voltage Monitor Register            | 0x80000000 |
+|              0x4F042028 | BHM_1V8_SNTVR       | BHM VDD_1V8 Shunt Voltage Monitor Register          | 0x80000000 |
+|              0x4F04202C | BHM_1V8_BUSVR       | BHM VDD_1V8 Bus Voltage Monitor Register            | 0x80000000 |
+|              0x4F042030 | BHM_3V3_SNTVR       | BHM VDD_3V3 Shunt Voltage Monitor Register          | 0x80000000 |
+|              0x4F042034 | BHM_3V3_BUSVR       | BHM VDD_3V3 Bus Voltage Monitor Register            | 0x80000000 |
+|              0x4F042038 | BHM_3V3SYSA_SNTVR   | BHM VDD_3V3_SYS_A Shunt Voltage Monitor Register    | 0x80000000 |
+|              0x4F04203C | BHM_3V3SYSA_BUSVR   | BHM VDD_3V3_SYS_A Bus Voltage Monitor Register      | 0x80000000 |
+|              0x4F042040 | BHM_3V3SYSB_SNTVR   | BHM VDD_3V3_SYS_B Shunt Voltage Monitor Register    | 0x80000000 |
+|              0x4F042044 | BHM_3V3SYSB_BUSVR   | BHM VDD_3V3_SYS_B Bus Voltage Monitor Register      | 0x80000000 |
+|              0x4F042048 | BHM_3V3IO_SNTVR     | BHM VDD_3V3_IO Shunt Voltage Monitor Register       | 0x80000000 |
+|              0x4F04204C | BHM_3V3IO_BUSVR     | BHM VDD_3V3_IO Bus Voltage Monitor Register         | 0x80000000 |
+|              0x4F042050 | BHM_TEMP1R          | BHM Temperature1 Monitor Register                   | 0x80000000 |
+|              0x4F042054 | BHM_TEMP2R          | BHM Temperature2 Monitor Register                   | 0x80000000 |
+|              0x4F042058 | BHM_TEMP3R          | BHM Health Temperature3 Monitor Register            | 0x80000000 |
+|              0x4F042060 | BHM_SW_CTLR         | BHM Access Control Register                         | 0x00000000 |
+|              0x4F042064 | BHM_SW_WDTR         | BHM Software Access Write Data Register             | 0x00000000 |
+|              0x4F042068 | BHM_SW_RDTR         | BHM Software Access Read Data Register              | 0x00000000 |
+|              0x4F042080 | BHM_PSCR            | BHM Prescale Setting Register                       | 0x00000077 |
+|              0x4F042084 | BHM_ACCCNTR         | BHM Retry Count Setting Register                    | 0x000001DF |
+|              0x4F0420C0 | BHM_ASR             | BHM Access Status Register                          | 0x00000000 |
 
 *** Watchdog Control Register (Offset 0x0000)
 Watchdog Control Registerは、SC OBC FPGAの Watchdogの制御を行うためのレジスタです。
@@ -618,6 +643,361 @@ Status Registerにアクセスするためのレジスタアドレスを以下�
 | 0x4F041270 | Min VCCBRAM        | 電源投入または最後に XADCをリセットしてから記録された最小VCCBRAM測定値が格納されます。                         |
 
 System Monitorの XADC Register Windowからは、XADCのすべてのレジスタ領域にアクセスする事ができますが、アラーム機能は現状実装されておりません。
+
+*** BHM Initialization Access Control Register (Offset 0x2000)
+BHM Initialization Access Control Registerは、OBC Moduleに実装するセンサーの初期化に関する制御を行うためのレジスタです。
+Board Health Monitorは、このレジスタを制御することによって、センサーに対し初期化のためのレジスタアクセスを実行します。
+
+Initialization Requestビットを "1"にセットすると、Initialization Enableビットが "1"にセットされているセンサーに初期化を行います。
+Initialization RequestビットとInitialization Enableビットは、同時にセットすることができます。
+
+センサーに設定する初期値は、RTL設計時にVerilogパラメータで指定する事ができます。
+
+#+CAPTION: BHM Initialization Access Control Register ビットフィールド
+|   bit | Symbol           | Field                                           | Description                                                                                                                                                                                                                              | R/W |
+|-------+------------------+-------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:17 | -                | Reserved                                        | Reserved                                                                                                                                                                                                                                 | -   |
+|    16 | BHM_INIT_REQ     | Initialization Request                          | OBC Moduleに実装するセンサーの初期化を開始するためのビットです。このビットに"1"をセットすると、初期化を開始します。Initialization Enableがセットされている全てのセンサーの初期化が完了すると、このビットは自動的に "0"にクリアされます。 | R/W |
+|  15:5 | -                | Reserved                                        | Reserved                                                                                                                                                                                                                                 | -   |
+|     4 | BHM_TEMP3_INITEN | Temperature Sensor 3 Initialization Enable      | Temperature Sensor 3 の初期化を有効化するためのビットです。0: Temperature Sensor 3 Initialization Disable 1: Temperature Sensor3 Initialization Enable                                                                                   | R/W |
+|     3 | BHM_TEMP2_INITEN | Temperature Sensor 2 Initialization Enable      | Temperature Sensor 2 の初期化を有効化するためのビットです。0: Temperature Sensor 2 Initialization Disable 1: Temperature Sensor2 Initialization Enable                                                                                   | R/W |
+|     2 | BHM_TEMP1_INITEN | Temperature Sensor 1 Initialization Enable      | Temperature Sensor 1 の初期化を有効化するためのビットです。0: Temperature Sensor 1 Initialization Disable 1: Temperature Sensor1 Initialization Enable                                                                                   | R/W |
+|     1 | BHM_CVM2_INITEN  | Current Voltage Monitor 2 Initialization Enable | Current Voltage Monitor 2 の初期化を有効化するためのビットです。0: Current Voltage Monitor 2 Initialization Disable 1: Current Voltage Monitor2 Initialization Enable                                                                    | R/W |
+|     0 | BHM_CVM1_INITEN  | Current Voltage Monitor 1 Initialization Enable | Current Voltage Monitor 1 の初期化を有効化するためのビットです。0: Current Voltage Monitor 1 Initialization Disable 1: Current Voltage Monitor1 Initialization Enable                                                                    | R/W |
+*** BHM Access Control Register (Offset 0x2004)
+BHM Access Control Registerは、OBC Moduleに実装するセンサーからのセンサーデータの自動読み出しに関する設定を行うためのレジスタです。
+
+対象のセンサーの Monitor Enableビットを "1"にセットしておくと、GPTMRモジュールに実装する Hardware Schedulerから タイミングパルスを受信するたびに、対応するセンサーからデータを読み出します。
+
+#+CAPTION: BHM Access Control Register ビットフィールド
+|  bit | Symbol           | Field                                    | Description                                                                                                                                                                                                                                                                                                                                                                                                                       | R/W |
+|------+------------------+------------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:5 | -                | Reserved                                 | Reserved                                                                                                                                                                                                                                                                                                                                                                                                                          | -   |
+|    4 | BHM_TEMP3_MONIEN | Temperature Sensor 3 Monitor Enable      | Temperature Sensor 3からセンサーデータを読み出すための設定を行うビットです。 このビットが "1"にセットされている時に Hardware Schedulerからタイミングパルスを受信すると、Temperature Sensor 3から温度データを読み出します。BHM_TEMP3_I2CERR 割り込みが発生した場合、このビットは自動的に"0"にクリアされます。 0: Temperature Sensor 3 Monitor Disable 1: Temperature Sensor 3 Monitoring Enable                                    | R/W |
+|    3 | BHM_TEMP2_MONIEN | Temperature Sensor 2 Monitor Enable      | Temperature Sensor 2からセンサーデータを読み出すための設定を行うビットです。 このビットが "1"にセットされている時に Hardware Schedulerからタイミングパルスを受信すると、Temperature Sensor 2から温度データを読み出します。BHM_TEMP2_I2CERR 割り込みが発生した場合、このビットは自動的に"0"にクリアされます。 0: Temperature Sensor 2 Monitor Disable 1: Temperature Sensor 2 Monitoring Enable                                    | R/W |
+|    2 | BHM_TEMP1_MONIEN | Temperature Sensor 1 Monitor Enable      | Temperature Sensor 1からセンサーデータを読み出すための設定を行うビットです。 このビットが "1"にセットされている時に Hardware Schedulerからタイミングパルスを受信すると、Temperature Sensor 1から温度データを読み出します。BHM_TEMP1_I2CERR 割り込みが発生した場合、このビットは自動的に"0"にクリアされます。 0: Temperature Sensor 1 Monitor Disable 1: Temperature Sensor 1 Monitoring Enable                                    | R/W |
+|    1 | BHM_CVM2_MONIEN  | Current Voltage Monitor 2 Monitor Enable | Current Voltage Monitor 2からセンサーデータを読み出すための設定を行うビットです。このビットが "1"にセットされている時に Hardware Schedulerからタイミングパルスを受信すると、Current Voltage Monitor 2からシャント電圧とバス電圧データを読み出します。BHM_CVM2_I2CERR 割り込みが発生した場合、このビットは自動的に"0"にクリアされます。 0: Current Voltage Monitor 2 Monitor Disable 1: Current Voltage Monitor2 Monitoring Enable | R/W |
+|    0 | BHM_CVM1_MONIEN  | Current Voltage Monitor 1 Monitor Enable | Current Voltage Monitor 1からセンサーデータの読み出すための設定を行うビットです。このビットが "1"にセットされている時に Hardware Schedulerからタイミングパルスを受信すると、Current Voltage Monitor 1からシャント電圧とバス電圧データを読み出します。BHM_CVM1_I2CERR 割り込みが発生した場合、このビットは自動的に "0"にクリアされます。0: Current Voltage Monitor 1 Monitor Disable 1: Current Voltage Monitor1 Monitoring Enable | R/W |
+*** BHM Interrupt Status Register (Offset: 0x2010)
+BHM Interrupt Status Registerは、Board Health Monitorの割り込みステータスレジスタです。
+それぞれのビットは "1"をセットすると、割り込みをクリアする事ができます。
+
+#+CAPTION: BHM Interrupt Status Register ビットフィールド
+|   bit | Symbol           | Field                                         | Description                                                                                                                                                                                                                                                                               | R/W  |
+|-------+------------------+-----------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+------|
+| 31:19 | -                | Reserved                                      | Reserved                                                                                                                                                                                                                                                                                  | -    |
+|    18 | BHM_TEMP_ALERT   | Temperature Sensor Alert Detect               | 温度センサーから Alert信号を受信したことを示すビットです。OBC Module上に実装される、いずれかの温度センサーが Alert信号をアサートした時、本ビットが"1"にセットされます。                                                                                                                   | R/WC |
+|    17 | BHM_CVM_WARN     | Current Voltage Monitor Warning Alert Detect  | Current Voltage Monitorから Warning Alert信号を受信したことを示すビットです。OBC Module上に実装される、いずれかの Current Voltage Monitorが Warning信号をアサートした時、本ビットが"1"にセットされます。                                                                                  | R/WC |
+|    16 | BHM_CVM_CRIT     | Current Voltage Monitor Critical Alert Detect | Current Voltage Monitorから Critical Alert信号を受信したことを示すビットです。OBC Module上に実装される、いずれかの Current Voltage Monitorが Critical信号をアサートした時、本ビットが"1"にセットされます。                                                                                | R/WC |
+| 15:14 | -                | Reserved                                      | Reserved                                                                                                                                                                                                                                                                                  | -    |
+|    13 | BHM_SW_I2CERR    | Software I2C Error                            | ソフトウェア指示によるセンサーへのアクセスにおいてエラーが発生したことを示すビットです。BHM Retry Count Setting Registerに設定されているリトライ回数を超えるエラーが連続で発生した場合に、本ビットが "1"にセットされます。                                                                | R/WC |
+|    12 | BHM_TEMP3_I2CERR | Temperature Sensor 3 I2C Error                | Temperature Sensor 3 へのアクセスにおいてエラーが発生した事を示すビットです。センサーの初期化とデータ読み出しのどちらのエラーも本ビットに通知されます。BHM Retry Count Setting Registerに設定されているリトライ回数を超えるエラーが連続で発生した場合に、本ビットが "1"にセットされます。 | R/WC |
+|    11 | BHM_TEMP2_I2CERR | Temperature Sensor 2 I2C Error                | Temperature Sensor 2 へのアクセスにおいてエラーが発生した事を示すビットです。センサーの初期化とデータ読み出しのどちらのエラーも本ビットに通知されます。BHM Retry Count Setting Registerに設定されているリトライ回数を超えるエラーが連続で発生した場合に、本ビットが "1"にセットされます。 | R/WC |
+|    10 | BHM_TEMP1_I2CERR | Temperature Sensor 1 I2C Error                | Temperature Sensor 1 へのアクセスにおいてエラーが発生した事を示すビットです。センサーの初期化とデータ読み出しのどちらのエラーも本ビットに通知されます。BHM Retry Count Setting Registerに設定されているリトライ回数を超えるエラーが連続で発生した場合に、本ビットが "1"にセットされます。 | R/WC |
+|     9 | BHM_CVM2_I2CERR  | Current Voltage Monitor2 I2C Error            | Current Voltage Monitor 2 へのアクセスにおいてエラーが発生した事を示すビットです。センサーの初期化とデータ読み出しのどちらのエラーも本ビットに通知されます。BHM Retry Count Registerに設定されているリトライ回数を超えるエラーが連続で発生した場合に、本ビットが "1"にセットされます。    | R/WC |
+|     8 | BHM_CVM1_I2CERR  | Current Voltage Monitor1 I2C Error            | Current Voltage Monitor 1 へのアクセスにおいてエラーが発生した事を示すビットです。センサーの初期化とデータ読み出しのどちらのエラーも本ビットに通知されます。BHM Retry Count Registerに設定されているリトライ回数を超えるエラーが連続で発生した場合に、本ビットが "1"にセットされます。    | R/WC |
+|   7:2 | -                | Reserved                                      | Reserved                                                                                                                                                                                                                                                                                  | -    |
+|     1 | BHM_SW_ACCEND    | Software Access End                           | ソフトウェア指示によるセンサーへの I2Cアクセスが完了した事を示すビットです。センサーのレジスタへのデータ書き込み または、読み出しが完了した時、本ビットが "1"にセットされます。                                                                                                           | R/WC |
+|     0 | BHM_INIT_ACCEND  | Initialization Access End                     | センサーの初期化が完了した事を示すビットです。BHM Initialization Access Control RegisterのInitialization Requestをセットした後に、Initialization Enableビットがセットされている全てのセンサーの初期化が完了した時、本ビットが "1"にセットされます。                                       | R/WC |
+
+*** BHM Interrupt Enable Register (Offset: 0x2014)
+BHM Interrupt Enable Registerは、Board Health Monitorの割り込みイベントを割り込み信号に通知する設定を行うためのレジスタです。
+
+本レジスタのビットが "1"にセットされている時、その割り込み要因に対応する Interrupt Status Registerのビットが "1"にセットされると、割り込み信号がアサートします。
+
+#+CAPTION: Board Health Interrupt Enable Register ビットフィールド
+|   bit | Symbol              | Field                                                 | Description                                                                          | R/W |
+|-------+---------------------+-------------------------------------------------------+--------------------------------------------------------------------------------------+-----|
+| 31:19 | -                   | Reserved                                              | Reserved                                                                             | -   |
+|    18 | BHM_TEMP_ALERTENB   | Temperature Sensor Alert Detect Enable                | BHM_TEMP_ALERTイベントが発生した時に割り込み信号を発生させるかどうかを設定します。   | R/W |
+|    17 | BHM_CVM_WARNENB     | Current Voltage Monitor Warning Alert Detect Enable   | BHM_CVM_WARNイベントが発生した時に割り込み信号を発生させるかどうかを設定します。     | R/W |
+|    16 | BHM_CVM_CRITENB     | Current Voltage Monitor Critical Alert Detect Enable  | BHM_CVM_CRITイベントが発生した時に割り込み信号を発生させるかどうかを設定します。     | R/W |
+| 15:14 | -                   | Reserved                                              | Reserved                                                                             | -   |
+|    13 | BHM_SW_I2CERRENB    | Software I2C Access Error Enable                      | BHM_SW_I2CERRイベントが発生した時に割り込み信号を発生させるかどうかを設定します。    | R/W |
+|    12 | BHM_TEMP3_I2CERRENB | Temperature Sensor3 Auto I2C Access Error Enable      | BHM_TEMP3_I2CERRイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
+|    11 | BHM_TEMP2_I2CERRENB | Temperature Sensor2 Auto I2C Access Error Enable      | BHM_TEMP2_I2CERRイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
+|    10 | BHM_TEMP1_I2CERRENB | Temperature Sensor1 Auto I2C Access Error Enable      | BHM_TEMP1_I2CERRイベントが発生した時に割り込み信号を発生させるかどうかを設定します。 | R/W |
+|     9 | BHM_CVM2_I2CERRENB  | Current Voltage Monitor2 Auto I2C Access Error Enable | BHM_CVM2_I2CERRイベントが発生した時に割り込み信号を発生させるかどうかを設定します。  | R/W |
+|     8 | BHM_CVM1_I2CERRENB  | Current Voltage Monitor1 Auto I2C Access Error Enable | BHM_CVM1_I2CERRイベントが発生した時に割り込み信号を発生させるかどうかを設定します。  | R/W |
+|   7:2 | -                   | Reserved                                              | Reserved                                                                             | -   |
+|     1 | BHM_SW_ACCENDENB    | Software Access End Enable                            | BHM_SWACCENDイベントが発生した時に割り込み信号を発生させるかどうかを設定します。     | R/W |
+|     0 | BHM_INIT_ACCENDENB  | Initialization Access End Enable                      | BHM_INITACCENDイベントが発生した時に割り込み信号を発生させるかどうかを設定します。   | R/W |
+
+*** BHM VDD_1V0 Shunt Voltage Monitor Register (Offset 0x2020)
+BHM VDD_1V0 Shunt Voltage Monitor Registerは、VDD_1V0 電源ドメインの Shunt Voltageを読み出すためのレジスタです。
+
+#+CAPTION: BHM VDD_1V0 Shunt Voltage Monitor Register ビットフィールド
+|   bit | Symbol            | Field                             | Description                                                                                                                                                                                                                                                                                                                                                                               | R/W |
+|-------+-------------------+-----------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+|    31 | BHM_1V0_SNTV_NUPD | VDD_1V0 Shunt Voltage Not Updated | センサーデータの更新状態を示すビットです。このビットが "1"にセットされている時、BHM_1V0_SNTVフィールドが前回の読み出し時から更新されていない事を示します。BHMがセンサーからデータを読み出した時、このビットは "0"にクリアされ、BHM_1V0_BUSV を読み出したときこのビットは"1"にセットされます。また、リセット解除後にセンサーデータが取得されていない状態でも、このビットは "1"を示します。 | RO  |
+| 30:16 | -                 | Reserved                          | Reserved                                                                                                                                                                                                                                                                                                                                                                                  | -   |
+|  15:0 | BHM_1V0_SNTV      | VDD_1V0 Shunt Voltage Monitor     | VDD_1V0 電源ドメインのシャント電圧を読み出すためのフィールドです。                                                                                                                                                                                                                                                                                                                        | RO  |
+
+*** BHM VDD_1V0 Bus Voltage Monitor Register (Offset 0x2024)
+BHM VDD_1V0 Bus Voltage Monitor Registerは、VDD_1V0 電源ドメインの Bus Voltageを読み出すためのレジスタです。
+
+#+CAPTION: BHM VDD_1V0 Bus Voltage Monitor Register ビットフィールド
+|   bit | Symbol            | Field                           | Description                                                                                                                                                                                                                                                                                                                                                                               | R/W |
+|-------+-------------------+---------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+|    31 | BHM_1V0_BUSV_NUPD | VDD_1V0 Bus Voltage Not Updated | センサーデータの更新状態を示すビットです。このビットが "1"にセットされている時、BHM_1V0_BUSVフィールドが前回の読み出し時から更新されていない事を示します。BHMがセンサーからデータを読み出した時、このビットは "0"にクリアされ、BHM_1V0_BUSV を読み出したときこのビットは"1"にセットされます。また、リセット解除後にセンサーデータが取得されていない状態でも、このビットは "1"を示します。 | RO  |
+| 30:16 | -                 | Reserved                        | Reserved                                                                                                                                                                                                                                                                                                                                                                                  | -   |
+|  15:0 | BHM_1V0_BUSV      | VDD_1V0 Bus Voltage Monitor     | VDD_1V0 電源ドメインのバス電圧を読み出すためのフィールドです。                                                                                                                                                                                                                                                                                                                            | RO  |
+
+*** BHM VDD_1V8 Shunt Voltage Monitor Register (Offset 0x2028)
+BHM VDD_1V8 Shunt Voltage Monitor Registerは、VDD_1V8 電源ドメインの Shunt Voltageを読み出すためのレジスタです。
+
+#+CAPTION: BHM VDD_1V8 Shunt Voltage Monitor Register ビットフィールド
+|   bit | Symbol            | Field                             | Description                                                                                                                                                                                                                                                                                                                                                                               | R/W |
+|-------+-------------------+-----------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+|    31 | BHM_1V8_SNTV_NUPD | VDD_1V8 Shunt Voltage Not Updated | センサーデータの更新状態を示すビットです。このビットが "1"にセットされている時、BHM_1V8_SNTVフィールドが前回の読み出し時から更新されていない事を示します。BHMがセンサーからデータを読み出した時、このビットは "0"にクリアされ、BHM_1V8_BUSV を読み出したときこのビットは"1"にセットされます。また、リセット解除後にセンサーデータが取得されていない状態でも、このビットは "1"を示します。 | RO  |
+| 30:16 | -                 | Reserved                          | Reserved                                                                                                                                                                                                                                                                                                                                                                                  | -   |
+|  15:0 | BHM_1V8_SNTV      | VDD_1V8 Shunt Voltage Monitor     | VDD_1V8 電源ドメインのシャント電圧を読み出すためのフィールドです。                                                                                                                                                                                                                                                                                                                        | RO  |
+
+*** BHM VDD_1V8 Bus Voltage Monitor Register (Offset 0x202C)
+BHM VDD_1V8 Bus Voltage Monitor Registerは、VDD_1V8 電源ドメインの Bus Voltageを読み出すためのレジスタです。
+
+#+CAPTION: BHM VDD_1V8 Bus Voltage Monitor Register ビットフィールド
+|   bit | Symbol            | Field                           | Description                                                                                                                                                                                                                                                                                                                                                                               | R/W |
+|-------+-------------------+---------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+|    31 | BHM_1V8_BUSV_NUPD | VDD_1V8 Bus Voltage Not Updated | センサーデータの更新状態を示すビットです。このビットが "1"にセットされている時、BHM_1V8_BUSVフィールドが前回の読み出し時から更新されていない事を示します。BHMがセンサーからデータを読み出した時、このビットは "0"にクリアされ、BHM_1V8_BUSV を読み出したときこのビットは"1"にセットされます。また、リセット解除後にセンサーデータが取得されていない状態でも、このビットは "1"を示します。 | RO  |
+| 30:16 | -                 | Reserved                        | Reserved                                                                                                                                                                                                                                                                                                                                                                                  | -   |
+|  15:0 | BHM_1V8_BUSV      | VDD_1V8 Bus Voltage Monitor     | VDD_1V8 電源ドメインのバス電圧を読み出すためのフィールドです。                                                                                                                                                                                                                                                                                                                            | RO  |
+
+*** BHM VDD_3V3 Shunt Voltage Monitor Register (Offset 0x2030)
+BHM VDD_3V3 Shunt Voltage Monitor Registerは、VDD_3V3 電源ドメインの Shunt Voltageを読み出すためのレジスタです。
+
+#+CAPTION: BHM VDD_3V3 Shunt Voltage Monitor Register ビットフィールド
+|   bit | Symbol            | Field                             | Description                                                                                                                                                                                                                                                                                                                                                                               | R/W |
+|-------+-------------------+-----------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+|    31 | BHM_3V3_SNTV_NUPD | VDD_3V3 Shunt Voltage Not Updated | センサーデータの更新状態を示すビットです。このビットが "1"にセットされている時、BHM_3V3_SNTVフィールドが前回の読み出し時から更新されていない事を示します。BHMがセンサーからデータを読み出した時、このビットは "0"にクリアされ、BHM_3V3_BUSV を読み出したときこのビットは"1"にセットされます。また、リセット解除後にセンサーデータが取得されていない状態でも、このビットは "1"を示します。 | RO  |
+| 30:16 | -                 | Reserved                          | Reserved                                                                                                                                                                                                                                                                                                                                                                                  | -   |
+|  15:0 | BHM_3V3_SNTV      | VDD_3V3 Shunt Voltage Monitor     | VDD_3V3 電源ドメインのシャント電圧を読み出すためのフィールドです。                                                                                                                                                                                                                                                                                                                        | RO  |
+
+*** BHM VDD_3V3 Bus Voltage Monitor Register (Offset 0x2034)
+BHM VDD_3V3 Bus Voltage Monitor Registerは、VDD_3V3 電源ドメインの Bus Voltageを読み出すためのレジスタです。
+
+#+CAPTION: BHM VDD_3V3 Bus Voltage Monitor Register ビットフィールド
+|   bit | Symbol            | Field                           | Description                                                                                                                                                                                                                                                                                                                                                                               | R/W |
+|-------+-------------------+---------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+|    31 | BHM_3V3_BUSV_NUPD | VDD_3V3 Bus Voltage Not Updated | センサーデータの更新状態を示すビットです。このビットが "1"にセットされている時、BHM_3V3_BUSVフィールドが前回の読み出し時から更新されていない事を示します。BHMがセンサーからデータを読み出した時、このビットは "0"にクリアされ、BHM_3V3_BUSV を読み出したときこのビットは"1"にセットされます。また、リセット解除後にセンサーデータが取得されていない状態でも、このビットは "1"を示します。 | RO  |
+| 30:16 | -                 | Reserved                        | Reserved                                                                                                                                                                                                                                                                                                                                                                                  | -   |
+|  15:0 | BHM_3V3_BUSV      | VDD_3V3 Bus Voltage Monitor     | VDD_3V3 電源ドメインのバス電圧を読み出すためのフィールドです。                                                                                                                                                                                                                                                                                                                            | RO  |
+
+*** BHM VDD_3V3_SYS_A Shunt Voltage Monitor Register (Offset 0x2038)
+BHM VDD_3V3_SYS_A Shunt Voltage Monitor Registerは、VDD_3V3_SYS_A 電源ドメインの Shunt Voltageを読み出すためのレジスタです。
+
+#+CAPTION: BHM VDD_3V3_SYS_A Shunt Voltage Monitor Register ビットフィールド
+|   bit | Symbol                | Field                                   | Description                                                                                                                                                                                                                                                                                                                                                                                       | R/W |
+|-------+-----------------------+-----------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+|    31 | BHM_3V3SYSA_SNTV_NUPD | VDD_3V3_SYS_A Shunt Voltage Not Updated | センサーデータの更新状態を示すビットです。このビットが "1"にセットされている時、BHM_3V3SYSA_SNTVフィールドが前回の読み出し時から更新されていない事を示します。BHMがセンサーからデータを読み出した時、このビットは "0"にクリアされ、BHM_3V3SYSA_BUSV を読み出したときこのビットは"1"にセットされます。また、リセット解除後にセンサーデータが取得されていない状態でも、このビットは "1"を示します。 | RO  |
+| 30:16 | -                     | Reserved                                | Reserved                                                                                                                                                                                                                                                                                                                                                                                          | -   |
+|  15:0 | BHM_3V3SYSA_SNTV      | VDD_3V3_SYS_A Shunt Voltage Monitor     | VDD_3V3_SYS_A 電源ドメインのシャント電圧を読み出すためのフィールドです。                                                                                                                                                                                                                                                                                                                          | RO  |
+
+*** BHM VDD_3V3_SYS_A Bus Voltage Monitor Register (Offset 0x203C)
+BHM VDD_3V3_SYS_A Bus Voltage Monitor Registerは、VDD_3V3_SYS_A 電源ドメインの Bus Voltageを読み出すためのレジスタです。
+
+#+CAPTION: BHM VDD_3V3_SYS_A Bus Voltage Monitor Register ビットフィールド
+|   bit | Symbol                | Field                                 | Description                                                                                                                                                                                                                                                                                                                                                                                       | R/W |
+|-------+-----------------------+---------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+|    31 | BHM_3V3SYSA_BUSV_NUPD | VDD_3V3_SYS_A Bus Voltage Not Updated | センサーデータの更新状態を示すビットです。このビットが "1"にセットされている時、BHM_3V3SYSA_BUSVフィールドが前回の読み出し時から更新されていない事を示します。BHMがセンサーからデータを読み出した時、このビットは "0"にクリアされ、BHM_3V3SYSA_BUSV を読み出したときこのビットは"1"にセットされます。また、リセット解除後にセンサーデータが取得されていない状態でも、このビットは "1"を示します。 | RO  |
+| 30:16 | -                     | Reserved                              | Reserved                                                                                                                                                                                                                                                                                                                                                                                          | -   |
+|  15:0 | BHM_3V3SYSA_BUSV      | VDD_3V3_SYS_A Bus Voltage Monitor     | VDD_3V3_SYS_A 電源ドメインのバス電圧を読み出すためのフィールドです。                                                                                                                                                                                                                                                                                                                              | RO  |
+
+*** BHM VDD_3V3_SYS_B Shunt Voltage Monitor Register (Offset 0x2040)
+BHM VDD_3V3_SYS_B Shunt Voltage Monitor Registerは、VDD_3V3_SYS_B 電源ドメインの Shunt Voltageを読み出すためのレジスタです。
+
+#+CAPTION: BHM VDD_3V3_SYS_B Shunt Voltage Monitor Register ビットフィールド
+|   bit | Symbol                | Field                                   | Description                                                                                                                                                                                                                                                                                                                                                                                       | R/W |
+|-------+-----------------------+-----------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+|    31 | BHM_3V3SYSB_SNTV_NUPD | VDD_3V3_SYS_B Shunt Voltage Not Updated | センサーデータの更新状態を示すビットです。このビットが "1"にセットされている時、BHM_3V3SYSB_SNTVフィールドが前回の読み出し時から更新されていない事を示します。BHMがセンサーからデータを読み出した時、このビットは "0"にクリアされ、BHM_3V3SYSB_BUSV を読み出したときこのビットは"1"にセットされます。また、リセット解除後にセンサーデータが取得されていない状態でも、このビットは "1"を示します。 | RO  |
+| 30:16 | -                     | Reserved                                | Reserved                                                                                                                                                                                                                                                                                                                                                                                          | -   |
+|  15:0 | BHM_3V3SYSB_SNTV      | VDD_3V3_SYS_B Shunt Voltage Monitor     | VDD_3V3_SYS_B 電源ドメインのシャント電圧を読み出すためのフィールドです。                                                                                                                                                                                                                                                                                                                          | RO  |
+
+*** BHM VDD_3V3_SYS_B Bus Voltage Monitor Register (Offset 0x2044)
+BHM VDD_3V3_SYS_B Bus Voltage Monitor Registerは、VDD_3V3_SYS_B 電源ドメインの Bus Voltageを読み出すためのレジスタです。
+
+#+CAPTION: BHM VDD_3V3_SYS_B Bus Voltage Monitor Register ビットフィールド
+|   bit | Symbol                | Field                                 | Description                                                                                                                                                                                                                                                                                                                                                                                       | R/W |
+|-------+-----------------------+---------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+|    31 | BHM_3V3SYSB_BUSV_NUPD | VDD_3V3_SYS_B Bus Voltage Not Updated | センサーデータの更新状態を示すビットです。このビットが "1"にセットされている時、BHM_3V3SYSB_BUSVフィールドが前回の読み出し時から更新されていない事を示します。BHMがセンサーからデータを読み出した時、このビットは "0"にクリアされ、BHM_3V3SYSB_BUSV を読み出したときこのビットは"1"にセットされます。また、リセット解除後にセンサーデータが取得されていない状態でも、このビットは "1"を示します。 | RO  |
+| 30:16 | -                     | Reserved                              | Reserved                                                                                                                                                                                                                                                                                                                                                                                          | -   |
+|  15:0 | BHM_3V3SYSB_BUSV      | VDD_3V3_SYS_B Bus Voltage Monitor     | VDD_3V3_SYS_B 電源ドメインのバス電圧を読み出すためのフィールドです。                                                                                                                                                                                                                                                                                                                              | RO  |
+
+*** BHM VDD_3V3_IO Shunt Voltage Monitor Register (Offset 0x2048)
+BHM VDD_3V3_IO Shunt Voltage Monitor Registerは、VDD_3V3_IO 電源ドメインの Shunt Voltageを読み出すためのレジスタです。
+
+#+CAPTION: BHM VDD_3V3_IO Shunt Voltage Monitor Register ビットフィールド
+|   bit | Symbol              | Field                                | Description                                                                                                                                                                                                                                                                                                                                                                                   | R/W |
+|-------+---------------------+--------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+|    31 | BHM_3V3IO_SNTV_NUPD | VDD_3V3_IO Shunt Voltage Not Updated | センサーデータの更新状態を示すビットです。このビットが "1"にセットされている時、BHM_3V3IO_SNTVフィールドが前回の読み出し時から更新されていない事を示します。BHMがセンサーからデータを読み出した時、このビットは "0"にクリアされ、BHM_3V3IO_BUSV を読み出したときこのビットは"1"にセットされます。また、リセット解除後にセンサーデータが取得されていない状態でも、このビットは "1"を示します。 | RO  |
+| 30:16 | -                   | Reserved                             | Reserved                                                                                                                                                                                                                                                                                                                                                                                      | -   |
+|  15:0 | BHM_3V3IO_SNTV      | VDD_3V3_IO Shunt Voltage Monitor     | VDD_3V3_IO 電源ドメインのシャント電圧を読み出すためのフィールドです。                                                                                                                                                                                                                                                                                                                         | RO  |
+
+*** BHM VDD_3V3_IO Bus Voltage Monitor Register (Offset 0x204C)
+BHM VDD_3V3_IO Bus Voltage Monitor Registerは、VDD_3V3_IO 電源ドメインの Bus Voltageを読み出すためのレジスタです。
+
+#+CAPTION: BHM VDD_3V3_IO Bus Voltage Monitor Register ビットフィールド
+|   bit | Symbol              | Field                              | Description                                                                                                                                                                                                                                                                                                                                                                                   | R/W |
+|-------+---------------------+------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+|    31 | BHM_3V3IO_BUSV_NUPD | VDD_3V3_IO Bus Voltage Not Updated | センサーデータの更新状態を示すビットです。このビットが "1"にセットされている時、BHM_3V3IO_BUSVフィールドが前回の読み出し時から更新されていない事を示します。BHMがセンサーからデータを読み出した時、このビットは "0"にクリアされ、BHM_3V3IO_BUSV を読み出したときこのビットは"1"にセットされます。また、リセット解除後にセンサーデータが取得されていない状態でも、このビットは "1"を示します。 | RO  |
+| 30:16 | -                   | Reserved                           | Reserved                                                                                                                                                                                                                                                                                                                                                                                      | -   |
+|  15:0 | BHM_3V3IO_BUSV      | VDD_3V3_IO Bus Voltage Monitor     | VDD_3V3_IO 電源ドメインのバス電圧を読み出すためのフィールドです。                                                                                                                                                                                                                                                                                                                             | RO  |
+
+*** BHM Temperature 1 Monitor Register (Offset 0x2050)
+BHM Temperature 1 Monitor Registerは、Temperature Sensor 1の温度データを読み出すためのレジスタです。
+
+#+CAPTION: BHM Temperature 1 Monitor Register ビットフィールド
+|   bit | Symbol         | Field                     | Description                                                                                                                                                                                                                                                                                                                                                                         | R/W |
+|-------+----------------+---------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+|    31 | BHM_TEMP1_NUPD | Temperature 1 Not Updated | センサーデータの更新状態を示すビットです。このビットが "1"にセットされている時、BHM_TEMP1フィールドが前回の読み出し時から更新されていない事を示します。BHMがセンサーからデータを読み出した時、このビットは "0"にクリアされ、BHM_TEMP1 を読み出したときこのビットは"1"にセットされます。また、リセット解除後にセンサーデータが取得されていない状態でも、このビットは "1"を示します。 | RO  |
+| 30:16 | -              | Reserved                  | Reserved                                                                                                                                                                                                                                                                                                                                                                            | -   |
+|  15:0 | BHM_TEMP1      | Temperature 1 Monitor     | Temperature Sensor 1から取得した温度データを読み出すためのフィールドです。                                                                                                                                                                                                                                                                                                          | RO  |
+
+*** BHM Temperature 2 Monitor Register (Offset 0x2054)
+BHM Temperature 2 Monitor Registerは、Temperature Sensor 2の温度データを読み出すためのレジスタです。
+
+#+CAPTION: BHM Temperature 2 Monitor Register ビットフィールド
+|   bit | Symbol         | Field                     | Description                                                                                                                                                                                                                                                                                                                                                                         | R/W |
+|-------+----------------+---------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+|    31 | BHM_TEMP2_NUPD | Temperature 2 Not Updated | センサーデータの更新状態を示すビットです。このビットが "1"にセットされている時、BHM_TEMP2フィールドが前回の読み出し時から更新されていない事を示します。BHMがセンサーからデータを読み出した時、このビットは "0"にクリアされ、BHM_TEMP2 を読み出したときこのビットは"1"にセットされます。また、リセット解除後にセンサーデータが取得されていない状態でも、このビットは "1"を示します。 | RO  |
+| 30:16 | -              | Reserved                  | Reserved                                                                                                                                                                                                                                                                                                                                                                            | -   |
+|  15:0 | BHM_TEMP2      | Temperature 2 Monitor     | Temperature Sensor 2から取得した温度データを読み出すためのフィールドです。                                                                                                                                                                                                                                                                                                          | RO  |
+
+*** BHM Temperature 3 Monitor Register (Offset 0x2058)
+BHM Temperature 3 Monitor Registerは、Temperature Sensor 3の温度データを読み出すためのレジスタです。
+
+#+CAPTION: BHM Temperature 3 Monitor Register ビットフィールド
+|   bit | Symbol         | Field                     | Description                                                                                                                                                                                                                                                                                                                                                                         | R/W |
+|-------+----------------+---------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+|    31 | BHM_TEMP3_NUPD | Temperature 3 Not Updated | センサーデータの更新状態を示すビットです。このビットが "1"にセットされている時、BHM_TEMP3フィールドが前回の読み出し時から更新されていない事を示します。BHMがセンサーからデータを読み出した時、このビットは "0"にクリアされ、BHM_TEMP3 を読み出したときこのビットは"1"にセットされます。また、リセット解除後にセンサーデータが取得されていない状態でも、このビットは "1"を示します。 | RO  |
+| 30:16 | -              | Reserved                  | Reserved                                                                                                                                                                                                                                                                                                                                                                            | -   |
+|  15:0 | BHM_TEMP3      | Temperature 3 Monitor     | Temperature Sensor 3から取得した温度データを読み出すためのフィールドです。                                                                                                                                                                                                                                                                                                          | RO  |
+
+*** BHM Software Access Control Register (Offset 0x2060)
+BHM Software Access Control Registerは、ソフトウェア指示により センサーの任意のレジスタにアクセスするための制御を行うレジスタです。
+
+BHMは Software I2C Access Request (BHM_SWACCREQ)に "1"をセットすると、BHM_SWDEVSEL・BHM_SWREGADR・BHM_SWRWSELに設定された情報をもとにアクセスを行います。
+BHM_SWACCREQと他の設定フィールドは、同時にセットすることができます。
+
+BHM_SWRWSELに "0"を設定し、センサーへのライトアクセスを行う場合は、予め BHM Software Access Write Data Registerにライトデータを書き込んでおく必要があります。
+
+#+CAPTION: BHM Software Access Control Register ビットフィールド
+|   bit | Symbol       | Field                                 | Description                                                                                                                                                                                                                                               | R/W |
+|-------+--------------+---------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:25 | -            | Reserved                              | Reserved                                                                                                                                                                                                                                                  | -   |
+|    24 | BHM_SWACCREQ | Software I2C Access Request           | Softwareによるセンサーへのアクセスを開始するためのリクエストビットです。このビットに"1"をセットするとセンサーアクセスを開始します。センサーへのアクセスが完了すると、このビットは自動的に "0"にクリアされます。                                           | R/W |
+| 23:19 | -            | Reserved                              | Reserved                                                                                                                                                                                                                                                  | -   |
+| 18:16 | BHM_SWDEVSEL | Software I2C Access Device Select     | Softwareによるセンサーへのアクセスを行う時のセンサーデバイスを選択するためのフィールドです。0x0: Current Voltage Monitor 1 0x1: Current Voltage Monitor 2 0x2: Temperature Sensor 1 0x3: Temperature Sensor 2 0x4: Temperature Sensor 3 0x5-0x7: 設定禁止 | R/W |
+|  15:8 | BHM_SWREGADR | Software I2C Access Register Address  | Softwareによるセンサーへのアクセスを行う時のセンサーのレジスタのアドレスを設定するためのフィールドです。                                                                                                                                                  | R/W |
+|   7:1 | -            | Reserved                              | Reserved                                                                                                                                                                                                                                                  | -   |
+|     0 | BHM_SWRWSEL  | Software I2C Access Read/Write Select | Softwareによるセンサーへのアクセスを行う時のアクセス方向 (リード/ライト)を設定するためのビットです。 0: Write Access 1: Read Access                                                                                                                       | R/W |
+
+*** BHM Software Access Write Data Register (Offset 0x2064)
+BHM Software Access Write Data Registerは、ソフトウェア指示による I2Cアクセスにおいて、センサーに送信するデータを書き込むためのレジスタです。
+
+#+CAPTION: BHM Software Access Write Data Register ビットフィールド
+|   bit | Symbol       | Field                          | Description                                        | R/W |
+|-------+--------------+--------------------------------+----------------------------------------------------+-----|
+| 31:16 | -            | Reserved                       | Reserved                                           | -   |
+|  15:0 | BHM_SWWRDATA | Software I2C Access Write Data | センサーに送信するデータを設定するフィールドです。 | R/W |
+
+*** BHM Software Access Read Data Register (Offset 0x2068)
+BHM Software Access Read Data Registerは、ソフトウェア指示による I2Cアクセスによってセンサーから受信したデータを読み出すためのレジスタです。
+
+#+CAPTION: BHM Software Access Write Data Register ビットフィールド
+|   bit | Symbol       | Field                         | Description                                                | R/W |
+|-------+--------------+-------------------------------+------------------------------------------------------------+-----|
+| 31:16 | -            | Reserved                      | Reserved                                                   | -   |
+|  15:0 | BHM_SWRDDATA | Software I2C Access Read Data | センサーから受信したデータを読み出すためのフィールドです。 | RO  |
+
+*** BHM Prescaler Register (Offset 0x2080)
+BHM Prescale Registerは、BHMがセンサーと行う I2Cの 通信タイミングを設定するためのレジスタです。
+
+OBC Module上のセンサーとの通信は I2Cの Standard mode (100 Kbps)で行います。
+このレジスタには、以下の計算値で設定される値を設定してください。
+
+#+BEGIN_QUOTE
+$BHM\_CLKPSC = \frac{System\ Clock\ frequency [MHz]}{0.1} - 1$
+#+END_QUOTE
+
+#+CAPTION: BHM Prescale Setting Register ビットフィールド
+|   bit | Symbol     | Field                          | Description                                                      | R/W |
+|-------+------------+--------------------------------+------------------------------------------------------------------+-----|
+| 31:16 | -          | Reserved                       | Reserved                                                         | -   |
+|  15:0 | BHM_CLKPSC | I2C Prescale From System Clock | システムクロックで I2Cの 1周期を生成するカウント数を設定します。 | R/W |
+
+BHM_CLKPDCの設定による I2C通信の各タイミングは、以下の式で計算できます。
+
+#+BEGIN_QUOTE
+$START\ Hold\ Time(tHDSTA)[s] = System\ Clock\ period[s] \times \frac{BHM\_CLKPSC+1}{2}$
+#+END_QUOTE
+#+BEGIN_QUOTE
+$STOP\ Setup\ Time(tSUSTO)[s] = System\ Clock\ period[s] \times \frac{BHM\_CLKPSC+1}{2}$
+#+END_QUOTE
+#+BEGIN_QUOTE
+$Repeated\ START\ Setup\ Time(tSUSTA)[s] = System\ Clock\ period[s] \times \frac{BHM\_CLKPSC+1}{2}$
+#+END_QUOTE
+#+BEGIN_QUOTE
+$SCL\ High\ Time(tHIGH)[s] = System\ Clock\ period[s] \times \frac{BHM\_CLKPSC+1}{2}-5$
+#+END_QUOTE
+#+BEGIN_QUOTE
+$Data\ Hold\ Time(tHDDAT)[s] = System\ Clock\ period[s] \times 5$
+#+END_QUOTE
+#+BEGIN_QUOTE
+$Data\ Setup\ Time(tSUDAT)[s] = System\ Clock\ period[s] \times \frac{BHM\_CLKPSC+1}{2}$
+#+END_QUOTE
+#+BEGIN_QUOTE
+$SCL\ Low\ Time(tLOW)[s] = tHDDAT[s] + tSUDAT[s]$
+#+END_QUOTE
+#+BEGIN_QUOTE
+$Bus\ Free\ Time(tBUF)[s] = System\ Clock\ period[s] \times \frac{BHM\_CLKPSC+1}{2}+5$
+#+END_QUOTE
+
+システムクロックが96MHz, 48MHz, 24MHzの場合において、I2Cを 100 kbpsに設定する場合の設定値と、I2Cのタイミングを以下に示します。
+
+#+CAPTION: Standard-mode (100 kbps)通信時の BHM I2C Prescale Setting Registerの設定値とI2Cタイミング (システムクロックのサイクル数)
+| Parameter                            | System Clock=96MHz     | System Clock=48MHz[default] | System Clock=24MHz     |
+|--------------------------------------+------------------------+-----------------------------+------------------------|
+| SYSMON_BHM_CLKPSC[15:0] 設定値       | 0x03BF [Divide by 960] | 0x01DF [Divide by 480]      | 0x00EF [Divide by 240] |
+| START Hold Timing (tHDSTA)           | 480 Cycle [5.00us]     | 240 Cycle [5.00us]          | 120 Cycle [5.00us]     |
+| STOP Setup Timing (tSUSTO)           | 480 Cycle [5.00us]     | 240 Cycle [5.00us]          | 120 Cycle [5.00us]     |
+| Repeated START Setup Timing (tSUSTA) | 480 Cycle [5.00us]     | 240 Cycle [5.00us]          | 120 Cycle [5.00us]     |
+| Clock High Timing (tHIGH)            | 475 Cycle [4.95us]     | 235 Cycle [4.90us]          | 115 Cycle [4.79us]     |
+| Data Hold Timing (tHDDAT)            | 5 Cycle [0.05us]       | 5 Cycle [0.10us]            | 5 Cycle [0.21us]       |
+| Data Setup Timing (tSUDAT)           | 480 Cycle [5.00us]     | 240 Cycle [5.00us]          | 120 Cycle [5.00us]     |
+| Clock Low Timing (tLOW)              | 485 Cycle [5.05us]     | 245 Cycle [5.10us]          | 125 Cycle [5.21us]     |
+| Bus Free Timing (tBUF)               | 485 Cycle [5.05us]     | 245 Cycle [5.10us]          | 125 Cycle [5.21us]     |
+
+*** BHM Retry Count Register (Offset 0x2084)
+BHM Retry Count Registerは、BHMが行うセンサーへのアクセスにおける、リトライ回数の上限を設定するためのレジスタです。
+
+BHMは I2Cバスの通信においてセンサーからアクノリッジが送信されてこない場合にバスエラーと認識します。
+BHMはバスエラーが起こった場合、BHM_I2CACCCNTに設定された回数のリトライアクセスを行います。
+
+I2Cアクセスが頻発する事により、BHM_I2CACCCNTに設定されたリトライを行ってもエラーが改善しなかった場合、BHMは I2Cアクセスを停止します。
+このとき、BHM Access Control Registerの対象のセンサーの Enableビットを Disableに設定するとともに、BHM Interrupt Status Registerの対象のセンサーの I2C Access Errorビットをセットし、割り込みを発生します。
+
+#+CAPTION: BHM Retry Count Register ビットフィールド
+|  bit | Symbol        | Field            | Description                                               | R/W |
+|------+---------------+------------------+-----------------------------------------------------------+-----|
+| 31:8 | -             | Reserved         | Reserved                                                  | -   |
+|  7:0 | BHM_I2CACCCNT | I2C Access Count | I2Cアクセスにおけるリトライ回数を設定するフィールドです。 | R/W |
+
+*** BHM Access Status Register (Offset 0x20C0)
+BHM Access Status Registerは、BHM機能が持つ I2Cバスの状態を示すレジスタです。
+
+このレジスタの全てのビットが "0"を示す時、I2Cバスは Idle状態であることを示します。
+
+#+CAPTION: BHM Access Status Register ビットフィールド
+|  bit | Symbol         | Field                                | Description                                                                                                                                           | R/W |
+|------+----------------+--------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:6 | -              | Reserved                             | Reserved                                                                                                                                              | -   |
+|    5 | BHM_SW_BUSY    | Software Access Busy                 | ソフトウェアからの指示により、BHMが いずれからのセンサーに対して行うアクセスの状態を示すビットです。                                                  | RO  |
+|    4 | BHM_TEMP3_BUSY | Temperature Sensor3 Access Busy      | BHMが Temperature Sensor 3に対して行う自動アクセスの状態を示すビットです。センサーの初期化時とデータ読み出し時に、このビットは "1"を示します。        | RO  |
+|    3 | BHM_TEMP2_BUSY | Temperature Sensor2 Access Busy      | BHMが Temperature Sensor 2に対して行う自動アクセスの状態を示すビットです。センサーの初期化時とデータ読み出し時に、このビットは "1"を示します。        | RO  |
+|    2 | BHM_TEMP1_BUSY | Temperature Sensor1 Access Busy      | BHMが Temperature Sensor 1に対して行う自動アクセスの状態を示すビットです。センサーの初期化時とデータ読み出し時に、このビットは "1"を示します。        | RO  |
+|    1 | BHM_CVM2_BUSY  | Current Voltage Monitor2 Access Busy | BHMが Current Voltage Monitor 2に対して行う自動アクセスの状態を示すビットです。センサーの初期化時とデータの読み出し時に、このビットは "1"を示します。 | RO  |
+|    0 | BHM_CVM1_BUSY  | Current Voltage Monitor1 Access Busy | BHMが Current Voltage Monitor 1に対して行う自動アクセスの状態を示すビットです。センサーの初期化時とデータの読み出し時に、このビットは "1"を示します。 | RO  |
 
 * General Purpose Timer
 General Purpose Timerは、SC OBC FPGAの運用時間の管理や、FPGA内の CPUや IPコアへのタイミング通知を行うためのタイマーモジュールです。
