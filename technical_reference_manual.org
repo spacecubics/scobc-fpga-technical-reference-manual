@@ -1028,7 +1028,8 @@ Global Timerは、FPGAのリセット解除から動作する Free Run Timerで�
 リセットの解除後からの時刻を数えるために使われます。
 Global Timerの最小時間は 0.0625秒であり、最大 268435455.9375秒(約 8年 186日)までカウントする事ができます。
 
-Software Interrupt Timerと Hardware Interrupt Timerは、CPU 及び IPコアに割り込みを発生させるタイマーとして使用する事ができます。
+Global Timerと Software Interrupt Timerは、CPUに割り込みを発生させるタイマーとして使用します。
+Hardware Interrupt Timerは、SC OBC FPGAの内部のIPコアに対しイベントを通知する、Hardware Schedulerとして使用します。
 Software Interrupt Timerと Hardware Interrupt Timerの最小時間は Prescalerにより設定する事ができます。
 
 ** レジスタ詳細
