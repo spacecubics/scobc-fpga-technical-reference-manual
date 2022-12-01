@@ -109,7 +109,7 @@ Mission Bus SystemはユーザーがCubeSatのミッションを行うためのI
 #+CAPTION: SC OBC FPGA メモリマップ
 | Field                                          | Address Space             | Comment           |
 |------------------------------------------------+---------------------------+-------------------|
-| Instruction Tightly Coupled Memory (Block RAM) | 0x0000_0000 - 0x0000_1FFF | CFGITCMEN[0] is 1 |
+| Instruction Tightly Coupled Memory (Block RAM) | 0x0000_0000 - 0x0000_7FFF | CFGITCMEN[0] is 1 |
 | HRMEM (SRAM)                                   | 0x0000_0000 - 0x003F_FFFF | CFGITCMEM[0] is 0 |
 | Main AXI Bus                                   | 0x4000_0000 - 0x4EFF_FFFF |                   |
 | - QSPI Controller (Configuration Memory)       | 0x4000_0000 - 0x4000_FFFF |                   |
