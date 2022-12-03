@@ -406,6 +406,53 @@ SEM Controllerの Heartbeat信号が停止した事を示す通知ビットで�
 このエラーが発生した後は、SEM Controllerが正常に動作していない可能性があります。
 そのため、このエラーが発生した場合はシステムを再起動する事を推奨します。
 
+** Board Health Monitor (BHM)
+Board Health Monitor (BHM)は、OBC Module上に搭載するセンサーから簡単にデータを取得するための機能です。
+
+OBC Moduleには、2つの Current Voltage Monitorと 3つの 温度センサーを搭載しています。
+これらのセンサーは I2C規格のバスで SC OBC FPGAと接続されています。
+BHMはセンサーにアクセスするためのシーケンサーが実装されており、センサーからのデータをレジスタに格納します。
+これにより、ソフトウェアによる煩雑な処理を実行しなくても、センサーからデータを取得する事ができます。
+
+BHMが、センサーからデータを取得するタイミングは General Purpose Timerの Hard Interrupt Timerによって決定します。
+Hardware Interrupt Timerを Hardware Schedulerとして動作させる事で、BHMに定期的にセンサーデータの取得トリガを生成します。
+BHMは、センサーのデータ取得トリガを検出したタイミングで、センサーに対する I2Cアクセスを行い データを取得します。
+
+*** BHMの I2Cアクセス
+BHMは 3つの I2Cアクセスを行うことができます。
+
+センサーデバイスの初期化
+- レジスタアクセスによりセンサーの初期化要求を発行すると、センサーの初期化のための I2Cアクセスを行います
+- センサーの初期化を行うアドレスや初期化データは、RTL設計時に Verilogのパラメータで設定する事ができます
+
+センサーデータの取得
+- Hardware Schedulerからのトリガを検出すると、センサーからデータを取得するための I2Cアクセスを行います
+- Current Voltage Monitorからのデータ取得は、General Purpose Timerの Hardware Interrupt Timer Output Compare Channel 1が発生するトリガで開始されます
+
+ソフトウェア指示による I2Cアクセス
+- ランタイムでセンサーの設定を変更したり、センサーが出力した Alertをクリアする目的で、簡単なレジスタアクセスで任意の I2Cアクセスを行います
+
+*** センサー構成
+BHMに接続するセンサーと、BHMによって取得されるセンサーデータの一覧を以下に示します
+
+| センサー                  | センサーレジスタアドレス | センサーデータ              | BHMレジスタアドレスオフセット |
+|---------------------------+--------------------------+-----------------------------+-------------------------------|
+| Current Voltage Monitor 1 |                     0x01 | VDD_1V0 Shunt Voltage       |                        0x2020 |
+|                           |                     0x02 | VDD_1V0 Bus Voltage         |                        0x2024 |
+|                           |                     0x03 | VDD_1V8 Shunt Voltage       |                        0x2028 |
+|                           |                     0x04 | VDD_1V8 Bus Voltage         |                        0x202C |
+|                           |                     0x05 | VDD_3V3 Shunt Voltage       |                        0x2030 |
+|                           |                     0x06 | VDD_3V3 Bus Voltage         |                        0x2034 |
+| Current Voltage Monitor 2 |                     0x01 | VDD_3V3_SYS_A Shunt Voltage |                        0x2038 |
+|                           |                     0x02 | VDD_3V3_SYS_A Bus Voltage   |                        0x203C |
+|                           |                     0x03 | VDD_3V3_SYS_B Shunt Voltage |                        0x2040 |
+|                           |                     0x04 | VDD_3V3_SYS_B Bus Voltage   |                        0x2044 |
+|                           |                     0x05 | VDD_3V3_IO Shunt Voltage    |                        0x2048 |
+|                           |                     0x06 | VDD_3V3_IO Bus Voltage      |                        0x204C |
+| Temperature Sensor 1      |                     0x01 | Temperature                 |                        0x2050 |
+| Temperature Sensor 2      |                     0x01 | Temperature                 |                        0x2054 |
+| Temperature Sensor 3      |                     0x01 | Temperature                 |                        0x2058 |
+
 ** レジスタ詳細
 System Monitorは、Base Address 0x4F04_0000に配置されています。
 
