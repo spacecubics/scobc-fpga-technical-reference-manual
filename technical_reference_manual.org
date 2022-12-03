@@ -1621,7 +1621,7 @@ HRMEM IP Version Registerは、HRMEM IPコアのバージョン管理レジス�
 QSPI Controllerは、SC OBCモジュールに搭載するメモリとSPIプロトコルによる通信を行うためのモジュールです。
 QSPI Controllerは、Single SPIモード, Dual SPIモード, Quad SPIモードに対応しており、メモリとの高速な通信を行う事ができます。
 
-SC OBCモジュールには、FPGA Configurationデータを格納するためのNOR Flashメモリと、運用データを格納するための NOR Flashメモリ 及び FRAMが搭載されています。
+SC OBCモジュールには、FPGAの Configurationデータを格納するためのNOR Flashメモリ (Configuration Flash Memory)と、運用データを格納するための NOR Flashメモリ (Data Store Flash Memory)及び FRAMが搭載されています。
 これに対し QSPI Controllerは 3個搭載されています。
 また、各メモリは冗長化の目的で 2個ずつ搭載されています。
 
@@ -1634,22 +1634,22 @@ QSPI Controllerとメモリの構成を以下に示します。
 SC OBCモジュールに実装される メモリの型番は以下の通りです。
 各メモリの仕様については、ベンダーからリリースされている Datasheetを参照してください。
 
-| Memory                                     | Vendor               | Part Number | SC OBC搭載数 |
-|--------------------------------------------+----------------------+-------------+--------------|
-| Configurationデータ格納用 NOR Flash Memory | infineon (旧Cypress) | S25FL256L   | 2 個         |
-| データ格納用 NOR Flash Memory              | infineon (旧Cypress) | S25FL256L   | 2 個         |
-| データ格納用 FRAM                          | infineon (旧Cypress) | CY15B104QSN | 2 個         |
+| Memory                     | 用途                           | Vendor               | Part Number | SC OBC搭載数 |
+|----------------------------+--------------------------------+----------------------+-------------+--------------|
+| Configuration Flash Memory | FPGA Configurationデータの格納 | infineon (旧Cypress) | S25FL256L   | 2 個         |
+| Data Store Flash Memory    | 運用データの格納               | infineon (旧Cypress) | S25FL256L   | 2 個         |
+| FRAM                       | 運用データの格納               | infineon (旧Cypress) | CY15B104QSN | 2 個         |
 
 ** レジスタ詳細
 QSPI Controllerは、各メモリにアクセスするため 3個搭載されています。
 各コアは以下のアドレスに配置されています。
 
 #+CAPTION: QSPI Controller アドレスの割り当て
-| Target                                      | Base Address |
-|---------------------------------------------+--------------|
-| Configuration Flash Memory Access QSPI Controller | 0x4000_0000  |
-| Data Store Memory Access QSPI Controller    | 0x4010_0000  |
-| FRAM Access QSPI Controller                 | 0x4020_0000  |
+| Target                     | Base Address |
+|----------------------------+--------------|
+| Configuration Flash Memory | 0x4000_0000  |
+| Data Store Memory          | 0x4010_0000  |
+| FRAM                       | 0x4020_0000  |
 
 QSPI Controllerには以下のレジスタが実装されています。
 
@@ -1672,13 +1672,13 @@ QSPI Controllerには以下のレジスタが実装されています。
 *** QSPI Access Control Register (Offset 0x0000)
 QSPI Access Control Registerは、SPIアクセスにおける SS信号、I/Oモードを制御するためのレジスタです。
 
-Data Store Memory Access QSPI Controllerと FRAM Access QSPI Controllerは、2つのメモリへのアクセスの切り替えを SPISSCTLビットで行います。
+Data Store Memoryと FRAMの制御を行う QSPI Controllerは、2つのメモリへのアクセスの切り替えを SPISSCTLビットで行います。
 メモリへのアクセスを開始するときは、SPISSCTLを 0b01または 0b10に設定し、アクセス対象の SS信号をアサートします。
 SPISSCTLを 0b11に設定することは禁止です。
 
-Configuration Flash Memory Access QSPI Controllerは、SS信号が 1本しか接続されておらず、OBCモジュールの基板上でセレクトされています。
-そのため、Configurationデータ格納用 NOR Flash Memoryへアクセスを行う場合は、アクセスするメモリに関わらず SPISSCTLを 0b01にセットします。
-Configurationデータ格納用 NOR Flash Memoryの メモリ選択は、System Registerの Configuration Flash Memory Registerの設定により行うことができます。
+Configuration Flash Memoryを制御する QSPI Controllerは、SS信号が 1本しか接続されておらず、OBCモジュールの基板上でセレクトされています。
+そのため、Configuration Flash Memoryへアクセスを行う場合は、アクセスするメモリに関わらず SPISSCTLを 0b01にセットします。
+Configuration Flash Memoryのメモリ選択は、System Registerの Configuration Flash Memory Registerの設定により行うことができます。
 詳細は、System Registerの「Configuration Flash Memory Register」の章を参照してください。
 
 #+CAPTION: QSPI Access Control Register ビットフィールド
@@ -1861,7 +1861,7 @@ CPOL=0、CPHA=0に設定した時のSPI Interface波形と手順を以下に示�
 [[file:./images/quad_page_program_acc_seq.png]]
 
 以下の手順は、メモリ 1にアクセスする場合のレジスタ設定例を示しています。
-Configurationデータ格納用 NOR Flash Memoryを除き、メモリ 2にアクセスする場合は、QSPI Access Control Registerの SPISSCTLを 0x01から 0x02に置き換えて下さい。
+Configuration Flash Memoryを除き、メモリ 2にアクセスする場合は、QSPI Access Control Registerの SPISSCTLを 0x01から 0x02に置き換えて下さい。
 
 A: QSPI Access Control Registerを設定します。
 SPI I/O Modeは Standard(Single)-IO SPIモード、SPI SS Controlは"1"とするため、0x00000001を書き込みます。
@@ -1893,7 +1893,7 @@ CPOL=0、CPHA=0に設定した時のSPI Interfaceの波形と手順を以下に�
 [[file:./images/quad_io_read_acc_seq.png]]
 
 以下の手順は、メモリ 1にアクセスする場合のレジスタ設定例を示しています。
-Configurationデータ格納用 NOR Flash Memoryを除き、メモリ 2にアクセスする場合は、QSPI Access Control Registerの SPISSCTLを 0x01から 0x02に置き換えて下さい。
+Configuration Flash Memoryを除き、メモリ 2にアクセスする場合は、QSPI Access Control Registerの SPISSCTLを 0x01から 0x02に置き換えて下さい。
 
 A: QSPI Access Control Registerを設定します。
 SPI I/O ModeはStandard(Single)-IO SPIモード、SPI SS Controlは1とするため、0x00000001を書き込みます。
