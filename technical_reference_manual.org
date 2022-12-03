@@ -86,9 +86,9 @@ Mission Bus SystemはユーザーがCubeSatのミッションを行うためのI
 | DMA                             | Not Support                                                                                 |
 | Interrupt Support               | 16 User interrupt signal                                                                    |
 | Watchdog Timer                  | Space Cubics TRCH-FPGA watchdog system                                                      |
-| FPGA Configuration Memory       | 32 MByte/Redundancy (S25FL256L)                                                             |
-| Data Memory                     | 32 MByte/Redundancy (S25FL256L)                                                             |
-| FeRAM                           | 512 kByte x 2 (CY15B104QSN)                                                                 |
+| FPGA Configuration Flash Memory | 32 MByte/Redundancy (S25FL256L)                                                             |
+| Data Store Flash Memory         | 32 MByte/Redundancy (S25FL256L)                                                             |
+| FRAM                            | 512 kByte x 2 (CY15B104QSN)                                                                 |
 | Control Area Network (CAN)      | Conforms to the ISO 11898-1, CAN2.0A, and CAN2.0B standards Supports bit rates up to 1 Mb/s |
 | Space Communication Bus (SCBus) | Revision Cでは実装されていません                                                            |
 |                                 | Compliant with the USB-based communication interface proposed by Space Cubics (T.B.D.)      |
@@ -112,9 +112,9 @@ Mission Bus SystemはユーザーがCubeSatのミッションを行うためのI
 | Instruction Tightly Coupled Memory (Block RAM) | 0x0000_0000 - 0x0000_7FFF | CFGITCMEN[0] is 1 |
 | HRMEM (SRAM)                                   | 0x0000_0000 - 0x003F_FFFF | CFGITCMEM[0] is 0 |
 | Main AXI Bus                                   | 0x4000_0000 - 0x4EFF_FFFF |                   |
-| - QSPI Controller (Configuration Memory)       | 0x4000_0000 - 0x4000_FFFF |                   |
-| - QSPI Controller (Data Memory)                | 0x4010_0000 - 0x4010_FFFF |                   |
-| - QSPI Controller(FeRAM)                       | 0x4020_0000 - 0x4020_FFFF |                   |
+| - QSPI Controller (Configuration Flash)        | 0x4000_0000 - 0x4000_FFFF |                   |
+| - QSPI Controller (Data Store Flash)           | 0x4010_0000 - 0x4010_FFFF |                   |
+| - QSPI Controller(FRAM)                        | 0x4020_0000 - 0x4020_FFFF |                   |
 | - CAN Controller                               | 0x4040_0000 - 0x4040_FFFF |                   |
 | - HRMEM Register                               | 0x4050_0000 - 0x4050_FFFF |                   |
 | Low Performance IP Bus                         | 0x4F00_0000 - 0x4FFF_FFFF |                   |
@@ -168,9 +168,9 @@ Cortex-M3の 割り込みコントローラの仕様については、ARM Cortex
 |---------------+---------+--------------------------------------------------+-------|
 |            16 | [0]     | AHB UART Lite(Console)                           | Pulse |
 |            17 | [1]     | HRMEM (High-reliability Memory)                  | Level |
-|            18 | [2]     | QSPI Controller (Configuration Memory)           | Level |
-|            19 | [3]     | QSPI Controller (Flash Data Memory)              | Level |
-|            20 | [4]     | QSPI Controller (FeRAM)                          | Level |
+|            18 | [2]     | QSPI Controller (Configuration Flash Memory)     | Level |
+|            19 | [3]     | QSPI Controller (Data Store Flash Memort)        | Level |
+|            20 | [4]     | QSPI Controller (FRAM)                           | Level |
 |            21 | [5]     | CAN Controller                                   | Level |
 |            22 | [6]     | Reserved (OBC System Interrupt Area)             | -     |
 |            23 | [7]     | External I2C Master                              | Level |
@@ -192,7 +192,7 @@ System Registerは、Base Address 0x4F00_0000に配置されています。
 |------------+------------------+-------------------------------------+------------|
 | 0x4F000000 | SYSREG_CODEMSEL  | Code Memory Select Register         | 0x00000001 |
 | 0x4F000004 | SYSREG_SYSCLKCTL | System Clock Control Register       | 0x00000001 |
-| 0x4F000010 | SYSREG_CFGMEMCTL | Configuration Memory Register       | 0x000x0000 |
+| 0x4F000010 | SYSREG_CFGMEMCTL | Configuration Flash Memory Register | 0x000x0000 |
 | 0x4F000020 | SYSREG_PWRCYCLE  | Power Cycle Register                | 0x00000000 |
 | 0x4F0000F0 | SYSREG_SPAD1     | Scratchpad 1 Register               | 0x00000000 |
 | 0x4F0000F4 | SYSREG_SPAD2     | Scratchpad 2 Register               | 0x00000000 |
@@ -241,21 +241,21 @@ CLKMODE信号の設定値と、PLLの状態 及び システムクロック周�
 | 0b10            | Normal Operation | 24 MHz (Reference Clock) | 96 MHz (PLL Output)      | 96 MHz (PLL Output)      | RTLパラメータにより設定 (PLL Output)              |
 | 0b11 (設定禁止) | -                | -                        | -                        | -                        | -                                                 |
 
-*** Configuration Memory Register (Offset 0x0010)
-Configuration Memory Registerは SC OBC Moduleに実装される 2つの Configuration Memory (NOR FLash Memory)に関する制御を行うためのレジスタです。
+*** Configuration Flash Memory Register (Offset 0x0010)
+Configuration Flash Memory Registerは SC OBC Moduleに実装される 2つの Configuration Flash Memory (NOR FLash Memory)に関する制御を行うためのレジスタです。
 
-#+CAPTION: Configuration Memory Register ビットフィールド
-|   bit | Symbol      | Field                        | Description                                                                                                                                                                                                                                                                                                                          | R/W |
-|-------+-------------+------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
-| 31:13 | -           | Reserved                     | Reserved                                                                                                                                                                                                                                                                                                                             | -   |
-|    12 | CFGBOOTMEM  | Boot Memory                  | SC OBC FPGAが Configurationsに使用した Configuration Memoryを示すビットです。このフィールドを読み出す事で、SC OBC FPGAがどちらの Configuration Memoryから起動したか知る事ができます。SC OBC FPGAの Configuration後 Resetが解除される時に確定します。                                                                                 | RO  |
-|  11:6 | -           | Reserved                     | Reserved                                                                                                                                                                                                                                                                                                                             | -   |
-|     5 | CFGMEMMON   | Configuration Memory Monitor | 現在選択されている Configuration Memoryの選択状態を示すビットです。                                                                                                                                                                                                                                                                  | RO  |
-|     4 | CFGMEMSEL   | Configuration Memory Select  | Configuration Memoryを選択するためのビットです。CFGMEMOWNERフィールドが "0"にクリアされている時のみ、このビットが有効になります。0: Configuration Memory 0を選択. 1: Configuration Memory 1を選択                                                                                                                                    | R/W |
-|   3:1 | -           | Reserved                     | Reserved                                                                                                                                                                                                                                                                                                                             | -   |
-|     0 | CFGMEMOWNER | Configuration Memory Owner   | Configuration Memoryの選択をレジスタによって選択するか、QSPIコアによって選択するかを決定するフィールドです。0: Configuration Memoryは CFGMEMSELビットにより選択される. 1: Configuration Memoryは QSPIコアにより選択される. QSPIコアによる Configuration Memoryのメモリパトロールを行う場合は、このビットを "1"にセットしてください。 | R/W |
+#+CAPTION: Configuration Flash Memory Register ビットフィールド
+|   bit | Symbol      | Field                              | Description                                                                                                                                                                                                                                                                                                                                                  | R/W |
+|-------+-------------+------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:13 | -           | Reserved                           | Reserved                                                                                                                                                                                                                                                                                                                                                     | -   |
+|    12 | CFGBOOTMEM  | Boot Memory                        | SC OBC FPGAが Configurationsに使用した Flash Memoryを示すビットです。このフィールドを読み出す事で、SC OBC FPGAがどちらの Flash Memoryから起動したか知る事ができます。SC OBC FPGAの Configuration後 Resetが解除される時に確定します。                                                                                                                         | RO  |
+|  11:6 | -           | Reserved                           | Reserved                                                                                                                                                                                                                                                                                                                                                     | -   |
+|     5 | CFGMEMMON   | Configuration Flash Memory Monitor | 現在選択されている Configuration Flash Memoryの選択状態を示すビットです。                                                                                                                                                                                                                                                                                    | RO  |
+|     4 | CFGMEMSEL   | Configuration Flash Memory Select  | Configuration Flash Memoryを選択するためのビットです。CFGMEMOWNERフィールドが "0"にクリアされている時のみ、このビットが有効になります。0: Configuration Flash Memory 0を選択. 1: Configuration Flash Memory 1を選択                                                                                                                                          | R/W |
+|   3:1 | -           | Reserved                           | Reserved                                                                                                                                                                                                                                                                                                                                                     | -   |
+|     0 | CFGMEMOWNER | Configuration Flash Memory Owner   | Configuration Flash Memoryの選択をレジスタによって選択するか、QSPIコアによって選択するかを決定するフィールドです。0: Configuration Flash Memoryは CFGMEMSELビットにより選択される. 1: Configuration Flash Memoryは QSPIコアにより選択される. QSPIコアによる Configuration Flash Memoryのメモリパトロールを行う場合は、このビットを "1"にセットしてください。 | R/W |
 
-Configuration Memoryの選択は、以下の 3つの制御状態を持っています。
+Configuration Flash Memoryの選択は、以下の 3つの制御状態を持っています。
 
 | 状態               | 選択条件                                                           |
 |--------------------+--------------------------------------------------------------------|
@@ -263,16 +263,16 @@ Configuration Memoryの選択は、以下の 3つの制御状態を持ってい�
 | レジスタによる選択 | TRCHが FPGAの Configuration完了を認識し、且つ CFGMEMOWNER=0の場合  |
 | QSPIコアによる選択 | TRCHが FPGAの Configuration完了を認識し、且つ CFGMEMOWNER=1の場合  |
 
-SC OBC FPGAが Configurationし TRCHが FPGAの起動完了を認識する間、Configuration Memoryの選択は TRCHによって行われます。
+SC OBC FPGAが Configurationし TRCHが FPGAの起動完了を認識する間、Configuration Flash Memoryの選択は TRCHによって行われます。
 この仕様により、SC OBC FPGAが Configurationするための Memoryは TRCHによって選択されます。
 
-TRCHが FPGAの起動完了を認識すると、Configuration Memoryの制御権は FPGAに移行します。
+TRCHが FPGAの起動完了を認識すると、Configuration Flash Memoryの制御権は FPGAに移行します。
 FPGAは CFGMEMSELビットの設定によって、ソフトウェアによる選択を行うか、QSPIコアによる選択を行うかを決定します。
 
-Configuration Memoryの選択を切り替える場合は、CFGMEMSELビットの値を変更後、CFGMEMMONビットを読み出し切り替えが完了した事を確認してください。
-Configuration Memoryへのアクセス開始は、必ず CFGMEMMONビットが切り替わった後に開始してください。
+Configuration Flash Memoryの選択を切り替える場合は、CFGMEMSELビットの値を変更後、CFGMEMMONビットを読み出し切り替えが完了した事を確認してください。
+Configuration Flash Memoryへのアクセス開始は、必ず CFGMEMMONビットが切り替わった後に開始してください。
 
-現状の SC OBC FPGAには QSPIコアによる Configuration Memoryのメモリパトロール機能は実装されていません。
+現状の SC OBC FPGAには QSPIコアによる Configuration Flash Memoryのメモリパトロール機能は実装されていません。
 CFGMEMOWNERビットは必ず "0"に設定し使用してください。
 
 *** Power Cycle Register (Offset 0x0020)
@@ -1621,7 +1621,7 @@ HRMEM IP Version Registerは、HRMEM IPコアのバージョン管理レジス�
 QSPI Controllerは、SC OBCモジュールに搭載するメモリとSPIプロトコルによる通信を行うためのモジュールです。
 QSPI Controllerは、Single SPIモード, Dual SPIモード, Quad SPIモードに対応しており、メモリとの高速な通信を行う事ができます。
 
-SC OBCモジュールには、FPGA Configurationデータを格納するためのNOR Flashメモリと、運用データを格納するための NOR Flashメモリ 及び FeRAMが搭載されています。
+SC OBCモジュールには、FPGA Configurationデータを格納するためのNOR Flashメモリと、運用データを格納するための NOR Flashメモリ 及び FRAMが搭載されています。
 これに対し QSPI Controllerは 3個搭載されています。
 また、各メモリは冗長化の目的で 2個ずつ搭載されています。
 
@@ -1638,7 +1638,7 @@ SC OBCモジュールに実装される メモリの型番は以下の通りで�
 |--------------------------------------------+----------------------+-------------+--------------|
 | Configurationデータ格納用 NOR Flash Memory | infineon (旧Cypress) | S25FL256L   | 2 個         |
 | データ格納用 NOR Flash Memory              | infineon (旧Cypress) | S25FL256L   | 2 個         |
-| データ格納用 FeRAM                         | infineon (旧Cypress) | CY15B104QSN | 2 個         |
+| データ格納用 FRAM                          | infineon (旧Cypress) | CY15B104QSN | 2 個         |
 
 ** レジスタ詳細
 QSPI Controllerは、各メモリにアクセスするため 3個搭載されています。
@@ -1647,9 +1647,9 @@ QSPI Controllerは、各メモリにアクセスするため 3個搭載されて
 #+CAPTION: QSPI Controller アドレスの割り当て
 | Target                                      | Base Address |
 |---------------------------------------------+--------------|
-| Configuration Memory Access QSPI Controller | 0x4000_0000  |
-| Data Memory Access QSPI Controller          | 0x4010_0000  |
-| FeRAM Access QSPI Controller                | 0x4020_0000  |
+| Configuration Flash Memory Access QSPI Controller | 0x4000_0000  |
+| Data Store Memory Access QSPI Controller    | 0x4010_0000  |
+| FRAM Access QSPI Controller                 | 0x4020_0000  |
 
 QSPI Controllerには以下のレジスタが実装されています。
 
@@ -1672,14 +1672,14 @@ QSPI Controllerには以下のレジスタが実装されています。
 *** QSPI Access Control Register (Offset 0x0000)
 QSPI Access Control Registerは、SPIアクセスにおける SS信号、I/Oモードを制御するためのレジスタです。
 
-Data Memory Access QSPI Controllerと FeRAM Access QSPI Controllerは、2つのメモリへのアクセスの切り替えを SPISSCTLビットで行います。
+Data Store Memory Access QSPI Controllerと FRAM Access QSPI Controllerは、2つのメモリへのアクセスの切り替えを SPISSCTLビットで行います。
 メモリへのアクセスを開始するときは、SPISSCTLを 0b01または 0b10に設定し、アクセス対象の SS信号をアサートします。
 SPISSCTLを 0b11に設定することは禁止です。
 
-Configuration Memory Access QSPI Controllerは、SS信号が 1本しか接続されておらず、OBCモジュールの基板上でセレクトされています。
+Configuration Flash Memory Access QSPI Controllerは、SS信号が 1本しか接続されておらず、OBCモジュールの基板上でセレクトされています。
 そのため、Configurationデータ格納用 NOR Flash Memoryへアクセスを行う場合は、アクセスするメモリに関わらず SPISSCTLを 0b01にセットします。
-Configurationデータ格納用 NOR Flash Memoryの メモリ選択は、System Registerの Configuration Memory Registerの設定により行うことができます。
-詳細は、System Registerの「Configuration Memory Register」の章を参照してください。
+Configurationデータ格納用 NOR Flash Memoryの メモリ選択は、System Registerの Configuration Flash Memory Registerの設定により行うことができます。
+詳細は、System Registerの「Configuration Flash Memory Register」の章を参照してください。
 
 #+CAPTION: QSPI Access Control Register ビットフィールド
 |   bit | Symbol    | Field          | Description                                                                                                                                                  | R/W |
