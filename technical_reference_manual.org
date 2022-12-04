@@ -1,7 +1,7 @@
 #+TITLE: Space Cubics OBC FPGA Technical Reference Manual
 #+SUBTITLE: 対象型番: SC-OBC-A1
 #+AUTHOR: Space Cubics
-#+DATE: August 16, 2022
+#+DATE: December 5, 2022
 #+EMAIL:
 #+OPTIONS: ^:{}
 #+OPTIONS: H:6
@@ -3305,3 +3305,8 @@ D: 受信するデータの Byte数から 1を引いた値のTX FIFOに書き込
 2. Register Write, Address Offset: 0x0004, Write Data: 0x000002FE
 3. Register Write, Address Offset: 0x0004, Write Data: 0x000000CF
 4. Register Write, Address Offset: 0x0004, Write Data: 0x00000104
+* Revision History
+
+| Revision | Date             | FPGA Version | Summary  |
+|----------+------------------+--------------+----------|
+|      1.0 | December 5, 2022 | v1.0.0       | 初版発行 |
