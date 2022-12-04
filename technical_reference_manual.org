@@ -357,6 +357,13 @@ FPGAからは、FUSE_DNAのうち 63 bitから 7 bitを、Device DNAとして読
 * System Monitor
 System Monitorは、SC OBC FPGAのシステムを監視するためのモジュールです。
 
+このモジュールは以下の機能を実装しています。
+- FPGA Watchdog機能
+- Hardware Monitor機能
+- SEM Controller機能
+- Board Health Monitor機能
+
+** FPGA Watchdog
 SC OBCのシステムは、TRCHによって監視されます。
 SC OBC FPGAは System Monitorが収集した FPGA内部の状態を Watchdog signal (FPGA_WATCHDOG)を通じて TRCHに伝えます。
 TRCHは FPGAが出力する FPGA_WATCHDOG信号が定期的にトグルしている間、FPGAが健全に動作していると判断します。
