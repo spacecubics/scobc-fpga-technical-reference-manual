@@ -1,0 +1,94 @@
+* Overview
+Space Cubics OBC FPGA(SC OBC FPGA)は Space Cubics OBCモジュール(SC-OBC-A1)のFPGAに搭載されるシステムです。
+
+Space Cubics OBCは 3U以上の CubeSatをターゲットとする On Board Computer(以下、OBC)です。
+メインプロセッサ用デバイスとして Xilinx製 Artix-7 FPGAを採用し、FPGAにインプリする ARM Cortex-M3を核としシステムを構成します。
+FPGAを採用する事で、インターフェースの種類や数を 柔軟にカスタマイズする事が可能です。
+
+SC OBC FPGAには、ユーザーのIPコアを実装するためのモジュールが準備されており、AXIバス規格に適合した IPコアを設計する事で、簡単にシステムに組み込む事ができます。
+
+#+CAPTION: SC OBC FPGA Block Diagram
+[[file:./images/FPGABlockDiagram.png]]
+
+SC OBC FPGAのシステムは大きく 6つの機能に分割されます。
+
+*System Controller*
+
+System Controllerは、FPGAのクロック, リセットを生成するためのモジュールです。
+このモジュールで生成されるクロック, リセットは、FPGA全体に供給されます。
+
+*CPU Subsystem*
+
+Space Cubics OBCの FPGA機能を司る CPUを構成するモジュールです。
+CPUには ARM製の Cortex-M3を採用しています。
+ARM Cortex-M3 Design Start FPGA-Xilinx editionをベースとし、ITCM(Instruction Tightly Coupled Memory)や、バスIPなどで構成されます。
+
+*HRMEM (High-reliability Memory)*
+
+HRMEMは、CPUが使用するメインメモリです。
+CPUとの接続は AMBA AHBで構成される CPU Local Busで行われます。
+
+CPU Local Busは ARM Cortex-M3の Instruction code AHB, Data code AHBをまとめたバスで構成されています。
+CPU Local Busでメモリと直接接続する構成とする事で、Instructionアクセスのレイテンシーを最小限に抑えるように設計されています。
+
+*Main AXI Bus System*
+
+Main AXI Bus Systemは、CubeSat向けの OBCシステムとして必須となる機能の中で、アクセススピードが比較的重視されるIPコアをまとめたシステムです。
+
+このバスには、コンピュータシステムとして必要なメモリコントロールIPや CubeSatのメインの通信バスとなる CANのコントローラIPなどが接続されています。
+
+*Low Performance IP Bus System*
+
+Low Performance IP Bus Systemは、CubeSat向け OBCシステムとして必須となる機能の中、アクセス頻度の低いIPコアをまとめたシステムです。
+
+このシステムは AHBを採用する事で、IPコアの回路規模を小さくする事ができます。
+このバスには、システムレジスタやI2Cコントローラなどが接続されます。
+
+*Mission Bus System*
+
+Mission Bus SystemはユーザーがCubeSatのミッションを行うためのIPコアを接続するシステムです。
+このシステムはバスに AXIを採用しています。
+ユーザーが設計するIPコアは全てこのバスに接続します。
+
+** Outline
+
+| Feature                         | Description                                                                                 |
+|---------------------------------+---------------------------------------------------------------------------------------------|
+| FPGA Device                     | Xilinx Artix-7 (XC7A200T-1FBG676I)                                                          |
+|                                 | - Logic Cell 215,360                                                                        |
+|                                 | - CLB スライス数(4 LUT, 8 F/F) 33,650                                                       |
+|                                 | - CLB 最大分散RAM 2,888 Kb                                                                  |
+|                                 | - DSP48E1スライス 740                                                                       |
+|                                 | - BlockRAM 36 Kb x 365 (18 Kb x 730)                                                        |
+|                                 | - CMT 10                                                                                    |
+|                                 | - XADC 1 (for FPGA die temperature measurement)                                             |
+|                                 | - I/O Bank 10                                                                               |
+| CPU Core                        | ARM Cortex-M3 Design Start FPGA Xilinx Edition r0p1                                         |
+|                                 | - CPU Revision r2p1                                                                         |
+|                                 | - ARMv7-M architecture profile                                                              |
+|                                 | - Maximum operation frequency up to 48 MHz (※)                                             |
+|                                 | ※ユーザーの回路も含めタイミング検証を行い 最高動作周波数を確認する必要があります           |
+| On Chip SRAM (ITCM for Boot)    | 8 KByte                                                                                     |
+| HRMEM [High-reliability Memory] | 4 MByte                                                                                     |
+|                                 | - ECC Memory Protection                                                                     |
+|                                 | - Memory Scrubbing                                                                          |
+| Internal System Bus             | CPU Local Bus: AMBA AHB3 32 bitMain Bus: AMBA AXI4 32bit                                    |
+|                                 | Mission Bus (for User): AMBA AXI4 32 bit                                                    |
+|                                 | Low Performance IP Bus: AMBA AHB3 32 bit                                                    |
+| DMA                             | Not Support                                                                                 |
+| Interrupt Support               | 16 User interrupt signal                                                                    |
+| Watchdog Timer                  | Space Cubics TRCH-FPGA watchdog system                                                      |
+| FPGA Configuration Flash Memory | 32 MByte/Redundancy (S25FL256L)                                                             |
+| Data Store Flash Memory         | 32 MByte/Redundancy (S25FL256L)                                                             |
+| FRAM                            | 512 kByte x 2 (CY15B104QSN)                                                                 |
+| Control Area Network (CAN)      | Conforms to the ISO 11898-1, CAN2.0A, and CAN2.0B standards Supports bit rates up to 1 Mb/s |
+| Space Communication Bus (SCBus) | Revision Cでは実装されていません                                                            |
+|                                 | Compliant with the USB-based communication interface proposed by Space Cubics (T.B.D.)      |
+|                                 | - Supports bit rates 12 Mbps (USB Full-Speed)                                               |
+| I2C Interface                   | SC OBC On Board I2C x 1 channel                                                             |
+|                                 | External I2C x 1 channel                                                                    |
+| FPGA User IO                    | User IO Group 1 x 16 pin (IO電圧可変)                                                       |
+|                                 | User IO Group 2 x 16 pin (IO電圧可変)                                                       |
+|                                 | User IO Group 4 x 6 pin, Cortex-M3 JTAG兼用 (3.3V固定)                                      |
+| Debug Port                      | ARM SWJ-DP Interface                                                                        |
+

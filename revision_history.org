@@ -1,0 +1,5 @@
+* Revision History
+
+| Revision | Date             | FPGA Version | Summary  |
+|----------+------------------+--------------+----------|
+|      1.0 | December 5, 2022 | v1.0.0       | 初版発行 |

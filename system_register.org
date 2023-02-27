@@ -1,0 +1,173 @@
+* System Register
+System Registerは、SC OBC FPGAのシステム制御を司るレジスタで構成されるモジュールです。
+
+** レジスタ詳細
+System Registerは、Base Address 0x4F00_0000に配置されています。
+
+#+CAPTION: System Registerメモリマップ
+|    Address | Symbol           | Register                            |    Initial |
+|------------+------------------+-------------------------------------+------------|
+| 0x4F000000 | SYSREG_CODEMSEL  | Code Memory Select Register         | 0x00000001 |
+| 0x4F000004 | SYSREG_SYSCLKCTL | System Clock Control Register       | 0x00000001 |
+| 0x4F000010 | SYSREG_CFGMEMCTL | Configuration Flash Memory Register | 0x000x0000 |
+| 0x4F000020 | SYSREG_PWRCYCLE  | Power Cycle Register                | 0x00000000 |
+| 0x4F0000F0 | SYSREG_SPAD1     | Scratchpad 1 Register               | 0x00000000 |
+| 0x4F0000F4 | SYSREG_SPAD2     | Scratchpad 2 Register               | 0x00000000 |
+| 0x4F0000F8 | SYSREG_SPAD3     | Scratchpad 3 Register               | 0x00000000 |
+| 0x4F0000FC | SYSREG_SPAD4     | Scratchpad 4 Register               | 0x00000000 |
+| 0x4F00F000 | SYSREG_VER       | System Register IP Version Register |          - |
+| 0x4F00FF00 | SYSREG_BUILDINFO | Build Information Register          |          - |
+| 0x4F00FF10 | SYSREG_DNA1      | Device DNA 1 Register               |          - |
+| 0x4F00FF14 | SYSREG_DNA2      | Device DNA 2 Register               |          - |
+
+*** Code Memory Select Register (Offset 0x0000)
+Code Memory Select Registerは CPUの Instruction codeが格納されているメモリを選択するためのレジスタです。
+本レジスタの制御により、メモリ空間の アドレス 0x00000000にマッピングされるメモリを選択します。
+
+電源投入時、ITCMENビットは "1"となっており、メモリ空間のアドレス 0x00000000には ITCMがマッピングされています。
+CPUによって、ITCMENビットが "0"に書き換えられると、メモリ空間のアドレス 0x00000000に HRMEMがマッピングされます。
+
+ITCMENビットの設定値が変更された時、システム全体にリセットが発行されます。
+ITCMENビットの変更は、ITCMに書き込まれた Boot用のソフトウェアから HRMEMに書き込まれたメインのソフトウェアに遷移する時に 1度だけ制御する事を想定しています。
+
+#+CAPTION: Code Memory Select Regsiter ビットフィールド
+|   bit | Symbol    | Field           | Description                                                                                                                                                                                                          | R/W |
+|-------+-----------+-----------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:16 | ITCMENPKC | Protect Keycode | ITCMENビットの書き込みプロテクトフィールドです。ITCMENビットに書き込みを行う場合は、このフィールドに0x5A5Aを書き込んでください。このフィールドに0x5A5A以外が設定された場合、ITCMENビットへの書き込みは無視されます。 | WO  |
+|  15:1 | -         | Reserved        | Reserved                                                                                                                                                                                                             | -   |
+|     0 | ITCMEN    | ITCM Enable     | メモリ空間のアドレス 0x00000000にマッピングされるメモリを選択します。0: HRMEM 1: ITCMEN                                                                                                                              | R/W |
+
+*** System Clock Control Register (Offset 0x0004)
+System Clock Control Registerは、システム内部で使われるクロックの周波数を設定するためのレジスタです。
+
+このレジスタの制御により、SC OBC FPGA内部の PLLを停止させ、低消費電力動作させることが可能です。
+
+#+CAPTION: System Clock Control Register ビットフィールド
+|  bit | Symbol  | Field           | Description                                                                                                                                | R/W |
+|------+---------+-----------------+--------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:2 | -       | Reserved        | Reserved                                                                                                                                   | -   |
+|  1:0 | CLKMODE | CLKMODE Control | システムのクロックモードを制御します。設定値とクロック周波数の関係は "CLKMODE設定と PLL状態 及び クロック周波数の関係"を参照してください。 | R/W |
+
+CLKMODE信号の設定値と、PLLの状態 及び システムクロック周波数の関係は以下となります。
+
+#+CAPTION: CLKMODE設定と PLL状態 及び クロック周波数の関係
+| CLKMODE[1:0]    | PLL Status       | REF_CLK                  | SYS_CLK                  | MAXI_CLK                 | USER_CLK1 / USER_CLK2                             |
+|-----------------+------------------+--------------------------+--------------------------+--------------------------+---------------------------------------------------|
+| 0b00            | PowerDown        | 24 MHz (Reference Clock) | 24 MHz (Reference Clock) | 24 MHz (Reference Clock) | RTLパラメータにより設定 (Stop or Reference Clock) |
+| 0b01            | Normal Operation | 24 MHz (Reference Clock) | 48 MHz (PLL Output)      | 48 MHz (PLL Output)      | RTLパラメータにより設定 (PLL Output)              |
+| 0b10            | Normal Operation | 24 MHz (Reference Clock) | 96 MHz (PLL Output)      | 96 MHz (PLL Output)      | RTLパラメータにより設定 (PLL Output)              |
+| 0b11 (設定禁止) | -                | -                        | -                        | -                        | -                                                 |
+
+*** Configuration Flash Memory Register (Offset 0x0010)
+Configuration Flash Memory Registerは SC OBC Moduleに実装される 2つの Configuration Flash Memory (NOR FLash Memory)に関する制御を行うためのレジスタです。
+
+#+CAPTION: Configuration Flash Memory Register ビットフィールド
+|   bit | Symbol      | Field                              | Description                                                                                                                                                                                                                                                                                                                                                  | R/W |
+|-------+-------------+------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:13 | -           | Reserved                           | Reserved                                                                                                                                                                                                                                                                                                                                                     | -   |
+|    12 | CFGBOOTMEM  | Boot Memory                        | SC OBC FPGAが Configurationsに使用した Flash Memoryを示すビットです。このフィールドを読み出す事で、SC OBC FPGAがどちらの Flash Memoryから起動したか知る事ができます。SC OBC FPGAの Configuration後 Resetが解除される時に確定します。                                                                                                                         | RO  |
+|  11:6 | -           | Reserved                           | Reserved                                                                                                                                                                                                                                                                                                                                                     | -   |
+|     5 | CFGMEMMON   | Configuration Flash Memory Monitor | 現在選択されている Configuration Flash Memoryの選択状態を示すビットです。                                                                                                                                                                                                                                                                                    | RO  |
+|     4 | CFGMEMSEL   | Configuration Flash Memory Select  | Configuration Flash Memoryを選択するためのビットです。CFGMEMOWNERフィールドが "0"にクリアされている時のみ、このビットが有効になります。0: Configuration Flash Memory 0を選択. 1: Configuration Flash Memory 1を選択                                                                                                                                          | R/W |
+|   3:1 | -           | Reserved                           | Reserved                                                                                                                                                                                                                                                                                                                                                     | -   |
+|     0 | CFGMEMOWNER | Configuration Flash Memory Owner   | Configuration Flash Memoryの選択をレジスタによって選択するか、QSPIコアによって選択するかを決定するフィールドです。0: Configuration Flash Memoryは CFGMEMSELビットにより選択される. 1: Configuration Flash Memoryは QSPIコアにより選択される. QSPIコアによる Configuration Flash Memoryのメモリパトロールを行う場合は、このビットを "1"にセットしてください。 | R/W |
+
+Configuration Flash Memoryの選択は、以下の 3つの制御状態を持っています。
+
+| 状態               | 選択条件                                                           |
+|--------------------+--------------------------------------------------------------------|
+| TRCHによる選択     | OBC Moduleへの電源投入後、TRCHが FPGAの 起動完了を認識するまでの間 |
+| レジスタによる選択 | TRCHが FPGAの Configuration完了を認識し、且つ CFGMEMOWNER=0の場合  |
+| QSPIコアによる選択 | TRCHが FPGAの Configuration完了を認識し、且つ CFGMEMOWNER=1の場合  |
+
+SC OBC FPGAが Configurationし TRCHが FPGAの起動完了を認識する間、Configuration Flash Memoryの選択は TRCHによって行われます。
+この仕様により、SC OBC FPGAが Configurationするための Memoryは TRCHによって選択されます。
+
+TRCHが FPGAの起動完了を認識すると、Configuration Flash Memoryの制御権は FPGAに移行します。
+FPGAは CFGMEMSELビットの設定によって、ソフトウェアによる選択を行うか、QSPIコアによる選択を行うかを決定します。
+
+Configuration Flash Memoryの選択を切り替える場合は、CFGMEMSELビットの値を変更後、CFGMEMMONビットを読み出し切り替えが完了した事を確認してください。
+Configuration Flash Memoryへのアクセス開始は、必ず CFGMEMMONビットが切り替わった後に開始してください。
+
+現状の SC OBC FPGAには QSPIコアによる Configuration Flash Memoryのメモリパトロール機能は実装されていません。
+CFGMEMOWNERビットは必ず "0"に設定し使用してください。
+
+*** Power Cycle Register (Offset 0x0020)
+Power Cycle Registerは SC OBC FPGAに対する Power Cycle要求を発行するためのレジスタです。
+
+このレジスタの制御により Power Cycleを要求すると、TRCHによって Power Cycleが実行されます。
+
+#+CAPTION: Power Cycle Register ビットフィールド
+|   bit | Symbol      | Field                       | Description                                                                                                                                                                                                                         | R/W |
+|-------+-------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:16 | PWRCYCLEPKC | Power Cycle Protect Keycode | PWRCYCLEREQビットの書き込みプロテクトフィールドです。PWRCYCLEREQビットに書き込みを行う場合は、このフィールドに0x5A5Aを書き込んでください。このフィールドに0x5A5A以外が設定された場合、PWRCYCLEREQビットへの書き込みは無視されます。 | WO  |
+|  15:1 | -           | Reserved                    | Reserved                                                                                                                                                                                                                            | -   |
+|     0 | PWRCYCLEREQ | Power Cycle Request         | TRCHに対し Power Cycle Requestを発行するためのビットです。このビットに "1"を書き込むと TRCHによる FPGAの Power Cycleが実行されます。このビットへの "0"の書き込みは何も影響しません。                                                | R/W |
+
+*** Scratchpad 1-4 Register (Offset 0x00F0-0x00FC)
+Scratchpad 1-4 Registerは、ソフトウェアがワークスペースとして使用する為のレジスタです。
+このレジスタの書き込みは、SC OBC FPGAの機能に一切影響を与えません。
+
+このレジスタは、SC OBC FPGAの Configuration後に一度だけ初期化されます。
+Code Memory Select Registerの ITCMENビットが変更された時に発行されるシステムリセットでは、このレジスタはクリアされません。
+
+#+CAPTION: Scratchpad 1 Register ビットフィールド (Offset: 0x00F0)
+|  bit | Symbol | Field        | Description                       | R/W |
+|------+--------+--------------+-----------------------------------+-----|
+| 31:0 | SPAD1  | Scratchpad 1 | 32bitのScratchpadフィールドです。 | R/W |
+
+#+CAPTION: Scratchpad 2 Register ビットフィールド (Offset: 0x00F4)
+|  bit | Symbol | Field        | Description                       | R/W |
+|------+--------+--------------+-----------------------------------+-----|
+| 31:0 | SPAD2  | Scratchpad 2 | 32bitのScratchpadフィールドです。 | R/W |
+
+#+CAPTION: Scratchpad 3 Register ビットフィールド (Offset: 0x00F8)
+|  bit | Symbol | Field        | Description                       | R/W |
+|------+--------+--------------+-----------------------------------+-----|
+| 31:0 | SPAD3  | Scratchpad 3 | 32bitのScratchpadフィールドです。 | R/W |
+
+#+CAPTION: Scratchpad 4 Register ビットフィールド (Offset: 0x00FC)
+|  bit | Symbol | Field        | Description                       | R/W |
+|------+--------+--------------+-----------------------------------+-----|
+| 31:0 | SPAD4  | Scratchpad 4 | 32bitのScratchpadフィールドです。 | R/W |
+
+*** System Register IP Version Register (Offset: 0xF000)
+System Registerの IPコアバージョンの管理レジスタです。
+
+#+CAPTION: System Register IP Version Register ビットフィールド
+|   bit | Symbol | Field                              | Description                              | R/W |
+|-------+--------+------------------------------------+------------------------------------------+-----|
+| 31:24 | MAJVER | System Register Core Major Version | System RegisterコアのMajor Versionです。 | RO  |
+| 23:16 | MINVER | System Register Core Minor Version | System RegisterコアのMinor Versionです。 | RO  |
+|  15:0 | PATVER | System Register Core Patch Version | System RegisterコアのPatch Versionです。 | RO  |
+
+*** Build Information Register (Offset: 0xFF00)
+SC OBC FPGAのビルド情報を保持するレジスタです。
+現在動作しているFPGAデータが作られた gitのハッシュ値の 先頭 8文字が保持されます。
+git管理されていない環境から生成された場合は、このレジスタが 0x00000000を示します。
+
+#+CAPTION: Build Information Register ビットフィールド
+|  bit | Symbol     | Field                      | Description                                                                           | R/W |
+|------+------------+----------------------------+---------------------------------------------------------------------------------------+-----|
+| 31:0 | BUILD_INFO | Build Information Register | 動作しているFPGAデータが作られた gitのハッシュ値の 先頭 8桁が格納されるレジスタです。 | RO  |
+
+*** Device DNA 1/2 Register (Offset: 0xFF10/0xFF14)
+Device DNA 1/2 Registerは、FPGAの Device DNAの値を保持するレジスタです。
+
+Artix-7は、デバイスの eFuse領域に FUSE_DNAと呼ばれる、64 bitのデバイス固有値を保持しています。
+FUSE_DNAは、FPGAの工場出荷時にプログラミングされるものであり、値を変える事はできません。
+
+FPGAからは、FUSE_DNAのうち 63 bitから 7 bitを、Device DNAとして読み出す事ができます。
+ユーザーは Device DNA 1/2 Registerを読み出す事によって、Device DNAの値を知る事ができます。
+
+#+CAPTION: Device DNA 1 Register ビットフィールド
+|  bit | Symbol  | Field               | Description                                     | R/W |
+|------+---------+---------------------+-------------------------------------------------+-----|
+| 31:7 | DNA_LSB | Device DNA LSB side | Device DNAの bit 31:7が格納されるレジスタです。 | RO  |
+|  6:0 | -       | Reserved            | Reserved                                        | -   |
+
+#+CAPTION: Device DNA 2 Register ビットフィールド
+|  bit | Symbol  | Field               | Description                                      | R/W |
+|------+---------+---------------------+--------------------------------------------------+-----|
+| 31:0 | DNA_MSB | Device DNA MAB side | Device DNAの bit 63:32が格納されるレジスタです。 | RO  |
+

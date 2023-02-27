@@ -5,4 +5,15 @@
 
 SC OBC FPGAの開発や、ソフトウェアの開発に必要な、FPGA機能に関する仕様やレジスタの仕様が記載されています。
 
-[[file:./technical_reference_manual.org][Space Cubics OBC FPGA Technical Reference Manual (日本語版)]]
+- [[file:./overview.org][1. Overview]]
+- [[file:./memory_map.org][2. Memory Map]]
+- [[file:./interrupt.org][3. Interrupt]]
+- [[file:./system_register.org][4. System Register]]
+- [[file:./system_monitor.org][5. System Monitor]]
+- [[file:./general_purpose_timer.org][6. General Purpose Timer]]
+- [[file:./hrmem.org][7. HRMEM (High-relibility Memory)]]
+- [[file:./qspi_controller.org][8. QSPI Controller]]
+- [[file:./can_controller.org][9. CAN Controller]]
+- [[file:./ahb_uart_lite.org][10. AHB Uart Lite]]
+- [[file:./i2c_master_controller.org][11. I2C Master Controller]]
+- [[file:./revision_history.org][Revision History]]

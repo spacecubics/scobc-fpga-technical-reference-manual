@@ -1,0 +1,24 @@
+* Interrupt
+SC OBC FPGAは、Cortex-M3に組み込まれる割り込みコントローラの外部割り込みを使用し、IPコアの割り込みをCPUに伝えます。
+Cortex-M3の 割り込みコントローラの仕様については、ARM Cortex-M3 Technical Reference Manualを参照してください。
+
+以下に、SC OBC FPGAの IPコアが出力する割り込みの割り当てを示します。
+
+#+CAPTION: SC OBC FPGA割り込みリスト
+| Exception No. | IRQ Bit | Interrupt                                        | Type  |
+|---------------+---------+--------------------------------------------------+-------|
+|            16 | [0]     | AHB UART Lite(Console)                           | Pulse |
+|            17 | [1]     | HRMEM (High-reliability Memory)                  | Level |
+|            18 | [2]     | QSPI Controller (Configuration Flash Memory)     | Level |
+|            19 | [3]     | QSPI Controller (Data Store Flash Memort)        | Level |
+|            20 | [4]     | QSPI Controller (FRAM)                           | Level |
+|            21 | [5]     | CAN Controller                                   | Level |
+|            22 | [6]     | Reserved (OBC System Interrupt Area)             | -     |
+|            23 | [7]     | External I2C Master                              | Level |
+|            24 | [8]     | System Monitor (Hardware Error)                  | Level |
+|            25 | [9]     | System Monitor (Board Health Monitor)            | Level |
+|            26 | [10]    | General Purpose Timer (Global Timer)             | Level |
+|            27 | [11]    | General Purpose Timer (Software Interrupt Timer) | Level |
+|       28 - 31 | [15:12] | Reserved (OBC System Interrupt Area)             | -     |
+|       32 - 47 | [31:16] | Reserved (UDL IP Interrupt Area)                 | -     |
+
