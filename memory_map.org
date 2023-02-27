@@ -18,7 +18,6 @@
 | Low Performance IP Bus                         | 0x4F00_0000 - 0x4FFF_FFFF |                   |
 | - System Register                              | 0x4F00_0000 - 0x4F00_FFFF |                   |
 | - UART Lite (Console Interface)                | 0x4F01_0000 - 0x4F01_FFFF |                   |
-| - Internal I2C Master                          | 0x4F02_0000 - 0x4F02_FFFF |                   |
 | - External I2C Master                          | 0x4F03_0000 - 0x4F03_FFFF |                   |
 | - System Monitor                               | 0x4F04_0000 - 0x4F04_FFFF |                   |
 | - General Purpose Timer                        | 0x4F05_0000 - 0x4F05_FFFF |                   |
