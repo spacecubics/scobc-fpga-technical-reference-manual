@@ -69,6 +69,9 @@ BHMが、センサーからデータを取得するタイミングは General Pu
 Hardware Interrupt Timerを Hardware Schedulerとして動作させる事で、BHMに定期的にセンサーデータの取得トリガを生成します。
 BHMは、センサーのデータ取得トリガを検出したタイミングで、センサーに対する I2Cアクセスを行い データを取得します。
 
+尚、Current Voltage Monitorは Texas Instruments社の INA3221-Q1、温度センサーは Texas Instruments社の TMP175-Q1を搭載しています。
+センサーやセンサーからの取得データの詳細は、各データのデータシートを参照してください。
+
 *** BHMの I2Cアクセス
 BHMは 3つの I2Cアクセスを行うことができます。
 
@@ -86,23 +89,23 @@ BHMは 3つの I2Cアクセスを行うことができます。
 *** センサー構成
 BHMに接続するセンサーと、BHMによって取得されるセンサーデータの一覧を以下に示します
 
-| センサー                  | センサーレジスタアドレス | センサーデータ              | BHMレジスタアドレスオフセット |
-|---------------------------+--------------------------+-----------------------------+-------------------------------|
-| Current Voltage Monitor 1 |                     0x01 | VDD_1V0 Shunt Voltage       |                        0x2020 |
-|                           |                     0x02 | VDD_1V0 Bus Voltage         |                        0x2024 |
-|                           |                     0x03 | VDD_1V8 Shunt Voltage       |                        0x2028 |
-|                           |                     0x04 | VDD_1V8 Bus Voltage         |                        0x202C |
-|                           |                     0x05 | VDD_3V3 Shunt Voltage       |                        0x2030 |
-|                           |                     0x06 | VDD_3V3 Bus Voltage         |                        0x2034 |
-| Current Voltage Monitor 2 |                     0x01 | VDD_3V3_SYS_A Shunt Voltage |                        0x2038 |
-|                           |                     0x02 | VDD_3V3_SYS_A Bus Voltage   |                        0x203C |
-|                           |                     0x03 | VDD_3V3_SYS_B Shunt Voltage |                        0x2040 |
-|                           |                     0x04 | VDD_3V3_SYS_B Bus Voltage   |                        0x2044 |
-|                           |                     0x05 | VDD_3V3_IO Shunt Voltage    |                        0x2048 |
-|                           |                     0x06 | VDD_3V3_IO Bus Voltage      |                        0x204C |
-| Temperature Sensor 1      |                     0x01 | Temperature                 |                        0x2050 |
-| Temperature Sensor 2      |                     0x01 | Temperature                 |                        0x2054 |
-| Temperature Sensor 3      |                     0x01 | Temperature                 |                        0x2058 |
+| センサー                  | センサーデバイス | センサーレジスタアドレス | センサーデータ              | BHMレジスタアドレスオフセット |
+|---------------------------+------------------+--------------------------+-----------------------------+-------------------------------|
+| Current Voltage Monitor 1 | INA3221-Q1       |                     0x01 | VDD_1V0 Shunt Voltage       |                        0x2020 |
+|                           |                  |                     0x02 | VDD_1V0 Bus Voltage         |                        0x2024 |
+|                           |                  |                     0x03 | VDD_1V8 Shunt Voltage       |                        0x2028 |
+|                           |                  |                     0x04 | VDD_1V8 Bus Voltage         |                        0x202C |
+|                           |                  |                     0x05 | VDD_3V3 Shunt Voltage       |                        0x2030 |
+|                           |                  |                     0x06 | VDD_3V3 Bus Voltage         |                        0x2034 |
+| Current Voltage Monitor 2 | INA3221-Q1       |                     0x01 | VDD_3V3_SYS_A Shunt Voltage |                        0x2038 |
+|                           |                  |                     0x02 | VDD_3V3_SYS_A Bus Voltage   |                        0x203C |
+|                           |                  |                     0x03 | VDD_3V3_SYS_B Shunt Voltage |                        0x2040 |
+|                           |                  |                     0x04 | VDD_3V3_SYS_B Bus Voltage   |                        0x2044 |
+|                           |                  |                     0x05 | VDD_3V3_IO Shunt Voltage    |                        0x2048 |
+|                           |                  |                     0x06 | VDD_3V3_IO Bus Voltage      |                        0x204C |
+| Temperature Sensor 1      | TMP175-Q1        |                     0x01 | Temperature                 |                        0x2050 |
+| Temperature Sensor 2      | TMP175-Q1        |                     0x01 | Temperature                 |                        0x2054 |
+| Temperature Sensor 3      | TMP175-Q1        |                     0x01 | Temperature                 |                        0x2058 |
 
 ** レジスタ詳細
 System Monitorは、Base Address 0x4F04_0000に配置されています。
