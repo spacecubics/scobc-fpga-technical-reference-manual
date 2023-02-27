@@ -107,6 +107,84 @@ BHMに接続するセンサーと、BHMによって取得されるセンサー�
 | Temperature Sensor 2      | TMP175-Q1        |                     0x01 | Temperature                 |                        0x2054 |
 | Temperature Sensor 3      | TMP175-Q1        |                     0x01 | Temperature                 |                        0x2058 |
 
+*** センサーデータ自動取得のためのレジスタアクセス手順
+この章では、SC OBC FPGAのシステムが起動してから、BHMによって Current Voltage Monitorと 温度センサーから、センサーデータを自動取得させるためのレジスタアクセス手順を説明します。
+
+BHMによるセンサーデータの自動取得を開始するためには、a) BHMの初期化、b) センサーデバイスの初期化、c) General Purpose Timerの初期化、d) BHMサービス開始 の処理を行う必要があります。
+本手順では、General Purpose Timerの初期化も行います。
+General Purpose Timerのレジスタ仕様の詳細は「General Purpose Timer」の章を参照してください。
+
+#+CAPTION: センサーデータ自動取得のためのレジスタアクセス手順
+[[file:./images/bhm_initilize.png]]
+
+1: BHM Prescaler Registerに I2Cの通信速度を設定します
+
+I2Cの通信速度は、必ず Standard-mode (100Kb/s)以下にしてください
+Standard-mode以上の速度にすると、正しく通信できない場合があります。
+BHM Prescaler Registerの初期値は、システムクロックが 48 MHzの場合に 100 Kb/sとなる 0x77に設定されています。
+システムクロックが 48 MHzの場合は、特に理由が無い限り設定値を 0x77のままにしてください。
+
+2: BHM Retry Count Registerに I2C通信のリトライ回数を設定します
+
+BHMは、I2C通信を行ったときにエラーを検出すると、このレジスタで設定した回数の自動リトライを行います。
+BHM Retry Count Registerの初期値は リトライ回数 "2"に設定されています。
+
+3: BHM Interrupt Enable Registerに 割り込みの有効化設定をします
+
+本手順を実行するためには、最低限 Bit 0と Bit 13:8を設定してください。
+
+4: BHM Initialization Access Control Registerの書き込み、センサーデバイスの書き込みを開始します
+
+初期化を行う対象の INITENビットと BHM_INIT_REQビットに "1"をセットする事でデバイスの初期化が開始されます。
+
+5: SYSMON_BHM_INT割り込みにより、センサーデバイスの初期化完了を検出します
+
+SYSMON_BHM_INT割り込み発生時、BHM Interrupt Status Registerの BHM_INIT_ACCENDビットが "1"にセットされているとき、デバイスの初期化が完了したと判断できます。
+この時、BHM Interrupt Status Registerの Bit 12:8の I2CERRビットがセットされていない事を確認してください。
+I2CERRビットがセットされている場合、手順 2で設定した I2C通信のリトライ回数を超えるエラーが発生した事を示します。
+
+6: BHM Interrupt Status Registerの BHM_INT_ACCENDビットに "1"を書き込み、割り込みをクリアしてください
+
+7: Hardware Interrupt Timer Control Registerに、Hardware Interruptの発生方式を設定します
+
+レジスタの設定は、必ず次の通りに設定してください。
+GPTMR_HITRUNMDビットを Restartモード (設定値 0b0)、GPTMR_HITOPMD2/GPTMR_HITOPMD3フィールド パルス割り込み出力 (設定値 0b10)。
+GPTMR_HITOPMD2の設定は Current Voltage Monitorからのデータを取得するために設定する必要があり、GPTMR_HITOPMD3の設定は 温度センサーからデータを取得するために設定する必要があります。
+
+8: Hardware Interrupt Timer Prescaler Registerに、Hardware Interrupt Timerのプリスケーラー設定を行います
+
+Hardware Inerrupt Timerの動作クロックは 24 MHzです。
+設定方法の詳細は Hardware Interrupt Timerのレジスタ設定を参照してください。
+
+9: Hardware Interrupt Timer Output Compare Register 1 に、Hardware Interrupt Timerの周期を設定します
+
+10: Hardware Interrupt Timer Output Compare Register 2 に、Current Voltage Monitorのセンサーデータ取得タイミングを設定します
+
+11: Hardware Interrupt Timer Output Compare Register 3 に、温度センサーのセンサーデータ取得タイミングを設定します
+
+12: BHM Access Control Registerの MONIENビットを "1"にセットし、各センサーからのデータの自動取得を有効化します
+
+13: Timer Enable Control Registerの HITENビットを"1"に設定し、Hardware Interrupt Timerの動作を開始します
+
+12、13の処理が完了すると、BHMは Hardware Interrupt Timerが生成するタイミングで、センサーに対し I2C通信を行いセンサーデータを取得します。
+BHMがセンサーデバイスから取得したデータは、Monitor Registerに格納されます。
+
+以下に Hardware Interrupt Timerの周期を 1秒とし、Current Voltage Monitorの読み出しタイミングを 100 ms、温度センサーの読み出しタイミングを 200 msとした場合のレジスタ設定を示します。
+
+#+CAPTION: Hardware Interrupt Timerを 1秒周期にした時の、センサーデータ自動受信の例
+[[file:./images/bhm_hardware_interrupt_timing.png]]
+
+- 手順 8で行う Hardware Interrupt Timer Prescaler Registerに 0x5DBFを設定する事で Hardware Interrupt Timerのカウントアップ時間を 1msとする
+- 手順 9で行う Hardware Interrupt Timer Output Compare Register 1に 0x3E8を設定する事で Hardware Interrupt Timerの周期を 1秒とする
+- 手順 10で行う Hardware Interrupt Timer Output Compare Register 2に 0x64を設定する事で、Current Voltage Monitorのデータ読み出し開始タイミングを 100 msとする
+- 手順 11で行う Hardware Interrupt Timer Output Compare Register 3に 0xC8を設定する事で、温度センサーのデータ読み出し開始タイミングを 200 msとする
+
+Current Voltage Monitorのデータ読み出しは 6 ms、温度センサーの読み出しは 1.5 msかかります。
+そのため、Hardware Interrupt Timerの周期は 7.5 msより大きな時間に設定してください。
+また、各センサーデバイスには AD変換時間があり、短い周期でデータを読み出した場合には、まだセンサーデバイスのデータ更新が行われていない場合があります。
+
+詳細は各センサーデバイスのデータシートを参照してください。
+
 ** レジスタ詳細
 System Monitorは、Base Address 0x4F04_0000に配置されています。
 
