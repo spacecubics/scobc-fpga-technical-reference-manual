@@ -224,7 +224,7 @@ System Monitorは、Base Address 0x4F04_0000に配置されています。
 |              0x4F042064 | BHM_SW_WDTR         | BHM Software Access Write Data Register          | 0x00000000 |
 |              0x4F042068 | BHM_SW_RDTR         | BHM Software Access Read Data Register           | 0x00000000 |
 |              0x4F042080 | BHM_PSCR            | BHM Prescale Setting Register                    | 0x00000077 |
-|              0x4F042084 | BHM_ACCCNTR         | BHM Retry Count Setting Register                 | 0x000001DF |
+|              0x4F042084 | BHM_ACCCNTR         | BHM Retry Count Setting Register                 | 0x00000002 |
 |              0x4F0420C0 | BHM_ASR             | BHM Access Status Register                       | 0x00000000 |
 |              0x4F04F000 | SYSMON_VER          | System Monitor IP Version Register               |          - |
 
