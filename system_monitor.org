@@ -189,44 +189,44 @@ Current Voltage Monitorのデータ読み出しは 6 ms、温度センサーの�
 System Monitorは、Base Address 0x4F04_0000に配置されています。
 
 #+CAPTION: System Monitorメモリマップ
-|                 Address | Symbol              | Register                                            |    Initial |
-|-------------------------+---------------------+-----------------------------------------------------+------------|
-|              0x4F040000 | SYSMON_WDOG_CTRL    | Watchdog Control Register                           | 0x00075A5A |
-|              0x4F040010 | SYSMON_WDOG_SIVAL   | Watchdog Signal Interval Register                   | 0x00B71AFF |
-|              0x4F040030 | SYSMON_INT_STATUS   | System Monitor Interrupt Status Register            | 0x00000000 |
-|              0x4F040034 | SYSMON_INT_ENABLE   | System Monitor Interrupt Enable Register            | 0x00000000 |
-|              0x4F040040 | SYSMON_SEM_STATE    | SEM Controller State Register                       | 0x00000000 |
-|              0x4F040044 | SYSMON_SEM_ECCOUNT  | SEM Error Correction Count Register                 | 0x00000000 |
-|              0x4F040048 | SYSMON_SEM_HTIMEOUT | SEM Heartbeat Timeout Register                      | 0x000000FF |
-|              0x4F040050 | SYSMON_SEM_EINJECT1 | SEM Error Injection Command Register 1              | 0x00000000 |
-|              0x4F040054 | SYSMON_SEM_EINJECT2 | SEM Error Injection Command Register 2              | 0x00000000 |
-| 0x4F041000 - 0x4F041FFF | SYSMON_XADC_REG     | XADC Register Window                                | ---------- |
-|              0x4F042000 | BHM_INICTLR         | Board Health Initialization Access Control Register | 0x0000001F |
-|              0x4F042004 | BHM_MONCTLR         | Board Health Monitoring Access Control Register     | 0x00000000 |
-|              0x4F042010 | BHM_ISR             | Board Health Interrupt Status Register              | 0x00000000 |
-|              0x4F042014 | BHM_IER             | Board Health Interrupt Enable Register              | 0x00000000 |
-|              0x4F042020 | BHM_1V0_SNTVR       | BHM VDD_1V0 Shunt Voltage Monitor Register          | 0x80000000 |
-|              0x4F042024 | BHM_1V0_BUSVR       | BHM VDD_1V0 Bus Voltage Monitor Register            | 0x80000000 |
-|              0x4F042028 | BHM_1V8_SNTVR       | BHM VDD_1V8 Shunt Voltage Monitor Register          | 0x80000000 |
-|              0x4F04202C | BHM_1V8_BUSVR       | BHM VDD_1V8 Bus Voltage Monitor Register            | 0x80000000 |
-|              0x4F042030 | BHM_3V3_SNTVR       | BHM VDD_3V3 Shunt Voltage Monitor Register          | 0x80000000 |
-|              0x4F042034 | BHM_3V3_BUSVR       | BHM VDD_3V3 Bus Voltage Monitor Register            | 0x80000000 |
-|              0x4F042038 | BHM_3V3SYSA_SNTVR   | BHM VDD_3V3_SYS_A Shunt Voltage Monitor Register    | 0x80000000 |
-|              0x4F04203C | BHM_3V3SYSA_BUSVR   | BHM VDD_3V3_SYS_A Bus Voltage Monitor Register      | 0x80000000 |
-|              0x4F042040 | BHM_3V3SYSB_SNTVR   | BHM VDD_3V3_SYS_B Shunt Voltage Monitor Register    | 0x80000000 |
-|              0x4F042044 | BHM_3V3SYSB_BUSVR   | BHM VDD_3V3_SYS_B Bus Voltage Monitor Register      | 0x80000000 |
-|              0x4F042048 | BHM_3V3IO_SNTVR     | BHM VDD_3V3_IO Shunt Voltage Monitor Register       | 0x80000000 |
-|              0x4F04204C | BHM_3V3IO_BUSVR     | BHM VDD_3V3_IO Bus Voltage Monitor Register         | 0x80000000 |
-|              0x4F042050 | BHM_TEMP1R          | BHM Temperature1 Monitor Register                   | 0x80000000 |
-|              0x4F042054 | BHM_TEMP2R          | BHM Temperature2 Monitor Register                   | 0x80000000 |
-|              0x4F042058 | BHM_TEMP3R          | BHM Health Temperature3 Monitor Register            | 0x80000000 |
-|              0x4F042060 | BHM_SW_CTLR         | BHM Access Control Register                         | 0x00000000 |
-|              0x4F042064 | BHM_SW_WDTR         | BHM Software Access Write Data Register             | 0x00000000 |
-|              0x4F042068 | BHM_SW_RDTR         | BHM Software Access Read Data Register              | 0x00000000 |
-|              0x4F042080 | BHM_PSCR            | BHM Prescale Setting Register                       | 0x00000077 |
-|              0x4F042084 | BHM_ACCCNTR         | BHM Retry Count Setting Register                    | 0x000001DF |
-|              0x4F0420C0 | BHM_ASR             | BHM Access Status Register                          | 0x00000000 |
-|              0x4F04F000 | SYSMON_VER          | System Monitor IP Version Register                  |          - |
+|                 Address | Symbol              | Register                                         |    Initial |
+|-------------------------+---------------------+--------------------------------------------------+------------|
+|              0x4F040000 | SYSMON_WDOG_CTRL    | Watchdog Control Register                        | 0x00075A5A |
+|              0x4F040010 | SYSMON_WDOG_SIVAL   | Watchdog Signal Interval Register                | 0x00B71AFF |
+|              0x4F040030 | SYSMON_INT_STATUS   | System Monitor Interrupt Status Register         | 0x00000000 |
+|              0x4F040034 | SYSMON_INT_ENABLE   | System Monitor Interrupt Enable Register         | 0x00000000 |
+|              0x4F040040 | SYSMON_SEM_STATE    | SEM Controller State Register                    | 0x00000000 |
+|              0x4F040044 | SYSMON_SEM_ECCOUNT  | SEM Error Correction Count Register              | 0x00000000 |
+|              0x4F040048 | SYSMON_SEM_HTIMEOUT | SEM Heartbeat Timeout Register                   | 0x000000FF |
+|              0x4F040050 | SYSMON_SEM_EINJECT1 | SEM Error Injection Command Register 1           | 0x00000000 |
+|              0x4F040054 | SYSMON_SEM_EINJECT2 | SEM Error Injection Command Register 2           | 0x00000000 |
+| 0x4F041000 - 0x4F041FFF | SYSMON_XADC_REG     | XADC Register Window                             | ---------- |
+|              0x4F042000 | BHM_INICTLR         | BHM Initialization Access Control Register       | 0x0000001F |
+|              0x4F042004 | BHM_ACCCTLR         | BHM Access Control Register                      | 0x00000000 |
+|              0x4F042010 | BHM_ISR             | BHM Interrupt Status Register                    | 0x00000000 |
+|              0x4F042014 | BHM_IER             | BHM Interrupt Enable Register                    | 0x00000000 |
+|              0x4F042020 | BHM_1V0_SNTVR       | BHM VDD_1V0 Shunt Voltage Monitor Register       | 0x80000000 |
+|              0x4F042024 | BHM_1V0_BUSVR       | BHM VDD_1V0 Bus Voltage Monitor Register         | 0x80000000 |
+|              0x4F042028 | BHM_1V8_SNTVR       | BHM VDD_1V8 Shunt Voltage Monitor Register       | 0x80000000 |
+|              0x4F04202C | BHM_1V8_BUSVR       | BHM VDD_1V8 Bus Voltage Monitor Register         | 0x80000000 |
+|              0x4F042030 | BHM_3V3_SNTVR       | BHM VDD_3V3 Shunt Voltage Monitor Register       | 0x80000000 |
+|              0x4F042034 | BHM_3V3_BUSVR       | BHM VDD_3V3 Bus Voltage Monitor Register         | 0x80000000 |
+|              0x4F042038 | BHM_3V3SYSA_SNTVR   | BHM VDD_3V3_SYS_A Shunt Voltage Monitor Register | 0x80000000 |
+|              0x4F04203C | BHM_3V3SYSA_BUSVR   | BHM VDD_3V3_SYS_A Bus Voltage Monitor Register   | 0x80000000 |
+|              0x4F042040 | BHM_3V3SYSB_SNTVR   | BHM VDD_3V3_SYS_B Shunt Voltage Monitor Register | 0x80000000 |
+|              0x4F042044 | BHM_3V3SYSB_BUSVR   | BHM VDD_3V3_SYS_B Bus Voltage Monitor Register   | 0x80000000 |
+|              0x4F042048 | BHM_3V3IO_SNTVR     | BHM VDD_3V3_IO Shunt Voltage Monitor Register    | 0x80000000 |
+|              0x4F04204C | BHM_3V3IO_BUSVR     | BHM VDD_3V3_IO Bus Voltage Monitor Register      | 0x80000000 |
+|              0x4F042050 | BHM_TEMP1R          | BHM Temperature1 Monitor Register                | 0x80000000 |
+|              0x4F042054 | BHM_TEMP2R          | BHM Temperature2 Monitor Register                | 0x80000000 |
+|              0x4F042058 | BHM_TEMP3R          | BHM Health Temperature3 Monitor Register         | 0x80000000 |
+|              0x4F042060 | BHM_SW_CTLR         | BHM Software Access Control Register             | 0x00000000 |
+|              0x4F042064 | BHM_SW_WDTR         | BHM Software Access Write Data Register          | 0x00000000 |
+|              0x4F042068 | BHM_SW_RDTR         | BHM Software Access Read Data Register           | 0x00000000 |
+|              0x4F042080 | BHM_PSCR            | BHM Prescale Setting Register                    | 0x00000077 |
+|              0x4F042084 | BHM_ACCCNTR         | BHM Retry Count Setting Register                 | 0x000001DF |
+|              0x4F0420C0 | BHM_ASR             | BHM Access Status Register                       | 0x00000000 |
+|              0x4F04F000 | SYSMON_VER          | System Monitor IP Version Register               |          - |
 
 *** Watchdog Control Register (Offset 0x0000)
 Watchdog Control Registerは、SC OBC FPGAの Watchdogの制御を行うためのレジスタです。
