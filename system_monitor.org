@@ -82,6 +82,7 @@ BHMは 3つの I2Cアクセスを行うことができます。
 センサーデータの取得
 - Hardware Schedulerからのトリガを検出すると、センサーからデータを取得するための I2Cアクセスを行います
 - Current Voltage Monitorからのデータ取得は、General Purpose Timerの Hardware Interrupt Timer Output Compare Channel 1が発生するトリガで開始されます
+- 温度センサーからのデータ取得は、General Purpose Timerの Hardware Interrupt Timer Output Compare Channel 2が発生するトリガで開始されます
 
 ソフトウェア指示による I2Cアクセス
 - ランタイムでセンサーの設定を変更したり、センサーが出力した Alertをクリアする目的で、簡単なレジスタアクセスで任意の I2Cアクセスを行います
