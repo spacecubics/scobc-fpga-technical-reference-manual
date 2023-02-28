@@ -104,9 +104,9 @@ BHMに接続するセンサーと、BHMによって取得されるセンサー�
 |                           |                  |                     0x04 | VDD_3V3_SYS_B Bus Voltage   |                        0x2044 |
 |                           |                  |                     0x05 | VDD_3V3_IO Shunt Voltage    |                        0x2048 |
 |                           |                  |                     0x06 | VDD_3V3_IO Bus Voltage      |                        0x204C |
-| Temperature Sensor 1      | TMP175-Q1        |                     0x01 | Temperature                 |                        0x2050 |
-| Temperature Sensor 2      | TMP175-Q1        |                     0x01 | Temperature                 |                        0x2054 |
-| Temperature Sensor 3      | TMP175-Q1        |                     0x01 | Temperature                 |                        0x2058 |
+| Temperature Sensor 1      | TMP175-Q1        |                     0x00 | Temperature                 |                        0x2050 |
+| Temperature Sensor 2      | TMP175-Q1        |                     0x00 | Temperature                 |                        0x2054 |
+| Temperature Sensor 3      | TMP175-Q1        |                     0x00 | Temperature                 |                        0x2058 |
 
 *** センサーデータ自動取得のためのレジスタアクセス手順
 この章では、SC OBC FPGAのシステムが起動してから、BHMによって Current Voltage Monitorと 温度センサーから、センサーデータを自動取得させるためのレジスタアクセス手順を説明します。
