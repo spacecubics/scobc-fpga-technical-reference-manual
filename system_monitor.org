@@ -557,8 +557,8 @@ BHM Interrupt Enable Registerは、Board Health Monitorの割り込みイベン�
 |     9 | BHM_CVM2_I2CERRENB  | Current Voltage Monitor2 Auto I2C Access Error Enable | BHM_CVM2_I2CERRイベントが発生した時に割り込み信号を発生させるかどうかを設定します。  | R/W |
 |     8 | BHM_CVM1_I2CERRENB  | Current Voltage Monitor1 Auto I2C Access Error Enable | BHM_CVM1_I2CERRイベントが発生した時に割り込み信号を発生させるかどうかを設定します。  | R/W |
 |   7:2 | -                   | Reserved                                              | Reserved                                                                             | -   |
-|     1 | BHM_SW_ACCENDENB    | Software Access End Enable                            | BHM_SWACCENDイベントが発生した時に割り込み信号を発生させるかどうかを設定します。     | R/W |
-|     0 | BHM_INIT_ACCENDENB  | Initialization Access End Enable                      | BHM_INITACCENDイベントが発生した時に割り込み信号を発生させるかどうかを設定します。   | R/W |
+|     1 | BHM_SW_ACCENDENB    | Software Access End Enable                            | BHM_SW_ACCENDイベントが発生した時に割り込み信号を発生させるかどうかを設定します。    | R/W |
+|     0 | BHM_INIT_ACCENDENB  | Initialization Access End Enable                      | BHM_INIT_ACCENDイベントが発生した時に割り込み信号を発生させるかどうかを設定します。  | R/W |
 
 *** BHM VDD_1V0 Shunt Voltage Monitor Register (Offset 0x2020)
 BHM VDD_1V0 Shunt Voltage Monitor Registerは、VDD_1V0 電源ドメインの Shunt Voltageを読み出すためのレジスタです。
