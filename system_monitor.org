@@ -796,20 +796,20 @@ $SCL\ Low\ Time(tLOW)[s] = tHDDAT[s] + tSUDAT[s]$
 $Bus\ Free\ Time(tBUF)[s] = System\ Clock\ period[s] \times \frac{BHM\_CLKPSC+1}{2}+5$
 #+END_QUOTE
 
-システムクロックが96MHz, 48MHz, 24MHzの場合において、I2Cを 100 kbpsに設定する場合の設定値と、I2Cのタイミングを以下に示します。
+システムクロックが 48MHz, 24MHzの場合において、I2Cを 100 kbpsに設定する場合の設定値と、I2Cのタイミングを以下に示します。
 
 #+CAPTION: Standard-mode (100 kbps)通信時の BHM I2C Prescale Setting Registerの設定値とI2Cタイミング (システムクロックのサイクル数)
-| Parameter                            | System Clock=96MHz     | System Clock=48MHz[default] | System Clock=24MHz     |
-|--------------------------------------+------------------------+-----------------------------+------------------------|
-| SYSMON_BHM_CLKPSC[15:0] 設定値       | 0x03BF [Divide by 960] | 0x01DF [Divide by 480]      | 0x00EF [Divide by 240] |
-| START Hold Timing (tHDSTA)           | 480 Cycle [5.00us]     | 240 Cycle [5.00us]          | 120 Cycle [5.00us]     |
-| STOP Setup Timing (tSUSTO)           | 480 Cycle [5.00us]     | 240 Cycle [5.00us]          | 120 Cycle [5.00us]     |
-| Repeated START Setup Timing (tSUSTA) | 480 Cycle [5.00us]     | 240 Cycle [5.00us]          | 120 Cycle [5.00us]     |
-| Clock High Timing (tHIGH)            | 475 Cycle [4.95us]     | 235 Cycle [4.90us]          | 115 Cycle [4.79us]     |
-| Data Hold Timing (tHDDAT)            | 5 Cycle [0.05us]       | 5 Cycle [0.10us]            | 5 Cycle [0.21us]       |
-| Data Setup Timing (tSUDAT)           | 480 Cycle [5.00us]     | 240 Cycle [5.00us]          | 120 Cycle [5.00us]     |
-| Clock Low Timing (tLOW)              | 485 Cycle [5.05us]     | 245 Cycle [5.10us]          | 125 Cycle [5.21us]     |
-| Bus Free Timing (tBUF)               | 485 Cycle [5.05us]     | 245 Cycle [5.10us]          | 125 Cycle [5.21us]     |
+| Parameter                            | System Clock=48MHz[default] | System Clock=24MHz     |
+|--------------------------------------+-----------------------------+------------------------|
+| SYSMON_BHM_CLKPSC[15:0] 設定値       | 0x01DF [Divide by 480]      | 0x00EF [Divide by 240] |
+| START Hold Timing (tHDSTA)           | 240 Cycle [5.00us]          | 120 Cycle [5.00us]     |
+| STOP Setup Timing (tSUSTO)           | 240 Cycle [5.00us]          | 120 Cycle [5.00us]     |
+| Repeated START Setup Timing (tSUSTA) | 240 Cycle [5.00us]          | 120 Cycle [5.00us]     |
+| Clock High Timing (tHIGH)            | 235 Cycle [4.90us]          | 115 Cycle [4.79us]     |
+| Data Hold Timing (tHDDAT)            | 5 Cycle [0.10us]            | 5 Cycle [0.21us]       |
+| Data Setup Timing (tSUDAT)           | 240 Cycle [5.00us]          | 120 Cycle [5.00us]     |
+| Clock Low Timing (tLOW)              | 245 Cycle [5.10us]          | 125 Cycle [5.21us]     |
+| Bus Free Timing (tBUF)               | 245 Cycle [5.10us]          | 125 Cycle [5.21us]     |
 
 *** BHM Retry Count Register (Offset 0x2084)
 BHM Retry Count Registerは、BHMが行うセンサーへのアクセスにおける、リトライ回数の上限を設定するためのレジスタです。
