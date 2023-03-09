@@ -186,6 +186,60 @@ Current Voltage Monitorのデータ読み出しは 6 ms、温度センサーの�
 
 詳細は各センサーデバイスのデータシートを参照してください。
 
+*** センサーデバイスの初期化のためのレジスタアクセス手順
+この章では、BHMによるセンサーデバイスの初期化のためのレジスタアクセス手順について説明します。
+
+BHMは、ソフトウェアからのレジスタアクセスにより、センサーデバイスの初期化要求を受けると、I2Cアクセスを行い センサーデバイスに初期設定値を書き込みます。
+センサーデバイスの初期化のためのレジスタアクセス手順を以下に示します。
+
+#+CAPTION: センサーデバイスの初期化のためのレジスタアクセス手順
+#+ATTR_HTML: :width 350
+[[file:./images/bhm_sensor_init.png]]
+
+1: BHM Initialization Access Control Registerの初期化を行うセンサーデバイスに対応する Initialization Enableと INIT_REQビットをセットします。
+INIT_REQビットをセットされると、Initialization Enableがセットされたセンサーデバイスへの初期化のための I2Cアクセスが開始されます。
+
+2: BHMによるセンサーデバイスへの書き込みアクセスの完了は、SYSMON_BHM_INT割り込みのアサートにより検出する事ができます。
+割り込みを検出したとき、BHM Interrupt Status Registerの BHM_INIT_ACCENDビットがセットされている場合、センサーデバイスの初期化のための I2Cアクセスが完了した事を示します。
+BHM_INIT_ACCENDがセットされたときは、I2CERRビットの確認を行い I2Cアクセスにエラーが発生したかどうかを確認します。
+I2CERRビットがセットされていないとき、そのセンサーデバイスのアクセスは正常に完了したと判断できます。
+
+3: Board Health Interrupt Status RegisterのBHM_SW_ACCENDビットに "1"を書き込むと、BHM_SW_ACCENDビットをクリアする事ができます。
+
+以下に、初期設定を行うセンサーデバイス、デバイスアドレス、初期設定値の一覧を示します。
+尚、初期設定値は、RTL設計において Verilog Parameterで変更する事ができます。
+
+#+CAPTION: デバイス初期設定一覧 (default)
+| Device                   | Address                              | 初期設定値 | Description                                                                                                           |
+|--------------------------+--------------------------------------+------------+-----------------------------------------------------------------------------------------------------------------------|
+| Current Voltage Monitor1 | 0x07: Channel-1 Critical-Alert Limit |     0x2710 | VDD_1V0の Critical-Alertをシャント電圧: 50mV (シャント電流: 5A)に設定                                                 |
+| Current Voltage Monitor1 | 0x08: Channel-1 Warning-Alert Limit  |     0x1770 | VDD_1V0の Warning-Alertをシャント電圧: 30mV (シャント電流: 3A)に設定                                                  |
+| Current Voltage Monitor1 | 0x09: Channel-2 Critical-Alert Limit |     0x2710 | VDD_1V8の Critical-Alertをシャント電圧: 50mV (シャント電流: 5A)に設定                                                 |
+| Current Voltage Monitor1 | 0x0A: Channel-2 Warning-Alert Limit  |     0x1770 | VDD_1V8の Warning-Alertをシャント電圧: 30mV (シャント電流: 3A)に設定                                                  |
+| Current Voltage Monitor1 | 0x0B: Channel-3 Critical-Alert Limit |     0x2710 | VDD_3V3の Critical-Alertをシャント電圧: 50mV (シャント電流: 5A)に設定                                                 |
+| Current Voltage Monitor1 | 0x0C: Channel-3 Warning-Alert Limit  |     0x1770 | VDD_3V3の Warning-Alertをシャント電圧: 30mV (シャント電流: 3A)に設定                                                  |
+| Current Voltage Monitor1 | 0x0F: Mask/Enable                    |     0x0C00 | Current Voltage Monitor 1の Critical-Alertピン、Warning-Alertピンのラッチの有効化を設定                               |
+| Current Voltage Monitor2 | 0x07: Channel-1 Critical-Alert Limit |     0x2710 | VDD_3V3_SYS_Aの Critical-Alertをシャント電圧: 50mV (シャント電流: 5A)に設定                                           |
+| Current Voltage Monitor2 | 0x08: Channel-1 Warning-Alert Limit  |     0x1770 | VDD_3V3_SYS_Aの Warning-Alertをシャント電圧: 30mV (シャント電流: 3A)に設定                                            |
+| Current Voltage Monitor2 | 0x09: Channel-2 Critical-Alert Limit |     0x2710 | VDD_3V3_SYS_Bの Critical-Alertをシャント電圧: 50mV (シャント電流: 5A)に設定                                           |
+| Current Voltage Monitor2 | 0x0A: Channel-2 Warning-Alert Limit  |     0x1770 | VDD_3V3_SYS_Bの Warning-Alertをシャント電圧: 30mV (シャント電流: 3A)に設定                                            |
+| Current Voltage Monitor2 | 0x0B: Channel-3 Critical-Alert Limit |     0x2710 | VDD_3V3_IOの Critical-Alertをシャント電圧: 50mV (シャント電流: 5A)に設定                                              |
+| Current Voltage Monitor2 | 0x0C: Channel-3 Warning-Alert Limit  |     0x1770 | VDD_3V3_IOの Warning-Alertをシャント電圧: 30mV (シャント電流: 3A)に設定                                               |
+| Current Voltage Monitor2 | 0x0F: Mask/Enable                    |     0x0C00 | Current Voltage Monitor 2の Critical-Alertピン、Warning-Alertピンのラッチの有効化を設定                               |
+| Temperature Sensor1      | 0x01: Configuration register         |     0x0200 | Temperature Sensor 1の ALERTピンの動作を Interrupt Modeに設定 (1Byteのレジスタの為、MSB Byteの書き込み値に設定される) |
+| Temperature Sensor1      | 0x02: TLOW register                  |     0x4B00 | Temperature Sensor 1の TLOWを 75℃に設定                                                                              |
+| Temperature Sensor1      | 0x03: THIGH register                 |     0x5000 | Temperature Sensor 1の THIGHを 80℃に設定                                                                             |
+| Temperature Sensor2      | 0x01: Configuration register         |     0x0200 | Temperature Sensor 2の ALERTピンの動作を Interrupt Modeに設定 (1Byteのレジスタの為、MSB Byteの書き込み値に設定される) |
+| Temperature Sensor2      | 0x02: TLOW register                  |     0x4B00 | Temperature Sensor 2の TLOWを 75℃に設定                                                                              |
+| Temperature Sensor2      | 0x03: THIGH register                 |     0x5000 | Temperature Sensor 2の THIGHを 80℃に設定                                                                             |
+| Temperature Sensor3      | 0x01: Configuration register         |     0x0200 | Temperature Sensor 3の ALERTピンの動作を Interrupt Modeに設定 (1Byteのレジスタの為、MSB Byteの書き込み値に設定される) |
+| Temperature Sensor3      | 0x02: TLOW register                  |     0x4B00 | Temperature Sensor 3の TLOWを 75℃に設定                                                                              |
+| Temperature Sensor3      | 0x03: THIGH register                 |     0x5000 | Temperature Sensor 3の THIGHを 80℃に設定                                                                             |
+
+センサーデバイスの初期化のための I2Cアクセスの実行中に、BHM Retry Count Setting Registerに設定されている回数の I2Cエラーが発生した場合、BHM Interrupt Status Registerの対応するセンサーデバイスの I2CERRビットがセットされます。
+また、I2Cエラーが発生したデバイスへの以降の初期化設定はスキップされます。
+ひとつのセンサーデバイスに I2Cエラーが起きても、I2CERRビットがセットされていないセンサーの初期化アクセスは正常に完了しています。
+
 *** ソフトウェア指示によるセンサーデバイスへの I2Cアクセス
 この章では、SC OBC FPGAに実装されるセンサーデバイス (Current Voltage Monitor 及び 温度センサー)に、ソフトウェアの指示によりアクセスする方法を説明します。
 
