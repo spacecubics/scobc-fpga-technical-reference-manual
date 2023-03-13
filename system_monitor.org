@@ -65,7 +65,7 @@ OBC Moduleには、2つの Current Voltage Monitorと 3つの 温度センサー
 BHMはセンサーにアクセスするためのシーケンサーが実装されており、センサーからのデータをレジスタに格納します。
 これにより、ソフトウェアによる煩雑な処理を実行しなくても、センサーからデータを取得する事ができます。
 
-BHMが、センサーからデータを取得するタイミングは General Purpose Timerの Hard Interrupt Timerによって決定します。
+BHMが、センサーからデータを取得するタイミングは General Purpose Timerの Hardware Interrupt Timerによって決定します。
 Hardware Interrupt Timerを Hardware Schedulerとして動作させる事で、BHMに定期的にセンサーデータの取得トリガを生成します。
 BHMは、センサーのデータ取得トリガを検出したタイミングで、センサーに対する I2Cアクセスを行い データを取得します。
 
@@ -81,8 +81,8 @@ BHMは 3つの I2Cアクセスを行うことができます。
 
 センサーデータの取得
 - Hardware Schedulerからのトリガを検出すると、センサーからデータを取得するための I2Cアクセスを行います
-- Current Voltage Monitorからのデータ取得は、General Purpose Timerの Hardware Interrupt Timer Output Compare Channel 1が発生するトリガで開始されます
-- 温度センサーからのデータ取得は、General Purpose Timerの Hardware Interrupt Timer Output Compare Channel 2が発生するトリガで開始されます
+- Current Voltage Monitorからのデータ取得は、General Purpose Timerの Hardware Interrupt Timer Output Compare Channel 2が発生するトリガで開始されます
+- 温度センサーからのデータ取得は、General Purpose Timerの Hardware Interrupt Timer Output Compare Channel 3が発生するトリガで開始されます
 
 ソフトウェア指示による I2Cアクセス
 - ランタイムでセンサーの設定を変更したり、センサーが出力した Alertをクリアする目的で、簡単なレジスタアクセスで任意の I2Cアクセスを行います
