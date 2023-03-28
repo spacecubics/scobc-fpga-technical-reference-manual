@@ -27,7 +27,7 @@ Hardware Interrupt Timerの出力チャネルと、接続されている IP Core
 General Purpose Timerは、Base Address 0x4F05_0000に配置されています。
 
 #+CAPTION: General Purpose Timer メモリマップ
-|    Address | Symbol        | Register                                           |    Initial |
+|     Offset | Symbol        | Register                                           |    Initial |
 |------------+---------------+----------------------------------------------------+------------|
 | 0x4F050000 | GPTMR_GTR     | Global Timer Register                              | 0x00000000 |
 | 0x4F050004 | GPTMR_TECR    | Timer Enable Control Register                      | 0x00000000 |

@@ -5,7 +5,7 @@ System Registerは、SC OBC FPGAのシステム制御を司るレジスタで構
 System Registerは、Base Address 0x4F00_0000に配置されています。
 
 #+CAPTION: System Registerメモリマップ
-|    Address | Symbol           | Register                            |    Initial |
+|     Offset | Symbol           | Register                            |    Initial |
 |------------+------------------+-------------------------------------+------------|
 | 0x4F000000 | SYSREG_CODEMSEL  | Code Memory Select Register         | 0x00000001 |
 | 0x4F000004 | SYSREG_SYSCLKCTL | System Clock Control Register       | 0x00000001 |

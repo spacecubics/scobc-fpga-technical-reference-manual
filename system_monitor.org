@@ -290,7 +290,7 @@ BHM Software Access Read Data Registerを読み出す事で、センサーデバ
 System Monitorは、Base Address 0x4F04_0000に配置されています。
 
 #+CAPTION: System Monitorメモリマップ
-|                 Address | Symbol              | Register                                         |    Initial |
+|                  Offset | Symbol              | Register                                         |    Initial |
 |-------------------------+---------------------+--------------------------------------------------+------------|
 |              0x4F040000 | SYSMON_WDOG_CTRL    | Watchdog Control Register                        | 0x00075A5A |
 |              0x4F040010 | SYSMON_WDOG_SIVAL   | Watchdog Signal Interval Register                | 0x00B71AFF |
