@@ -487,10 +487,10 @@ Xilinxの SEM Controller (v4.1)では、Heartbeat信号のアサート間隔は 
 |  7:0 | HTIMEOUT | Heartbeat Timeout Value | SEM Controllerが出力する Heartbeat信号の受信Timeout時間を設定します。SEM Controllerのステートが、監視ステートのとき このレジスタに設定されるカウント値まで Heartbeat信号がアサートされないとき、SEM Heartbeat Timeout割り込みを発生させます。 | R/W |
 
 *** SEM Error Injection Command Register 1/2 (Offset 0x0050/0x0054)
-SEM Error Injection Command Register は、SEM Controller のエラー挿入機能を使用するためのレジスタです。 
+SEM Error Injection Command Register は、SEM Controller のエラー挿入機能を使用するためのレジスタです。
 このレジスタを使用し、SEM Controllerのエラー挿入インターフェースにコマンドを入力する事により、エラー挿入機能を使用する事ができます。
 
-このレジスタは試験専用レジスタであり、FPGA インプリ時のコンフィギュレーションにより、無効化する事ができます。 
+このレジスタは試験専用レジスタであり、FPGA インプリ時のコンフィギュレーションにより、無効化する事ができます。
 
 SEM Controller へのコマンド送信は、SEM Error Injection Command Register 2 への書き込みをきっかけに行われます。
 そのため、SEM Error Injection Command Register 1 への書き込みは、必ず SEM Error Injection Command Register 2 の書き込み前に行ってください。
@@ -905,4 +905,3 @@ System Monitor IP Version Registerは、System Monitorの IPコアバージョ�
 | 31:24 | SYSMON_MAJVER | System Monitor IP Major Version | System MonitorコアのMajor Versionを示します。 | RO  |
 | 23:16 | SYSMON_MINVER | System Monitor IP Minor Version | System MonitorコアのMinor Versionを示します。 | RO  |
 |  15:0 | SYSMON_PATVER | System Monitor IP Patch Version | System MonitorコアのPatch Versionを示します。 | RO  |
-

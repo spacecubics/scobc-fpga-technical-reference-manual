@@ -170,4 +170,3 @@ FPGAからは、FUSE_DNAのうち 63 bitから 7 bitを、Device DNAとして読
 |  bit | Symbol  | Field               | Description                                      | R/W |
 |------+---------+---------------------+--------------------------------------------------+-----|
 | 31:0 | DNA_MSB | Device DNA MAB side | Device DNAの bit 63:32が格納されるレジスタです。 | RO  |
-

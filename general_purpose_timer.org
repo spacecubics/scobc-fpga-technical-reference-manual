@@ -389,4 +389,3 @@ General Purpose Timer IP Version Registerは、General Purpose Timerの IPコア
 | 31:24 | GPTMR_MAJVER | General Purpose Timer IP Major Version | General Purpose TimerコアのMajor Versionを示します。 | RO  |
 | 23:16 | GPTMR_MINVER | General Purpose Timer IP Minor Version | General Purpose TimerコアのMinor Versionを示します。 | RO  |
 |  15:0 | GPTMR_PATVER | General Purpose Timer IP Patch Version | General Purpose TimerコアのPatch Versionを示します。 | RO  |
-
