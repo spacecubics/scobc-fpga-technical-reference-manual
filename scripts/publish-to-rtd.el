@@ -15,6 +15,11 @@
          :base-directory "./images"
          :publishing-directory "_readthedocs/html/images/"
          :publishing-function org-publish-attachment
-         :base-extension "png")))
+         :base-extension "png")
+        ("css"
+         :base-directory "./css"
+         :publishing-directory "_readthedocs/html/css/"
+         :publishing-function org-publish-attachment
+         :base-extension "css")))
 
 (org-publish-all t)
