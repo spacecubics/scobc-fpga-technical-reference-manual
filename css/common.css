@@ -1184,32 +1184,6 @@ footer p {
 
 #copyright,
 #postamble {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 300px;
-    color: #fcfcfc;
-    background: #1f1d1d;
-    border-top: solid 10px #343131;
-    font-family: "Lato", "proxima-nova", "Helvetica Neue", Arial, sans-serif;
-    font-size: 90%;
-    z-index: 400;
-    padding: 12px;
-}
-
-#postamble .author {
-    font-size: 100%;
-    margin-bottom: 0px;
-}
-
-#postamble .date {
-    font-size: 90%;
-    margin-bottom: 0px;
-    color: #27ae60;
-}
-
-#postamble .creator,
-#postamble .validation {
     display: none;
 }
 
