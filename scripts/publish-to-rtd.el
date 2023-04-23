@@ -20,6 +20,11 @@
          :base-directory "./css"
          :publishing-directory "_readthedocs/html/css/"
          :publishing-function org-publish-attachment
-         :base-extension "css")))
+         :base-extension "css")
+        ("js"
+         :base-directory "./js"
+         :publishing-directory "_readthedocs/html/js/"
+         :publishing-function org-publish-attachment
+         :base-extension "js")))
 
 (org-publish-all t)

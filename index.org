@@ -1,6 +1,8 @@
 #+TITLE: Space Cubics OBC (SC-OBC-A1) Technical Reference Manual
 #+PROPERTY: header-args:emacs-lisp :results silent
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="css/common.css"/>
+#+HTML_HEAD: <script type="text/javascript" src="js/jquery.min.js"></script>
+#+HTML_HEAD: <script type="text/javascript" src="js/bootstrap.min.js"></script>
 
 このドキュメントは、Space Cubics OBCに搭載する FPGAの仕様を説明する「SC OBC FPGA Technical Reference Manual」に関するものです。
 
