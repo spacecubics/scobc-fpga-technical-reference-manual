@@ -10,7 +10,7 @@ Cortex-M3の 割り込みコントローラの仕様については、ARM Cortex
 |            16 | [0]     | AHB UART Lite(Console)                           | Pulse |
 |            17 | [1]     | HRMEM (High-reliability Memory)                  | Level |
 |            18 | [2]     | QSPI Controller (Configuration Flash Memory)     | Level |
-|            19 | [3]     | QSPI Controller (Data Store Flash Memort)        | Level |
+|            19 | [3]     | QSPI Controller (Data Store Flash Memory)        | Level |
 |            20 | [4]     | QSPI Controller (FRAM)                           | Level |
 |            21 | [5]     | CAN Controller                                   | Level |
 |            22 | [6]     | Reserved (OBC System Interrupt Area)             | -     |
@@ -21,4 +21,3 @@ Cortex-M3の 割り込みコントローラの仕様については、ARM Cortex
 |            27 | [11]    | General Purpose Timer (Software Interrupt Timer) | Level |
 |       28 - 31 | [15:12] | Reserved (OBC System Interrupt Area)             | -     |
 |       32 - 47 | [31:16] | Reserved (UDL IP Interrupt Area)                 | -     |
-
