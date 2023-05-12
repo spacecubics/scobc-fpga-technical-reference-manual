@@ -64,6 +64,21 @@
 	      (if a (org-svd-export-to-svd t s v)
 		(org-open-file (org-svd-export-to-svd nil s v))))))))
 
+
+;;; User Configurable Variables
+
+(defgroup org-export-svd nil
+  "Options for exporting Org mode files to SVD."
+  :tag "Org Export SVD"
+  :group 'org-export)
+
+(defcustom org-svd-table-caption-bit-field
+  "ビットフィールド"
+  "String to identify tables with bit fields information."
+  :group 'org-export-svd
+  :type 'string)
+
+
 ;;; Identity
 (defun org-svd-identity (blob contents info)
   "Transcode BLOB element or object back into Org syntax.
@@ -119,14 +134,15 @@ CONTENTS is the headline contents."
   (let* ((header (and (org-export-table-has-header-p table info) "header"))
          (pgwide (and (org-export-read-attribute :attr_svd table :pgwide) "pgwide"))
          (options (remq nil (list header pgwide)))
-         (register (pop org-svd-register-list)))
-    (concat "<register>\n"
-            register
-            "<fields>\n"
-	    contents
-	    "</fields>\n"
-            "</register>\n"
-            )))
+         (caption (org-export-get-caption table)))
+    (when (string-search org-svd-table-caption-bit-field (org-export-data caption info))
+      (concat "<register>\n"
+              (pop org-svd-register-list)
+              "<fields>\n"
+	      contents
+	      "</fields>\n"
+              "</register>\n"
+              ))))
 
 (defun org-svd-table (table contents info)
   "Transcode TABLE element into SVD format."
