@@ -163,9 +163,9 @@ CONTENTS is the headline contents."
       (let ((lines (concat
                     (with-temp-buffer
                       (insert (org-no-properties contents))
-                      (beginning-of-buffer)
+                      (goto-char (point-min))
                       (flush-lines "^$")
-                      (beginning-of-buffer)
+                      (goto-char (point-min))
                       (transpose-lines 2)
                       (buffer-string)))))
         (add-to-list 'org-svd-register-list lines t)
@@ -178,9 +178,9 @@ CONTENTS is the headline contents."
     (when (eql group 2)
       (let ((lines (with-temp-buffer
                      (insert (org-no-properties contents))
-                     (beginning-of-buffer)
+                     (goto-char (point-min))
                      (flush-lines "^$")
-                     (beginning-of-buffer)
+                     (goto-char (point-min))
                      (transpose-lines 2)
                      (buffer-string))))
         (concat
