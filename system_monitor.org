@@ -290,44 +290,44 @@ BHM Software Access Read Data Registerを読み出す事で、センサーデバ
 System Monitorは、Base Address 0x4F04_0000に配置されています。
 
 #+CAPTION: System Monitorメモリマップ
-|                  Offset | Symbol              | Register                                         |    Initial |
-|-------------------------+---------------------+--------------------------------------------------+------------|
-|              0x4F040000 | SYSMON_WDOG_CTRL    | Watchdog Control Register                        | 0x00075A5A |
-|              0x4F040010 | SYSMON_WDOG_SIVAL   | Watchdog Signal Interval Register                | 0x00B71AFF |
-|              0x4F040030 | SYSMON_INT_STATUS   | System Monitor Interrupt Status Register         | 0x00000000 |
-|              0x4F040034 | SYSMON_INT_ENABLE   | System Monitor Interrupt Enable Register         | 0x00000000 |
-|              0x4F040040 | SYSMON_SEM_STATE    | SEM Controller State Register                    | 0x00000000 |
-|              0x4F040044 | SYSMON_SEM_ECCOUNT  | SEM Error Correction Count Register              | 0x00000000 |
-|              0x4F040048 | SYSMON_SEM_HTIMEOUT | SEM Heartbeat Timeout Register                   | 0x000000FF |
-|              0x4F040050 | SYSMON_SEM_EINJECT1 | SEM Error Injection Command Register 1           | 0x00000000 |
-|              0x4F040054 | SYSMON_SEM_EINJECT2 | SEM Error Injection Command Register 2           | 0x00000000 |
-| 0x4F041000 - 0x4F041FFF | SYSMON_XADC_REG     | XADC Register Window                             | ---------- |
-|              0x4F042000 | BHM_INICTLR         | BHM Initialization Access Control Register       | 0x0000001F |
-|              0x4F042004 | BHM_ACCCTLR         | BHM Access Control Register                      | 0x00000000 |
-|              0x4F042010 | BHM_ISR             | BHM Interrupt Status Register                    | 0x00000000 |
-|              0x4F042014 | BHM_IER             | BHM Interrupt Enable Register                    | 0x00000000 |
-|              0x4F042020 | BHM_1V0_SNTVR       | BHM VDD_1V0 Shunt Voltage Monitor Register       | 0x80000000 |
-|              0x4F042024 | BHM_1V0_BUSVR       | BHM VDD_1V0 Bus Voltage Monitor Register         | 0x80000000 |
-|              0x4F042028 | BHM_1V8_SNTVR       | BHM VDD_1V8 Shunt Voltage Monitor Register       | 0x80000000 |
-|              0x4F04202C | BHM_1V8_BUSVR       | BHM VDD_1V8 Bus Voltage Monitor Register         | 0x80000000 |
-|              0x4F042030 | BHM_3V3_SNTVR       | BHM VDD_3V3 Shunt Voltage Monitor Register       | 0x80000000 |
-|              0x4F042034 | BHM_3V3_BUSVR       | BHM VDD_3V3 Bus Voltage Monitor Register         | 0x80000000 |
-|              0x4F042038 | BHM_3V3SYSA_SNTVR   | BHM VDD_3V3_SYS_A Shunt Voltage Monitor Register | 0x80000000 |
-|              0x4F04203C | BHM_3V3SYSA_BUSVR   | BHM VDD_3V3_SYS_A Bus Voltage Monitor Register   | 0x80000000 |
-|              0x4F042040 | BHM_3V3SYSB_SNTVR   | BHM VDD_3V3_SYS_B Shunt Voltage Monitor Register | 0x80000000 |
-|              0x4F042044 | BHM_3V3SYSB_BUSVR   | BHM VDD_3V3_SYS_B Bus Voltage Monitor Register   | 0x80000000 |
-|              0x4F042048 | BHM_3V3IO_SNTVR     | BHM VDD_3V3_IO Shunt Voltage Monitor Register    | 0x80000000 |
-|              0x4F04204C | BHM_3V3IO_BUSVR     | BHM VDD_3V3_IO Bus Voltage Monitor Register      | 0x80000000 |
-|              0x4F042050 | BHM_TEMP1R          | BHM Temperature1 Monitor Register                | 0x80000000 |
-|              0x4F042054 | BHM_TEMP2R          | BHM Temperature2 Monitor Register                | 0x80000000 |
-|              0x4F042058 | BHM_TEMP3R          | BHM Health Temperature3 Monitor Register         | 0x80000000 |
-|              0x4F042060 | BHM_SW_CTLR         | BHM Software Access Control Register             | 0x00000000 |
-|              0x4F042064 | BHM_SW_WDTR         | BHM Software Access Write Data Register          | 0x00000000 |
-|              0x4F042068 | BHM_SW_RDTR         | BHM Software Access Read Data Register           | 0x00000000 |
-|              0x4F042080 | BHM_PSCR            | BHM Prescale Setting Register                    | 0x00000077 |
-|              0x4F042084 | BHM_ACCCNTR         | BHM Retry Count Setting Register                 | 0x00000002 |
-|              0x4F0420C0 | BHM_ASR             | BHM Access Status Register                       | 0x00000000 |
-|              0x4F04F000 | SYSMON_VER          | System Monitor IP Version Register               |          - |
+|          Offset | Symbol              | Register                                         |    Initial |
+|-----------------+---------------------+--------------------------------------------------+------------|
+|          0x0000 | SYSMON_WDOG_CTRL    | Watchdog Control Register                        | 0x00075A5A |
+|          0x0010 | SYSMON_WDOG_SIVAL   | Watchdog Signal Interval Register                | 0x00B71AFF |
+|          0x0030 | SYSMON_INT_STATUS   | System Monitor Interrupt Status Register         | 0x00000000 |
+|          0x0034 | SYSMON_INT_ENABLE   | System Monitor Interrupt Enable Register         | 0x00000000 |
+|          0x0040 | SYSMON_SEM_STATE    | SEM Controller State Register                    | 0x00000000 |
+|          0x0044 | SYSMON_SEM_ECCOUNT  | SEM Error Correction Count Register              | 0x00000000 |
+|          0x0048 | SYSMON_SEM_HTIMEOUT | SEM Heartbeat Timeout Register                   | 0x000000FF |
+|          0x0050 | SYSMON_SEM_EINJECT1 | SEM Error Injection Command Register 1           | 0x00000000 |
+|          0x0054 | SYSMON_SEM_EINJECT2 | SEM Error Injection Command Register 2           | 0x00000000 |
+| 0x1000 - 0x1FFF | SYSMON_XADC_REG     | XADC Register Window                             | ---------- |
+|          0x2000 | BHM_INICTLR         | BHM Initialization Access Control Register       | 0x0000001F |
+|          0x2004 | BHM_ACCCTLR         | BHM Access Control Register                      | 0x00000000 |
+|          0x2010 | BHM_ISR             | BHM Interrupt Status Register                    | 0x00000000 |
+|          0x2014 | BHM_IER             | BHM Interrupt Enable Register                    | 0x00000000 |
+|          0x2020 | BHM_1V0_SNTVR       | BHM VDD_1V0 Shunt Voltage Monitor Register       | 0x80000000 |
+|          0x2024 | BHM_1V0_BUSVR       | BHM VDD_1V0 Bus Voltage Monitor Register         | 0x80000000 |
+|          0x2028 | BHM_1V8_SNTVR       | BHM VDD_1V8 Shunt Voltage Monitor Register       | 0x80000000 |
+|          0x202C | BHM_1V8_BUSVR       | BHM VDD_1V8 Bus Voltage Monitor Register         | 0x80000000 |
+|          0x2030 | BHM_3V3_SNTVR       | BHM VDD_3V3 Shunt Voltage Monitor Register       | 0x80000000 |
+|          0x2034 | BHM_3V3_BUSVR       | BHM VDD_3V3 Bus Voltage Monitor Register         | 0x80000000 |
+|          0x2038 | BHM_3V3SYSA_SNTVR   | BHM VDD_3V3_SYS_A Shunt Voltage Monitor Register | 0x80000000 |
+|          0x203C | BHM_3V3SYSA_BUSVR   | BHM VDD_3V3_SYS_A Bus Voltage Monitor Register   | 0x80000000 |
+|          0x2040 | BHM_3V3SYSB_SNTVR   | BHM VDD_3V3_SYS_B Shunt Voltage Monitor Register | 0x80000000 |
+|          0x2044 | BHM_3V3SYSB_BUSVR   | BHM VDD_3V3_SYS_B Bus Voltage Monitor Register   | 0x80000000 |
+|          0x2048 | BHM_3V3IO_SNTVR     | BHM VDD_3V3_IO Shunt Voltage Monitor Register    | 0x80000000 |
+|          0x204C | BHM_3V3IO_BUSVR     | BHM VDD_3V3_IO Bus Voltage Monitor Register      | 0x80000000 |
+|          0x2050 | BHM_TEMP1R          | BHM Temperature1 Monitor Register                | 0x80000000 |
+|          0x2054 | BHM_TEMP2R          | BHM Temperature2 Monitor Register                | 0x80000000 |
+|          0x2058 | BHM_TEMP3R          | BHM Health Temperature3 Monitor Register         | 0x80000000 |
+|          0x2060 | BHM_SW_CTLR         | BHM Software Access Control Register             | 0x00000000 |
+|          0x2064 | BHM_SW_WDTR         | BHM Software Access Write Data Register          | 0x00000000 |
+|          0x2068 | BHM_SW_RDTR         | BHM Software Access Read Data Register           | 0x00000000 |
+|          0x2080 | BHM_PSCR            | BHM Prescale Setting Register                    | 0x00000077 |
+|          0x2084 | BHM_ACCCNTR         | BHM Retry Count Setting Register                 | 0x00000002 |
+|          0x20C0 | BHM_ASR             | BHM Access Status Register                       | 0x00000000 |
+|          0xF000 | SYSMON_VER          | System Monitor IP Version Register               |          - |
 
 *** Watchdog Control Register (Offset 0x0000)
 Watchdog Control Registerは、SC OBC FPGAの Watchdogの制御を行うためのレジスタです。
@@ -518,20 +518,20 @@ XADCの詳細は Xilinxのドキュメント (UG480: 7シリーズ FPGAおよび
 XADCのレジスタにアクセスするためには、ベースアドレスを 0x4F041000とし Bit 11:4に 対象となるXADCのレジスタアドレスを設定する事で行えます。
 Status Registerにアクセスするためのレジスタアドレスを以下に示します。
 
-|    Address | Name               | Description                                                                                                    |
-|------------+--------------------+----------------------------------------------------------------------------------------------------------------|
-| 0x4F041000 | Temperature Status | オンチップ温度センサーの測定結果が格納されます。Bit 15:4の 12 Bitが温度センサーの伝達関数に対応します。        |
-| 0x4F041010 | VCCINT Status      | オンチップVCCINT電圧モニターの測定結果が格納されます。Bit 15:4の 12 Bitが電圧センサーの伝達関数に対応します。  |
-| 0x4F041020 | VCCAUX Status      | オンチップVCCAUX電圧モニターの測定結果が格納されます。Bit 15:4の 12 Bitが電圧センサーの伝達関数に対応します。  |
-| 0x4F041060 | VCCBRAM Status     | オンチップVCCBRAM電圧モニターの測定結果が格納されます。Bit 15:4の 12 Bitが電圧センサーの伝達関数に対応します。 |
-| 0x4F041200 | Max Temperature    | 電源投入または最後に XADCをリセットしてから記録された最大温度測定値が格納されます。                            |
-| 0x4F041210 | Max VCCINT         | 電源投入または最後に XADCをリセットしてから記録された最大VCCINT測定値が格納されます。                          |
-| 0x4F041220 | Max VCCAUX         | 電源投入または最後に XADCをリセットしてから記録された最大VCCAUX測定値が格納されます。                          |
-| 0x4F041230 | Max VCCBRAM        | 電源投入または最後に XADCをリセットしてから記録された最大VCCBRAM測定値が格納されます。                         |
-| 0x4F041240 | Min Temperature    | 電源投入または最後に XADCをリセットしてから記録された最小温度測定値が格納されます。                            |
-| 0x4F041250 | Min VCCINT         | 電源投入または最後に XADCをリセットしてから記録された最小VCCINT測定値が格納されます。                          |
-| 0x4F041260 | Min VCCAUX         | 電源投入または最後に XADCをリセットしてから記録された最小VCCAUX測定値が格納されます。                          |
-| 0x4F041270 | Min VCCBRAM        | 電源投入または最後に XADCをリセットしてから記録された最小VCCBRAM測定値が格納されます。                         |
+| Offset | Name               | Description                                                                                                    |
+|--------+--------------------+----------------------------------------------------------------------------------------------------------------|
+| 0x1000 | Temperature Status | オンチップ温度センサーの測定結果が格納されます。Bit 15:4の 12 Bitが温度センサーの伝達関数に対応します。        |
+| 0x1010 | VCCINT Status      | オンチップVCCINT電圧モニターの測定結果が格納されます。Bit 15:4の 12 Bitが電圧センサーの伝達関数に対応します。  |
+| 0x1020 | VCCAUX Status      | オンチップVCCAUX電圧モニターの測定結果が格納されます。Bit 15:4の 12 Bitが電圧センサーの伝達関数に対応します。  |
+| 0x1060 | VCCBRAM Status     | オンチップVCCBRAM電圧モニターの測定結果が格納されます。Bit 15:4の 12 Bitが電圧センサーの伝達関数に対応します。 |
+| 0x1200 | Max Temperature    | 電源投入または最後に XADCをリセットしてから記録された最大温度測定値が格納されます。                            |
+| 0x1210 | Max VCCINT         | 電源投入または最後に XADCをリセットしてから記録された最大VCCINT測定値が格納されます。                          |
+| 0x1220 | Max VCCAUX         | 電源投入または最後に XADCをリセットしてから記録された最大VCCAUX測定値が格納されます。                          |
+| 0x1230 | Max VCCBRAM        | 電源投入または最後に XADCをリセットしてから記録された最大VCCBRAM測定値が格納されます。                         |
+| 0x1240 | Min Temperature    | 電源投入または最後に XADCをリセットしてから記録された最小温度測定値が格納されます。                            |
+| 0x1250 | Min VCCINT         | 電源投入または最後に XADCをリセットしてから記録された最小VCCINT測定値が格納されます。                          |
+| 0x1260 | Min VCCAUX         | 電源投入または最後に XADCをリセットしてから記録された最小VCCAUX測定値が格納されます。                          |
+| 0x1270 | Min VCCBRAM        | 電源投入または最後に XADCをリセットしてから記録された最小VCCBRAM測定値が格納されます。                         |
 
 System Monitorの XADC Register Windowからは、XADCのすべてのレジスタ領域にアクセスする事ができますが、アラーム機能は現状実装されておりません。
 

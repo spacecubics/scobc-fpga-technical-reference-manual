@@ -5,20 +5,20 @@ System Registerは、SC OBC FPGAのシステム制御を司るレジスタで構
 System Registerは、Base Address 0x4F00_0000に配置されています。
 
 #+CAPTION: System Registerメモリマップ
-|     Offset | Symbol           | Register                            |    Initial |
-|------------+------------------+-------------------------------------+------------|
-| 0x4F000000 | SYSREG_CODEMSEL  | Code Memory Select Register         | 0x00000001 |
-| 0x4F000004 | SYSREG_SYSCLKCTL | System Clock Control Register       | 0x00000001 |
-| 0x4F000010 | SYSREG_CFGMEMCTL | Configuration Flash Memory Register | 0x000x0000 |
-| 0x4F000020 | SYSREG_PWRCYCLE  | Power Cycle Register                | 0x00000000 |
-| 0x4F0000F0 | SYSREG_SPAD1     | Scratchpad 1 Register               | 0x00000000 |
-| 0x4F0000F4 | SYSREG_SPAD2     | Scratchpad 2 Register               | 0x00000000 |
-| 0x4F0000F8 | SYSREG_SPAD3     | Scratchpad 3 Register               | 0x00000000 |
-| 0x4F0000FC | SYSREG_SPAD4     | Scratchpad 4 Register               | 0x00000000 |
-| 0x4F00F000 | SYSREG_VER       | System Register IP Version Register |          - |
-| 0x4F00FF00 | SYSREG_BUILDINFO | Build Information Register          |          - |
-| 0x4F00FF10 | SYSREG_DNA1      | Device DNA 1 Register               |          - |
-| 0x4F00FF14 | SYSREG_DNA2      | Device DNA 2 Register               |          - |
+| Offset | Symbol           | Register                            |    Initial |
+|--------+------------------+-------------------------------------+------------|
+| 0x0000 | SYSREG_CODEMSEL  | Code Memory Select Register         | 0x00000001 |
+| 0x0004 | SYSREG_SYSCLKCTL | System Clock Control Register       | 0x00000001 |
+| 0x0010 | SYSREG_CFGMEMCTL | Configuration Flash Memory Register | 0x000x0000 |
+| 0x0020 | SYSREG_PWRCYCLE  | Power Cycle Register                | 0x00000000 |
+| 0x00F0 | SYSREG_SPAD1     | Scratchpad 1 Register               | 0x00000000 |
+| 0x00F4 | SYSREG_SPAD2     | Scratchpad 2 Register               | 0x00000000 |
+| 0x00F8 | SYSREG_SPAD3     | Scratchpad 3 Register               | 0x00000000 |
+| 0x00FC | SYSREG_SPAD4     | Scratchpad 4 Register               | 0x00000000 |
+| 0xF000 | SYSREG_VER       | System Register IP Version Register |          - |
+| 0xFF00 | SYSREG_BUILDINFO | Build Information Register          |          - |
+| 0xFF10 | SYSREG_DNA1      | Device DNA 1 Register               |          - |
+| 0xFF14 | SYSREG_DNA2      | Device DNA 2 Register               |          - |
 
 *** Code Memory Select Register (Offset 0x0000)
 Code Memory Select Registerは CPUの Instruction codeが格納されているメモリを選択するためのレジスタです。
