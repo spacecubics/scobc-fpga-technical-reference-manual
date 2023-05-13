@@ -1,4 +1,10 @@
 * System Register
+  :PROPERTIES:
+  :version:  1.0
+  :base_address: 0x4F000000
+  :size:     0x10000
+  :END:
+
 System Registerは、SC OBC FPGAのシステム制御を司るレジスタで構成されるモジュールです。
 
 ** レジスタ詳細

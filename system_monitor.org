@@ -1,4 +1,10 @@
 * System Monitor
+  :PROPERTIES:
+  :version:  1.0
+  :base_address: 0x4F040000
+  :size:     0x10000
+  :END:
+
 System Monitorは、SC OBC FPGAのシステムを監視するためのモジュールです。
 
 このモジュールは以下の機能を実装しています。

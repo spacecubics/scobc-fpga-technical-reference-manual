@@ -1,4 +1,10 @@
 * HRMEM (High-reliability Memory)
+  :PROPERTIES:
+  :version:  1.0
+  :base_address: 0x40500000
+  :size:     0x10000
+  :END:
+
 HRMEM (High-reliability Memory)は、SC-OBC-A1に実装される SRAMにアクセスを行うメモリコントローラモジュールです。
 
 HRMEMのメモリ空間は、Address 0x00000000をベースとする 4 MByteの領域に配置されており、CPU SubSystemの CPU Local Busを通じアクセスされます。
@@ -202,4 +208,3 @@ HRMEM IP Version Registerは、HRMEM IPコアのバージョン管理レジス�
 | 31:24 | HRMEMMAJVER | HRMEM IP Major Version | HRMEMコアのMajor Versionを示します。 | RO  |
 | 23:16 | HRMEMMINVER | HRMEM IP Minor Version | HRMEMコアのMinor Versionを示します。 | RO  |
 |  15:0 | HRMEMPATVER | HRMEM IP Patch Version | HRMEMコアのPatch Versionを示します。 | RO  |
-

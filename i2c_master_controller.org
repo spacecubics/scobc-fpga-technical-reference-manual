@@ -1,4 +1,10 @@
 * I2C Master Controller
+  :PROPERTIES:
+  :version:  1.0
+  :base_address: 0x4F030000
+  :size:     0x10000
+  :END:
+
 I2C Master Controllerは、OBC Moduleの外部に実装される I2Cデバイスに通信するために使用する External I2C Interfaceを制御するためのモジュールです。
 
 OBC Moduleは、OBC Module上のセンサーにアクセスするための I2C Interface (Internal I2C)と、OBC Moduleの外部の I2Cデバイスにアクセスするための I2C Interface (External I2C)を持っています。

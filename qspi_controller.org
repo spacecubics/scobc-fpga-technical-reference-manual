@@ -1,4 +1,10 @@
 * QSPI Controller
+  :PROPERTIES:
+  :version:  0.1
+  :base_address: 0x40000000
+  :size:     0x10000
+  :END:
+
 QSPI Controllerは、SC OBCモジュールに搭載するメモリとSPIプロトコルによる通信を行うためのモジュールです。
 QSPI Controllerは、Single SPIモード, Dual SPIモード, Quad SPIモードに対応しており、メモリとの高速な通信を行う事ができます。
 
@@ -21,7 +27,6 @@ SC OBCモジュールに実装される メモリの型番は以下の通りで�
 | Data Store Flash Memory    | 運用データの格納               | infineon (旧Cypress) | S25FL256L   | 2 個         |
 | FRAM                       | 運用データの格納               | infineon (旧Cypress) | CY15B104QSN | 2 個         |
 
-** レジスタ詳細
 QSPI Controllerは、各メモリにアクセスするため 3個搭載されています。
 各コアは以下のアドレスに配置されています。
 
@@ -32,6 +37,7 @@ QSPI Controllerは、各メモリにアクセスするため 3個搭載されて
 | Data Store Memory          | 0x4010_0000  |
 | FRAM                       | 0x4020_0000  |
 
+** レジスタ詳細
 QSPI Controllerには以下のレジスタが実装されています。
 
 #+CAPTION: QSPI Controller Register メモリマップ

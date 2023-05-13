@@ -1,4 +1,10 @@
 * CAN Controller
+  :PROPERTIES:
+  :version:  0.1
+  :base_address: 0x40400000
+  :size:     0x10000
+  :END:
+
 CAN Controllerは、 ISO 11898-1, CAN2.0A および CAN2.0Bに準拠した CAN通信 IPコアです。
 1 Mbpsのビットレートをサポートしています。
 
@@ -669,4 +675,3 @@ RX FIFOは最大 64個のメッセージを格納することができ、FIFOが
 
 CAN RX Message Register 1～4は、CAN Enable Registerの CAN_ENビットが "0"の状態でも読み出す事が出来ます。
 但し、この時は新しいメッセージの受信は行われません。
-

@@ -1,4 +1,10 @@
 * AHB UART Lite
+  :PROPERTIES:
+  :version:  1.0
+  :base_address: 0x4F010000
+  :size:     0x10000
+  :END:
+
 AHU UART Liteは、UART通信を行うためのモジュールです。
 このモジュールはソフトウェア開発時のコンソール出力を目的としているため、フロー制御を行う機能などは持っていません。
 

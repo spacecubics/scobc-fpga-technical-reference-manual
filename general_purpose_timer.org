@@ -1,4 +1,10 @@
 * General Purpose Timer
+  :PROPERTIES:
+  :version:  1.0
+  :base_address: 0x4F050000
+  :size:     0x10000
+  :END:
+
 General Purpose Timerは、SC OBC FPGAの運用時間の管理や、FPGA内の CPUや IPコアへのタイミング通知を行うためのタイマーモジュールです。
 General Purpose Timerは、Global Timer・Software Interrupt Timer・Hardware Interrupt Timerと呼ばれる、3つの32bitアップカウンターで構成されています。
 
