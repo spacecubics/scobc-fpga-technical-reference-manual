@@ -6,14 +6,14 @@ AHU UART Liteは、UART通信を行うためのモジュールです。
 AHB UART Liteは、Base Address 0x4F010000に配置されています。
 
 #+CAPTION: AHB UART Lite Registerメモリマップ
-|     Offset | Symbol        | Register                          |    Initial |
-|------------+---------------+-----------------------------------+------------|
-| 0x4F010000 | UARTL_RXFIFOR | Rx FIFO Register                  | 0x00000000 |
-| 0x4F010004 | UARTL_TXFIFOR | Tx FIFO Register                  | 0x00000000 |
-| 0x4F010008 | UARTL_STATR   | Status Register                   | 0x00000004 |
-| 0x4F01000C | UARTL_CTRLR   | Control Register                  | 0x00000000 |
-| 0x4F010010 | UARTL_UBRSR   | UART Baudrate Setting Register    | 0x000001A0 |
-| 0x4F01F000 | UARTL_VER     | AHB UART Lite IP Version Register |          - |
+| Offset | Symbol        | Register                          |    Initial |
+|--------+---------------+-----------------------------------+------------|
+| 0x0000 | UARTL_RXFIFOR | Rx FIFO Register                  | 0x00000000 |
+| 0x0004 | UARTL_TXFIFOR | Tx FIFO Register                  | 0x00000000 |
+| 0x0008 | UARTL_STATR   | Status Register                   | 0x00000004 |
+| 0x000C | UARTL_CTRLR   | Control Register                  | 0x00000000 |
+| 0x0010 | UARTL_UBRSR   | UART Baudrate Setting Register    | 0x000001A0 |
+| 0xF000 | UARTL_VER     | AHB UART Lite IP Version Register |          - |
 
 *** Rx FIFO Register (Offset 0x0000)
 Rx FIFO Registerは、UARTの受信データを読み出すためのレジスタです。
