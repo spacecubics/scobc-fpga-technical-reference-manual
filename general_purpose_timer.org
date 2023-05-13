@@ -27,41 +27,41 @@ Hardware Interrupt Timerの出力チャネルと、接続されている IP Core
 General Purpose Timerは、Base Address 0x4F05_0000に配置されています。
 
 #+CAPTION: General Purpose Timer メモリマップ
-|     Offset | Symbol        | Register                                           |    Initial |
-|------------+---------------+----------------------------------------------------+------------|
-| 0x4F050000 | GPTMR_GTR     | Global Timer Register                              | 0x00000000 |
-| 0x4F050004 | GPTMR_TECR    | Timer Enable Control Register                      | 0x00000000 |
-| 0x4F050008 | GPTMR_SITRR   | Software Interrupt Timer Remaining Register        | 0x00000000 |
-| 0x4F05000C | GPTMR_HITRR   | Hardware Interrupt Timer Remaining Register        | 0x00000000 |
-| 0x4F050010 | GPTMR_GTSR    | Global Timer Interrupt Status Register             | 0x00000000 |
-| 0x4F050014 | GPTMR_GTER    | Global Timer Interrupt Enable Register             | 0x00000000 |
-| 0x4F050020 | GPTMR_GTOCR1  | Global Timer Output Compare Register 1             | 0x00000000 |
-| 0x4F050024 | GPTMR_GTOCR2  | Global Timer Output Compare Register 2             | 0x00000000 |
-| 0x4F050028 | GPTMR_GTOCR3  | Global Timer Output Compare Register 3             | 0x00000000 |
-| 0x4F05002C | GPTMR_GTOCR4  | Global Timer Output Compare Register 4             | 0x00000000 |
-| 0x4F050100 | GPTMR_SITCR   | Software Interrupt Timer Control Register          | 0x00000000 |
-| 0x4F050104 | GPTMR_SITPR   | Software Interrupt Timer Prescaler Register        | 0x00000000 |
-| 0x4F050108 | GPTMR_SITSR   | Software Interrupt Timer Status Register           | 0x00000000 |
-| 0x4F05010C | GPTMR_SITER   | Software Interrupt Timer Enable Register           | 0x00000000 |
-| 0x4F050110 | GPTMR_SITOCR1 | Software Interrupt Timer Output Compare Register 1 | 0x00000000 |
-| 0x4F050114 | GPTMR_SITOCR2 | Software Interrupt Timer Output Compare Register 2 | 0x00000000 |
-| 0x4F050118 | GPTMR_SITOCR3 | Software Interrupt Timer Output Compare Register 3 | 0x00000000 |
-| 0x4F05011C | GPTMR_SITOCR4 | Software Interrupt Timer Output Compare Register 4 | 0x00000000 |
-| 0x4F050120 | GPTMR_SITOCR5 | Software Interrupt Timer Output Compare Register 5 | 0x00000000 |
-| 0x4F050124 | GPTMR_SITOCR6 | Software Interrupt Timer Output Compare Register 6 | 0x00000000 |
-| 0x4F050128 | GPTMR_SITOCR7 | Software Interrupt Timer Output Compare Register 7 | 0x00000000 |
-| 0x4F05012C | GPTMR_SITOCR8 | Software Interrupt Timer Output Compare Register 8 | 0x00000000 |
-| 0x4F050200 | GPTMR_HITCR   | Hardware Interrupt Timer Control Register          | 0x00000000 |
-| 0x4F050204 | GPTMR_HITPR   | Hardware Interrupt Timer Prescaler Register        | 0x00000000 |
-| 0x4F050210 | GPTMR_HITOCR1 | Hardware Interrupt Timer Output Compare Register 1 | 0x00000000 |
-| 0x4F050214 | GPTMR_HITOCR2 | Hardware Interrupt Timer Output Compare Register 2 | 0x00000000 |
-| 0x4F050218 | GPTMR_HITOCR3 | Hardware Interrupt Timer Output Compare Register 3 | 0x00000000 |
-| 0x4F05021C | GPTMR_HITOCR4 | Hardware Interrupt Timer Output Compare Register 4 | 0x00000000 |
-| 0x4F050220 | GPTMR_HITOCR5 | Hardware Interrupt Timer Output Compare Register 5 | 0x00000000 |
-| 0x4F050224 | GPTMR_HITOCR6 | Hardware Interrupt Timer Output Compare Register 6 | 0x00000000 |
-| 0x4F050228 | GPTMR_HITOCR7 | Hardware Interrupt Timer Output Compare Register 7 | 0x00000000 |
-| 0x4F05022C | GPTMR_HITOCR8 | Hardware Interrupt Timer Output Compare Register 8 | 0x00000000 |
-| 0x4F05F000 | GPTMR_VER     | General Purpose Timer IP Version Register          |          - |
+| Offset | Symbol        | Register                                           |    Initial |
+|--------+---------------+----------------------------------------------------+------------|
+| 0x0000 | GPTMR_GTR     | Global Timer Register                              | 0x00000000 |
+| 0x0004 | GPTMR_TECR    | Timer Enable Control Register                      | 0x00000000 |
+| 0x0008 | GPTMR_SITRR   | Software Interrupt Timer Remaining Register        | 0x00000000 |
+| 0x000C | GPTMR_HITRR   | Hardware Interrupt Timer Remaining Register        | 0x00000000 |
+| 0x0010 | GPTMR_GTSR    | Global Timer Interrupt Status Register             | 0x00000000 |
+| 0x0014 | GPTMR_GTER    | Global Timer Interrupt Enable Register             | 0x00000000 |
+| 0x0020 | GPTMR_GTOCR1  | Global Timer Output Compare Register 1             | 0x00000000 |
+| 0x0024 | GPTMR_GTOCR2  | Global Timer Output Compare Register 2             | 0x00000000 |
+| 0x0028 | GPTMR_GTOCR3  | Global Timer Output Compare Register 3             | 0x00000000 |
+| 0x002C | GPTMR_GTOCR4  | Global Timer Output Compare Register 4             | 0x00000000 |
+| 0x0100 | GPTMR_SITCR   | Software Interrupt Timer Control Register          | 0x00000000 |
+| 0x0104 | GPTMR_SITPR   | Software Interrupt Timer Prescaler Register        | 0x00000000 |
+| 0x0108 | GPTMR_SITSR   | Software Interrupt Timer Status Register           | 0x00000000 |
+| 0x010C | GPTMR_SITER   | Software Interrupt Timer Enable Register           | 0x00000000 |
+| 0x0110 | GPTMR_SITOCR1 | Software Interrupt Timer Output Compare Register 1 | 0x00000000 |
+| 0x0114 | GPTMR_SITOCR2 | Software Interrupt Timer Output Compare Register 2 | 0x00000000 |
+| 0x0118 | GPTMR_SITOCR3 | Software Interrupt Timer Output Compare Register 3 | 0x00000000 |
+| 0x011C | GPTMR_SITOCR4 | Software Interrupt Timer Output Compare Register 4 | 0x00000000 |
+| 0x0120 | GPTMR_SITOCR5 | Software Interrupt Timer Output Compare Register 5 | 0x00000000 |
+| 0x0124 | GPTMR_SITOCR6 | Software Interrupt Timer Output Compare Register 6 | 0x00000000 |
+| 0x0128 | GPTMR_SITOCR7 | Software Interrupt Timer Output Compare Register 7 | 0x00000000 |
+| 0x012C | GPTMR_SITOCR8 | Software Interrupt Timer Output Compare Register 8 | 0x00000000 |
+| 0x0200 | GPTMR_HITCR   | Hardware Interrupt Timer Control Register          | 0x00000000 |
+| 0x0204 | GPTMR_HITPR   | Hardware Interrupt Timer Prescaler Register        | 0x00000000 |
+| 0x0210 | GPTMR_HITOCR1 | Hardware Interrupt Timer Output Compare Register 1 | 0x00000000 |
+| 0x0214 | GPTMR_HITOCR2 | Hardware Interrupt Timer Output Compare Register 2 | 0x00000000 |
+| 0x0218 | GPTMR_HITOCR3 | Hardware Interrupt Timer Output Compare Register 3 | 0x00000000 |
+| 0x021C | GPTMR_HITOCR4 | Hardware Interrupt Timer Output Compare Register 4 | 0x00000000 |
+| 0x0220 | GPTMR_HITOCR5 | Hardware Interrupt Timer Output Compare Register 5 | 0x00000000 |
+| 0x0224 | GPTMR_HITOCR6 | Hardware Interrupt Timer Output Compare Register 6 | 0x00000000 |
+| 0x0228 | GPTMR_HITOCR7 | Hardware Interrupt Timer Output Compare Register 7 | 0x00000000 |
+| 0x022C | GPTMR_HITOCR8 | Hardware Interrupt Timer Output Compare Register 8 | 0x00000000 |
+| 0xF000 | GPTMR_VER     | General Purpose Timer IP Version Register          |          - |
 
 *** Global Timer Register (Offset: 0x0000)
 Global Timer Registerは、Global Timerの現在の値を示すレジスタです。
