@@ -1,0 +1,12 @@
+#+TITLE: Space Cubics OBC module A1
+#+EXPORT_FILE_NAME: scobc-a1.svd
+
+# #+INCLUDE: "../interrupt.org"
+#+INCLUDE: "../system_register.org"
+# #+INCLUDE: "../system_monitor.org"
+#+INCLUDE: "../general_purpose_timer.org"
+#+INCLUDE: "../hrmem.org"
+#+INCLUDE: "../qspi_controller.org"
+#+INCLUDE: "../can_controller.org"
+#+INCLUDE: "../ahb_uart_lite.org"
+#+INCLUDE: "../i2c_master_controller.org"
