@@ -1,6 +1,6 @@
 * CAN Controller
   :PROPERTIES:
-  :version:  0.1
+  :version:  1.0
   :base_address: 0x40400000
   :size:     0x10000
   :END:
