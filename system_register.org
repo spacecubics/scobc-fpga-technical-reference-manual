@@ -17,6 +17,7 @@ System Registerは、Base Address 0x4F00_0000に配置されています。
 | 0x0004 | SYSREG_SYSCLKCTL | System Clock Control Register       | 0x00000001 |
 | 0x0010 | SYSREG_CFGMEMCTL | Configuration Flash Memory Register | 0x000x0000 |
 | 0x0020 | SYSREG_PWRCYCLE  | Power Cycle Register                | 0x00000000 |
+| 0x0030 | SYSREG_PWRMANAGE | Power Management Register           | 0x00000000 |
 | 0x00F0 | SYSREG_SPAD1     | Scratchpad 1 Register               | 0x00000000 |
 | 0x00F4 | SYSREG_SPAD2     | Scratchpad 2 Register               | 0x00000000 |
 | 0x00F8 | SYSREG_SPAD3     | Scratchpad 3 Register               | 0x00000000 |
@@ -109,6 +110,25 @@ Power Cycle Registerは SC OBC FPGAに対する Power Cycle要求を発行する
 | 31:16 | PWRCYCLEPKC | Power Cycle Protect Keycode | PWRCYCLEREQビットの書き込みプロテクトフィールドです。PWRCYCLEREQビットに書き込みを行う場合は、このフィールドに0x5A5Aを書き込んでください。このフィールドに0x5A5A以外が設定された場合、PWRCYCLEREQビットへの書き込みは無視されます。 | WO  |
 |  15:1 | -           | Reserved                    | Reserved                                                                                                                                                                                                                            | -   |
 |     0 | PWRCYCLEREQ | Power Cycle Request         | TRCHに対し Power Cycle Requestを発行するためのビットです。このビットに "1"を書き込むと TRCHによる FPGAの Power Cycleが実行されます。このビットへの "0"の書き込みは何も影響しません。                                                | R/W |
+
+*** Power Management Register (Offset 0x0030)
+Power Management Registerは、SC OBC FPGAの低電力制御を行うためのレジスタです。
+
+このレジスタは、CPUが WFI (Wait For Interrupt)命令や WFE (Wait For Event)命令を実行したときに遷移する、Sleepモードにおける SC OBC FPGAの状態を決定します。
+WFI命令や WFE命令を実行すると、CPUは 条件によって Sleepモードに遷移し 命令の実行を停止します。
+
+PWRDOWNENがセットされた状態で CPUが Sleepモードに遷移すると、システムクロックを生成する PLLは停止状態になります。
+PWRDOWNENがセットされていない状態では、CPUが Sleepモードに遷移しても、PLLは停止しません。
+
+PLLが停止すると、UARTや QSPI Controllerなどのクロックも停止します。
+したがって、低消費電力化のため PWRDOWNENをセットして WFI命令を実行する場合は、全ての Peripheralのデータ転送が完全に完了した後で、WFI命令を実行してください。
+
+#+CAPTION: Power Management Register ビットフィールド
+|   bit | Symbol     | Field                      | Description                                                                                                                                                                                                                   | R/W |
+|-------+------------+----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:16 | PWRDOWNPKC | Power Down Protect Keycode | PWRDOWNENビットの書き込みプロテクトフィールドです。PWRDOWNENビットに書き込みを行う場合は、このフィールドに0x5A5Aを書き込んでください。このフィールドに0x5A5A以外が設定された場合、PWRDOWNENビットへの書き込みは無視されます。 | WO  |
+|  15:1 | -          | Reserved                   | Reserved                                                                                                                                                                                                                      | -   |
+|     0 | PWRDOWNEN  | Power Down Enable          | CPUが Sleepモードになった時の PLLの状態を設定します。0: CPUが Sleepモードになった時 PLLは停止しません。1: CPUが Sleepモードになった時 PLLは停止します。                                                                       | R/W |
 
 *** Scratchpad 1-4 Register (Offset 0x00F0-0x00FC)
 Scratchpad 1-4 Registerは、ソフトウェアがワークスペースとして使用する為のレジスタです。
