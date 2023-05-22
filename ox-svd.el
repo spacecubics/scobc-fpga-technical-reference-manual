@@ -135,7 +135,7 @@ CONTENTS is the headline contents."
          (pgwide (and (org-export-read-attribute :attr_svd table :pgwide) "pgwide"))
          (options (remq nil (list header pgwide)))
          (caption (org-export-get-caption table)))
-    (when (string-search org-svd-table-caption-bit-field (org-export-data caption info))
+    (when (string-match-p (regexp-quote org-svd-table-caption-bit-field) (org-export-data caption info))
       (concat "<register>\n"
               (pop org-svd-register-list)
               "<fields>\n"
