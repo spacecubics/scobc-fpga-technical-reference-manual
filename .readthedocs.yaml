@@ -8,7 +8,7 @@ build:
   tools:
     python: "3.11"
   apt_packages:
-    - emacs
+    - emacs-nox
   jobs:
     pre_create_environment:
       - echo "### 'pre_create_environment' step"
