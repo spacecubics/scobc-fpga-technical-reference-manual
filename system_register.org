@@ -169,13 +169,13 @@ System Registerの IPコアバージョンの管理レジスタです。
 
 *** Build Information Register (Offset: 0xFF00)
 SC OBC FPGAのビルド情報を保持するレジスタです。
-現在動作しているFPGAデータが作られた gitのハッシュ値の 先頭 8文字が保持されます。
-git管理されていない環境から生成された場合は、このレジスタが 0x00000000を示します。
+現在動作しているシステムの FPGAデータが作られた Git Repositoryのハッシュ値の先頭 8文字が保持されます。
+FPGAデータが Git管理されていない環境から生成された場合、このレジスタは 0x00000000を示します。
 
 #+CAPTION: Build Information Register ビットフィールド
-|  bit | Symbol     | Field                      | Description                                                                           | R/W |
-|------+------------+----------------------------+---------------------------------------------------------------------------------------+-----|
-| 31:0 | BUILD_INFO | Build Information Register | 動作しているFPGAデータが作られた gitのハッシュ値の 先頭 8桁が格納されるレジスタです。 | RO  |
+|  bit | Symbol     | Field                      | Description                                                                                                     | R/W |
+|------+------------+----------------------------+-----------------------------------------------------------------------------------------------------------------+-----|
+| 31:0 | BUILD_INFO | Build Information Register | 現在動作しているシステムの FPGAデータが作られた Git Repositoryのハッシュ値の 先頭 8桁が格納されるレジスタです。 | RO  |
 
 *** Device DNA 1/2 Register (Offset: 0xFF10/0xFF14)
 Device DNA 1/2 Registerは、FPGAの Device DNAの値を保持するレジスタです。
@@ -195,4 +195,4 @@ FPGAからは、FUSE_DNAのうち 63 bitから 7 bitを、Device DNAとして読
 #+CAPTION: Device DNA 2 Register ビットフィールド
 |  bit | Symbol  | Field               | Description                                      | R/W |
 |------+---------+---------------------+--------------------------------------------------+-----|
-| 31:0 | DNA_MSB | Device DNA MAB side | Device DNAの bit 63:32が格納されるレジスタです。 | RO  |
+| 31:0 | DNA_MSB | Device DNA MSB side | Device DNAの bit 63:32が格納されるレジスタです。 | RO  |
