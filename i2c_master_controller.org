@@ -1,6 +1,6 @@
 * I2C Master Controller
   :PROPERTIES:
-  :version:  1.0
+  :version:  2.0
   :base_address: 0x4F030000
   :size:     0x10000
   :END:
