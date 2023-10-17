@@ -27,15 +27,15 @@ I2C Master Controllerは、Base Address 0x4F03_0000に配置されています�
 | 0x001C | I2CM_FIFORR  | I2C Master FIFO Reset Register                          | 0x00000000 |
 | 0x0020 | I2CM_FTLSR   | I2C Master FIFO Threshold Level Setting Register        | 0x00000000 |
 | 0x0024 | I2CM_SCLTSR  | I2C Master SCL Timeout Setting Register                 | 0x00000000 |
-| 0x0030 | I2CM_THDSTAR | I2C Master START Hold Timing Setting Register           | 0x00000031 |
-| 0x0034 | I2CM_TSUSTOR | I2C Master STOP Setup Timing Setting Register           | 0x00000031 |
-| 0x0038 | I2CM_TSUSTAR | I2C Master Repeated START Setup Timing Setting Register | 0x00000031 |
-| 0x003C | I2CM_THIGHR  | I2C Master Clock High Timing Setting Register           | 0x00000039 |
-| 0x0040 | I2CM_THDDATR | I2C Master Data Hold Timing Setting Register            | 0x00000004 |
-| 0x0044 | I2CM_TSUDATR | I2C Master Data Setup Timing Setting Register           | 0x00000039 |
-| 0x0048 | I2CM_TBUFR   | I2C Master Bus Free Timing Setting Register             | 0x00000045 |
+| 0x0030 | I2CM_THDSTAR | I2C Master START Hold Timing Setting Register           | 0x000000EF |
+| 0x0034 | I2CM_TSUSTOR | I2C Master STOP Setup Timing Setting Register           | 0x000000EF |
+| 0x0038 | I2CM_TSUSTAR | I2C Master Repeated START Setup Timing Setting Register | 0x00000117 |
+| 0x003C | I2CM_THIGHR  | I2C Master Clock High Timing Setting Register           | 0x000000E5 |
+| 0x0040 | I2CM_THDDATR | I2C Master Data Hold Timing Setting Register            | 0x00000013 |
+| 0x0044 | I2CM_TSUDATR | I2C Master Data Setup Timing Setting Register           | 0x000000E5 |
+| 0x0048 | I2CM_TBUFR   | I2C Master Bus Free Timing Setting Register             | 0x00000117 |
 | 0x004C | I2CM_TBSMPLR | I2C Master Bus Sampling Timing Setting Register         | 0x00000000 |
-| 0x0050 | I2CM_BFSR    | I2C Master Bus Filter Setting Register                  | 0x0000000E |
+| 0x0050 | I2CM_BFSR    | I2C Master Bus Filter Setting Register                  | 0x0000002F |
 | 0xF000 | I2CM_VER     | I2C Master Controller IP Version Register               |          - |
 
 *** I2C Master Enable Register (Offset 0x0000)
@@ -382,7 +382,7 @@ I2C Master Controllerの初期設定の手順について説明します。
 #+CAPTION: 初期設定フロー
 [[file:./images/i2cm_init_config_seq.svg]]
 
-I2C Master ControllerのTiming Parameterは、システムクロックが 48 MHz、Fast-mode(ビットレート:400Kb/s)でのI2C通信に合わせて初期設定がされています。
+I2C Master ControllerのTiming Parameterは、システムクロックが 48 MHz、Standard-mode(ビットレート:100Kb/s)でのI2C通信に合わせて初期設定がされています。
 システムクロックが 48 MHz、Fast-mode(ビットレート:400Kb/s)で通信を行う場合はタイミングパラメータの設定変更を省略し、手順例8から設定を進めることが出来ます。
 それ以外の場合は、タイミングパラメータの設定変更(手順例1～7)を行う必要があります。
 
@@ -410,7 +410,7 @@ I2C Master ControllerによるI2C通信タイミングは、以下のレジス�
 - I2C Master Data Setup Timing Setting Register: I2Cデータ(SDA)のSetup時間
 - I2C Master Bus Free Timing Setting Register: STOP ConditionからSTART Condition間のBus Free時間
 
-初期状態ではシステムクロック 48 MHz、Fast-mode(400Kb/s)で通信を行う場合のタイミングに設定されています。
+初期状態ではシステムクロック 48 MHz、Standard-mode(100Kb/s)で通信を行う場合のタイミングに設定されています。
 接続する I2Cデバイスが対応する通信レートやモードに応じ変更することが出来ます。
 
 各タイミングパラメータの設定により生成される、I2C Master Controllerのタイミングを以下に示します。
@@ -440,16 +440,16 @@ I2C通信の1ビットは、I2Cクロック(SCL)のHigh期間(I2CM_THIGH)と I2C
 | I2CM_FLTCYC[7:0]  | 0x5F(1000ns)           | 0x1C(302ns)        | 0x0B(125ns)           |
 
 #+CAPTION: I2C Master Controller タイミングパラメータの設定例 (システムクロック 48 MHz)
-| Parameter         | Standard-mode(100Kb/s) | Fast-mode(400Kb/s)[default] | Fast-mode Plus(1Mb/s) |
-|-------------------+------------------------+-----------------------------+-----------------------|
-| I2CM_THDSTA[15:0] | 0x00EF(5us)            | 0x0031(1.04us)              | 0x0013(0.42us)        |
-| I2CM_TSUSTO[15:0] | 0x00EF(5us)            | 0x0031(1.04us)              | 0x0013(0.42us)        |
-| I2CM_TSUSTA[15:0] | 0x0117(5.83us)         | 0x0031(1.04us)              | 0x0013(0.42us)        |
-| I2CM_THIGH[15:0]  | 0x00E5(4.79us)         | 0x0039(1.21us)              | 0x0015(0.46us)        |
-| I2CM_THDDAT[15:0] | 0x0013(0.42us)         | 0x0004(0.10us)              | 0x0003(0.08us)        |
-| I2CM_TSUDAT[15:0] | 0x00E5(4.79us)         | 0x0039(1.21us)              | 0x0015(0.46us)        |
-| I2CM_TBUF[15:0]   | 0x0117(5.83us)         | 0x0045(1.46us)              | 0x001B(0.58us)        |
-| I2CM_FLTCYC[7:0]  | 0x2F(1000ns)           | 0x0E(312ns)                 | 0x05(125ns)           |
+| Parameter         | Standard-mode(100Kb/s)[default] | Fast-mode(400Kb/s) | Fast-mode Plus(1Mb/s) |
+|-------------------+---------------------------------+--------------------+-----------------------|
+| I2CM_THDSTA[15:0] | 0x00EF(5us)                     | 0x0031(1.04us)     | 0x0013(0.42us)        |
+| I2CM_TSUSTO[15:0] | 0x00EF(5us)                     | 0x0031(1.04us)     | 0x0013(0.42us)        |
+| I2CM_TSUSTA[15:0] | 0x0117(5.83us)                  | 0x0031(1.04us)     | 0x0013(0.42us)        |
+| I2CM_THIGH[15:0]  | 0x00E5(4.79us)                  | 0x0039(1.21us)     | 0x0015(0.46us)        |
+| I2CM_THDDAT[15:0] | 0x0013(0.42us)                  | 0x0004(0.10us)     | 0x0003(0.08us)        |
+| I2CM_TSUDAT[15:0] | 0x00E5(4.79us)                  | 0x0039(1.21us)     | 0x0015(0.46us)        |
+| I2CM_TBUF[15:0]   | 0x0117(5.83us)                  | 0x0045(1.46us)     | 0x001B(0.58us)        |
+| I2CM_FLTCYC[7:0]  | 0x2F(1000ns)                    | 0x0E(312ns)        | 0x05(125ns)           |
 
 #+CAPTION: I2C Master Controller タイミングパラメータの設定例 (システムクロック 24 MHz)
 | Parameter         | Standard-mode(100Kb/s) | Fast-mode(400Kb/s) | Fast-mode Plus(1Mb/s) |
