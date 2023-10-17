@@ -35,6 +35,7 @@ I2C Master Controllerは、Base Address 0x4F03_0000に配置されています�
 | 0x0044 | I2CM_TSUDATR | I2C Master Data Setup Timing Setting Register           | 0x00000039 |
 | 0x0048 | I2CM_TBUFR   | I2C Master Bus Free Timing Setting Register             | 0x00000045 |
 | 0x004C | I2CM_TBSMPLR | I2C Master Bus Sampling Timing Setting Register         | 0x00000000 |
+| 0x0050 | I2CM_BFSR    | I2C Master Bus Filter Setting Register                  | 0x0000000E |
 | 0xF000 | I2CM_VER     | I2C Master Controller IP Version Register               |          - |
 
 *** I2C Master Enable Register (Offset 0x0000)
@@ -339,6 +340,25 @@ SCLの立ち上がりタイミングを起点として、このレジスタに�
 
 #+BEGIN_QUOTE
 $SDA Sampling Delay\ [s] = System\ Clock\ period\ [s] \times I2CM\_SMPLDLY$
+#+END_QUOTE
+
+*** I2C Master Bus Filter Setting Register (Offset 0x0050)
+I2C Master Bus Filter Setting Registerは、I2C Bus信号の入力信号のフィルタ時間を設定するためのレジスタです。
+
+I2C Busから入力される信号は、このレジスタで設定された値で動作するデジタルフィルターを介して後段に信号を伝えます。
+フィルタ時間は、I2C規格で定められる「SDA信号と SCL信号の立ち上がり時間 (tr)」、「SDA信号と SCL信号の立ち下がり時間 (tf)」値を元に設定します。
+
+#+CAPTION: I2C Master Bus Filter Setting Register ビットフィールド
+|  bit | Symbol      | Field              | Description                                                                                                                                       | R/W |
+|------+-------------+--------------------+---------------------------------------------------------------------------------------------------------------------------------------------------+-----|
+| 31:8 | -           | Reserved           | Reserved                                                                                                                                          | -   |
+|  7:0 | I2CM_FLTCYC | I2C Filtering Time | SDA, SCL信号のレベルが 遷移するときのフィルタリング時間を設定するフィールドです。このフィールドはシステムクロックのサイクル数によって設定します。 | R/W |
+
+I2CM_FLTCYCの値は、以下の計算で算出される値を設定します。
+計算結果の小数点以下は切り上げた値を設定してください。
+
+#+BEGIN_QUOTE
+$I2CM\_FLTCYC = System Clock Frequency [MHz] \times Filter Timing [us] - 1$
 #+END_QUOTE
 
 *** I2C Master Controller IP Version Register (Offset: 0xF000)
