@@ -15,6 +15,7 @@ System Registerは、Base Address 0x4F00_0000に配置されています。
 |--------+------------------+-------------------------------------+------------|
 | 0x0000 | SYSREG_CODEMSEL  | Code Memory Select Register         | 0x00000001 |
 | 0x0004 | SYSREG_SYSCLKCTL | System Clock Control Register       | 0x00000001 |
+| 0x0008 | SYSREG_PLLINFO   | PLL Infomation Register             | 0x00280014 |
 | 0x0010 | SYSREG_CFGMEMCTL | Configuration Flash Memory Register | 0x000x0000 |
 | 0x0020 | SYSREG_PWRCYCLE  | Power Cycle Register                | 0x00000000 |
 | 0x0030 | SYSREG_PWRMANAGE | Power Management Register           | 0x00000000 |
@@ -64,6 +65,23 @@ CLKMODE信号の設定値と、PLLの状態 及び システムクロック周�
 | 0b01            | Normal Operation | 24 MHz (Reference Clock) | 48 MHz (PLL Output)      | 48 MHz (PLL Output)      | RTLパラメータにより設定 (PLL Output)              |
 | 0b10            | Normal Operation | 24 MHz (Reference Clock) | 96 MHz (PLL Output)      | 96 MHz (PLL Output)      | RTLパラメータにより設定 (PLL Output)              |
 | 0b11 (設定禁止) | -                | -                        | -                        | -                        | -                                                 |
+
+*** PLL Infomation Register (Offset 0x0008)
+PLL Infomation Registerは、システムクロックの設定状況を示すレジスタです。
+ソフトウェアはこのレジスタの値から、現在のシステムクロックの周波数を計算する事ができます。
+
+#+CAPTION: System Clock Control Register ビットフィールド
+|   bit | Symbol   | Field             | Description                                                       | R/W |
+|-------+----------+-------------------+-------------------------------------------------------------------+-----|
+| 31:16 | PLL_MULT | PLL Multiple Rate | システムクロックを生成するPLLの現在の逓倍率を示すフィールドです。 | RO  |
+|  15:0 | PLL_DIV  | PLL Divide Rate   | システムクロックを生成するPLLの現在の分周率を示すフィールドです。 | RO  |
+
+システムクロック周波数は PLL Infomation Registerから読み出した値を使い以下の式で計算する事ができます。
+
+#+BEGIN_QUOTE
+$システムクロック周波数 (MHz) = リファレンスクロック (24 MHz) \times \frac{PLL\_MULT}{PLL\_DIV}$
+#+END_QUOTE
+
 
 *** Configuration Flash Memory Register (Offset 0x0010)
 Configuration Flash Memory Registerは SC OBC Moduleに実装される 2つの Configuration Flash Memory (NOR FLash Memory)に関する制御を行うためのレジスタです。
