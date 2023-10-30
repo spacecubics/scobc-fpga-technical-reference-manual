@@ -2,7 +2,7 @@
 以下に、SC OBC FPGAのメモリマップを示します。
 
 #+CAPTION: SC OBC FPGA Memory Map
-[[file:./images/memory_map.png]]
+[[file:./images/MemoryMap.svg]]
 
 #+CAPTION: SC OBC FPGA メモリマップ
 | Field                                          | Address Space             | Comment           |
