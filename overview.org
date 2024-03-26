@@ -8,7 +8,7 @@ FPGAを採用する事で、インターフェースの種類や数を 柔軟に
 SC OBC FPGAには、ユーザーのIPコアを実装するためのモジュールが準備されており、AXIバス規格に適合した IPコアを設計する事で、簡単にシステムに組み込む事ができます。
 
 #+CAPTION: SC OBC FPGA Block Diagram
-[[file:./images/FPGABlockDiagram.png]]
+[[file:./images/FPGA_BlockDiagram.svg]]
 
 SC OBC FPGAのシステムは大きく 6つの機能に分割されます。
 
