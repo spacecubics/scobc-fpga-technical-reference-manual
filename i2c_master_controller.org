@@ -160,9 +160,9 @@ I2C Master FIFO Reset Registerは、TX FIFO/RX FIFOのリセットを行うた�
 |   bit | Symbol         | Field             | Description                                                                                                     | R/W |
 |-------+----------------+-------------------+-----------------------------------------------------------------------------------------------------------------+-----|
 | 31:17 | -              | Reserved          | Reserved                                                                                                        | -   |
-|    16 | I2CM_RXFIFORST | I2C RX FIFO Reset | RX FIFOをリセットするためのビットです。本ビットに"1"をセットすると、TX FIFOがリセットされデータが消去されます。 | WO  |
+|    16 | I2CM_RXFIFORST | I2C RX FIFO Reset | RX FIFOをリセットするためのビットです。本ビットに"1"をセットすると、RX FIFOがリセットされデータが消去されます。 | WO  |
 |  15:1 | -              | Reserved          | Reserved                                                                                                        | -   |
-|     0 | I2CM_TXFIFORST | I2C TX FIFO Reset | TX FIFOをリセットするためのビットです。本ビットに"1"をセットすると、RX FIFOがリセットされデータが消去されます。 | WO  |
+|     0 | I2CM_TXFIFORST | I2C TX FIFO Reset | TX FIFOをリセットするためのビットです。本ビットに"1"をセットすると、TX FIFOがリセットされデータが消去されます。 | WO  |
 
 *** I2C Master FIFO Threshold Level Setting Register (Offset 0x0020)
 I2C Master FIFO Threshold Level Registerは、TX FIFO/RX FIFOのデータ量に応じた割り込み出力を行うための設定レジスタです。
